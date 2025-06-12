@@ -1,0 +1,35 @@
+.planner-page {
+  height: calc(100vh - 30px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; 
+}
+
+/* === Layout Wrapper === */
+.planner-layout {
+  display: flex;
+  flex: 1;
+  box-sizing: border-box;
+}
+
+/* === Left Panel (Map) === */
+.planner-left {
+  flex: 1;
+  min-width: 50%;
+  background-color: #eef1ff;
+  border-right: 1px solid #ccc;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* === Right Panel (Details) === */
+.planner-right {
+  flex: 1;
+  min-width: 50%;
+  padding: 1rem;
+  background-color: #fff;
+  overflow-y: auto;
+  border-radius: 12px;
+}
+
+

@@ -1,0 +1,10 @@
+.map-panel {
+  flex: 1;
+  min-width: 50%;
+  background-color: #f0f4ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid #e0e0e0;
+}
+

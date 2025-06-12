@@ -1,4 +1,23 @@
+import MapPanel from '../../Components/MapPanel';
+import './Planner.css'
+import Navbar from '../../Components/Navbar';
+
+
 function MyPlans() {
-  return <div> Your saved plans and itineraries.</div>;
+  return (
+    <div className="planner-page">
+      <Navbar />
+      <div className="planner-layout">
+        <div className="planner-left">
+          <MapPanel /> {/* optional or custom map here */}
+        </div>
+        <div className="planner-right">
+          {/* Discover content goes here */}
+          <h2>Welcome to my plans</h2>
+        </div>
+      </div>
+    </div>
+  );
 }
+
 export default MyPlans;

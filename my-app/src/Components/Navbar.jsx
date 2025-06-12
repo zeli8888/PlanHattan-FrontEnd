@@ -3,14 +3,13 @@ import './Navbar.css';
 import profilePic from '../Assets/profilePic.jpg'
 
 const navItems = [
-  { name: 'Discover', path: 'discover' },
-  { name: 'My Plans', path: 'my-plans' },
-  { name: 'Friends', path: 'friends' },
+    { name: 'Discover', path: '/plan' },       // change from '/plan/discover' to '/plan'
+  { name: 'My Plans', path: '/my-plans' },
+  { name: 'Friends', path: '/friends' },
 ];
 
 function Navbar() {
   const location = useLocation();
-  const currentTab = location.pathname.split('/')[2];
 
   return (
     <nav className="navbar">
@@ -24,7 +23,12 @@ function Navbar() {
           <Link
             key={item.name}
             to={item.path}
-            className={`navbar-link ${currentTab === item.path ? 'active' : ''}`}
+            className={`navbar-link ${
+              location.pathname === item.path ||
+              (item.name === 'Discover' && location.pathname === '/plan/discover')
+                ? 'active'
+                : ''
+            }`}
           >
             {item.name}
           </Link>
