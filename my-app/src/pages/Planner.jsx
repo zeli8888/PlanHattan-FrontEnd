@@ -1,18 +1,19 @@
-import { Link, Outlet } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
+import Navbar from '../Components/Navbar';
 
 function Planner() {
   return (
     <div>
-      <nav style={{ display: 'flex', gap: '1rem', padding: '1rem', borderBottom: '1px solid #ccc' }}>
-        <Link to="discover">Discover</Link>
-        <Link to="my-plans">My Plans</Link>
-        <Link to="friends">Friends</Link>
-      </nav>
+      <Navbar />
 
-      <div style={{ padding: '2rem' }}>
-        <Outlet /> {}
+        <main style={{
+          flexGrow: 1,
+          padding: '2rem',
+          overflowY: 'auto'
+        }}>
+          <Outlet />
+        </main>
       </div>
-    </div>
   );
 }
 
