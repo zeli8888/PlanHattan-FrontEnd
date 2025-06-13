@@ -24,8 +24,7 @@ function Navbar() {
             key={item.name}
             to={item.path}
             className={`navbar-link ${
-              location.pathname === item.path ||
-              (item.name === 'Discover' && location.pathname === '/plan/discover')
+              location.pathname === item.path
                 ? 'active'
                 : ''
             }`}

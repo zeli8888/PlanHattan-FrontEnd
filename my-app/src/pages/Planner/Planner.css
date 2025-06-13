@@ -17,7 +17,6 @@
   flex: 1;
   min-width: 50%;
   background-color: #eef1ff;
-  border-right: 1px solid #ccc;
   border-radius: 12px;
   overflow: hidden;
 }
