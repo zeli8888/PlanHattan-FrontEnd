@@ -1,8 +1,8 @@
 import './App.css'
-import Home from './pages/Home'
-import Discover from './pages/Planner/Discover.jsx';
-import MyPlans from './pages/Planner/MyPlans.jsx';
-import Friends from './pages/Planner/Friends.jsx';
+import Home from './pages/home/Home.jsx'
+import Discover from './pages/planner/Discover.jsx';
+import MyPlans from './pages/planner/MyPlans.jsx';
+import Friends from './pages/planner/Friends.jsx';
 import { Routes, Route } from 'react-router-dom';
 
 function App() {

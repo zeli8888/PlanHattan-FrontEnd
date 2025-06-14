@@ -1,5 +1,5 @@
 import './MapPanel.css';
-import { useMapContext } from '../Contexts/MapContexts'; // 👈 use context
+import { useMapContext } from '../../contexts/MapContext';
 import Map from 'react-map-gl/mapbox';
 
 
