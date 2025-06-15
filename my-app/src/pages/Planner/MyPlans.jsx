@@ -9,9 +9,15 @@ function MyPlans() {
   // Initial sample data - sorted by date and time
 
   const [plans, setPlans] = useState(initialPlans);
+  const [deletingId, setDeletingId] = useState(null);
 
-  const handleDelete = (index) => {
-    setPlans(plans.filter((_, i) => i !== index));
+
+const handleDelete = (index) => {
+    setDeletingId(index);
+    setTimeout(() => {
+      setPlans(prev => prev.filter((_, i) => i !== index));
+      setDeletingId(null);
+    }, 300); // Match this duration with your CSS transition
   };
 
   const getPredictionColor = (percentage) => {
@@ -42,10 +48,16 @@ function MyPlans() {
             </thead>
             <tbody>
               {plans.map((plan, index) => (
-                <tr key={index}>
+                <tr key={index} className={`plan-row ${deletingId === index ? 'deleting' : ''}`}>
                   <td>
                     <div className="place-cell">
-                      <span className="area-badge">{plan.area}</span>
+                      <div className="area-image-container">
+                        <img 
+                          src={plan.areaImage} 
+                          alt={plan.area} 
+                          className="area-image"
+                        />
+                      </div>
                       {plan.place}
                     </div>
                   </td>

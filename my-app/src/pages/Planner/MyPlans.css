@@ -136,3 +136,58 @@
   --medium-prediction: #faad14; /* Orange/Yellow for 40-79% */
   --low-prediction: #52c41a; /* Green for <40% */
 }
+
+/* Replace the .area-badge styles with these: */
+.area-image-container {
+  position: relative;
+  width: 60px;
+  height: 40px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.area-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.place-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem; /* Increased gap for images */
+}
+
+/* Add these at the bottom of your existing CSS */
+.plan-row {
+  transition: all 0.3s ease-out;
+  transform-origin: top;
+}
+
+.plan-row.deleting {
+  transform: scaleY(0);
+  opacity: 0;
+  height: 0;
+  padding: 0;
+  margin: 0;
+  border: none;
+}
+
+/* Ensure table rows don't collapse during animation */
+.plans-table {
+  border-collapse: separate;
+  border-spacing: 0 0.75rem;
+}
+
+/* Fix for border-radius during animation */
+.plans-table tr td:first-child,
+.plans-table tr.deleting td:first-child {
+  border-left: 1px solid #edf2f7;
+  border-radius: 8px 0 0 8px;
+}
+
+.plans-table tr td:last-child,
+.plans-table tr.deleting td:last-child {
+  border-right: 1px solid #edf2f7;
+  border-radius: 0 8px 8px 0;
+}

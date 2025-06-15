@@ -1,49 +1,55 @@
 // src/data/plansData.js
+import image from '../../assests/brooklyn.jpg'
 export const initialPlans = [
   {
     area: "WEST VILLAGE",
+    areaImage: image,
     place: "Washington Square Park",
     date: "24/01/26",
     time: "09:00-10:30",
-    predicted: "92%"
+    predicted: "92%",
+    coordinates: [-73.9973, 40.7308] // [longitude, latitude]
   },
   {
     area: "WEST VILLAGE",
+    areaImage: image,
     place: "The Comedy Cellar",
     date: "24/01/26",
     time: "21:00-23:00",
-    predicted: "88%"
+    predicted: "88%",
+    coordinates: [-74.0010, 40.7324]
   },
   {
     area: "SOHO",
+    areaImage: image,
     place: "Shopping on Broadway",
     date: "25/01/26",
     time: "11:00-13:00",
-    predicted: "78%"
+    predicted: "78%",
+    coordinates: [-74.0008, 40.7237]
+  },
+  // ... add coordinates for all other locations
+  {
+    area: "BROOKLYN",
+    areaImage: image,
+    place: "DUMBO Photo Walk",
+    date: "30/01/26",
+    time: "16:00-17:30",
+    predicted: "62%",
+    coordinates: [-73.9903, 40.7033]
   },
   {
-    area: "SOHO",
-    place: "Dominique Ansel Bakery",
-    date: "25/01/26",
-    time: "14:00-14:30",
-    predicted: "65%"
-  },
-  {
-    area: "LOWER EAST SIDE",
-    place: "Tenement Museum",
-    date: "26/01/26",
-    time: "10:30-12:00",
-    predicted: "82%"
-  },
-  {
-    area: "LOWER EAST SIDE",
-    place: "Katz's Delicatessen",
-    date: "26/01/26",
-    time: "12:30-13:30",
-    predicted: "95%"
+    area: "BROOKLYN",
+    areaImage: image,
+    place: "Peter Luger Steakhouse",
+    date: "30/01/26",
+    time: "19:00-21:30",
+    predicted: "92%",
+    coordinates: [-73.9636, 40.7099]
   },
   {
     area: "CHELSEA",
+    areaImage: image,
     place: "High Line Walk",
     date: "27/01/26",
     time: "15:00-16:30",
@@ -51,6 +57,7 @@ export const initialPlans = [
   },
   {
     area: "CHELSEA",
+    areaImage: image,
     place: "Chelsea Market",
     date: "27/01/26",
     time: "17:00-18:30",
@@ -58,6 +65,7 @@ export const initialPlans = [
   },
   {
     area: "MIDTOWN",
+    areaImage: image,
     place: "Top of the Rock",
     date: "28/01/26",
     time: "10:00-11:30",
@@ -65,6 +73,7 @@ export const initialPlans = [
   },
   {
     area: "MIDTOWN",
+    areaImage: image,
     place: "Broadway Show - Hamilton",
     date: "28/01/26",
     time: "19:30-22:00",
@@ -72,6 +81,7 @@ export const initialPlans = [
   },
   {
     area: "UPPER WEST SIDE",
+    areaImage: image,
     place: "American Museum of Natural History",
     date: "29/01/26",
     time: "10:00-13:00",
@@ -79,6 +89,7 @@ export const initialPlans = [
   },
   {
     area: "UPPER WEST SIDE",
+    areaImage: image,
     place: "Levain Bakery",
     date: "29/01/26",
     time: "13:30-14:00",
@@ -86,6 +97,7 @@ export const initialPlans = [
   },
   {
     area: "BROOKLYN",
+    areaImage: image,
     place: "DUMBO Photo Walk",
     date: "30/01/26",
     time: "16:00-17:30",
@@ -93,6 +105,7 @@ export const initialPlans = [
   },
   {
     area: "BROOKLYN",
+    areaImage: image,
     place: "Peter Luger Steakhouse",
     date: "30/01/26",
     time: "19:00-21:30",
@@ -100,6 +113,7 @@ export const initialPlans = [
   },
   {
     area: "QUEENS",
+    areaImage: image,
     place: "Museum of the Moving Image",
     date: "31/01/26",
     time: "11:00-13:00",
@@ -107,6 +121,7 @@ export const initialPlans = [
   },
   {
     area: "QUEENS",
+    areaImage: image,
     place: "Flushing Chinatown Food Tour",
     date: "31/01/26",
     time: "18:00-20:30",
