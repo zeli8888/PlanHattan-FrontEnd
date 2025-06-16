@@ -1,39 +1,36 @@
+/* MapPanel.css */
 .map-panel {
   position: relative;
   width: 100%;
   height: 100%;
-  overflow: hidden;
-}
-
-.mapboxgl-marker {
-  will-change: transform; /* Improves animation performance */
 }
 
 .popup-content {
-  padding: 8px;
+  padding: 12px;
   min-width: 200px;
 }
 
 .popup-content h3 {
-  margin: 0 0 4px 0;
-  font-size: 16px;
+  margin-top: 0;
   color: #333;
 }
 
-/* MyPlans page markers */
-.myplans-map .mapboxgl-marker {
-  z-index: 100;
+.busyness-meter {
+  height: 8px;
+  background: #f0f0f0;
+  border-radius: 4px;
+  margin-top: 8px;
+  overflow: hidden;
 }
 
-.myplans-map .mapboxgl-marker svg {
-  filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3));
+.busyness-level {
+  height: 100%;
+  background: #5c5cff;
+  border-radius: 4px;
 }
 
-.myplans-popup .mapboxgl-popup-content {
-  border-left: 3px solid #5c5cff;
-}
-
-/* Other pages can have different styles */
-.discover-map .mapboxgl-marker {
-  /* different styles */
+/* Marker text styling */
+text {
+  font-weight: bold;
+  pointer-events: none;
 }
