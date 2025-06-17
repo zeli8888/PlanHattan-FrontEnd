@@ -10,9 +10,6 @@ const LocationMarker = ({ busyness }) => (
   <svg width="28" height="40" viewBox="0 0 28 40" fill="#5c5cff">
     <path d="M14 0C6.268 0 0 6.268 0 14c0 10 14 26 14 26s14-16 14-26C28 6.268 21.732 0 14 0zm0 20c-3.314 0-6-2.686-6-6s2.686-6 6-6 6 2.686 6 6-2.686 6-6 6z"/>
     <circle cx="14" cy="14" r="3" fill="white"/>
-    <text x="14" y="12" textAnchor="middle" fill="white" fontSize="8" fontWeight="bold">
-      {Math.round(busyness)}%
-    </text>
   </svg>
 );
 function MapPanel() {
