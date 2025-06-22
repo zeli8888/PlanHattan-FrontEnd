@@ -90,4 +90,6 @@
 
 .go-btn:hover {
   background: #373dc4;
+  transform: scale(1.1);
+  transition: all 0.3s
 }

@@ -15,7 +15,7 @@
 /* === Left Panel (Map) === */
 .planner-left {
   flex: 1;
-  min-width: 50%;
+  min-width: 45%;
   background-image: url(../../assests/sign-in.png);
   background-size: cover;
   border-radius: 20px;
@@ -161,4 +161,157 @@
   font-weight: bold;
 }
 
+/* Add these to your existing SignIn.css */
+
+/* Form title animation */
+.form-title {
+  transition: all 0.3s ease;
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.form-title.login {
+  animation: slideIn 0.3s ease forwards;
+}
+
+.form-title.signup {
+  animation: slideIn 0.3s ease forwards;
+}
+
+/* Field animations */
+.name-field, .confirm-field {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.name-field.visible, .confirm-field.visible {
+  max-height: 100px;
+  opacity: 1;
+  margin-bottom: 1rem;
+}
+
+.remember-forgot {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.remember-forgot.visible {
+  max-height: 50px;
+  opacity: 1;
+  margin-bottom: 1.5rem;
+}
+
+/* Keyframes for slide animation */
+@keyframes slideIn {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Container for password fields */
+.password-container {
+  display: flex;
+  gap: 1rem;
+  transition: all 0.4s ease;
+  overflow: hidden;
+}
+
+.password-container.login {
+  flex-direction: column;
+}
+
+.password-container.signup {
+  flex-direction: row;
+}
+
+.password-container.signup .input-group {
+  flex: 1;
+  min-width: 0;
+}
+
+.name-field, .confirm-field, .remember-forgot {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transform: translateY(10px);
+  transition: all 0.4s ease;
+}
+
+.name-field.visible, 
+.confirm-field.visible, 
+.remember-forgot.visible {
+  max-height: 100px;
+  opacity: 1;
+  transform: translateY(0);
+  margin-bottom: 1rem;
+}
+
+.email-field {
+  transition: all 0.4s ease;
+}
+
+.form-title {
+  transition: all 0.4s ease;
+  transform: translateY(0);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .password-container.signup {
+    flex-direction: column;
+  }
+  
+  .password-container.signup .input-group {
+    width: 100%;
+  }
+}
+
+/* Button hover effect */
+.signin-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(74, 84, 225, 0.4);
+}
+
+.signin-btn:active {
+  transform: translateY(0);
+}
+
  
+/* Add these to your existing SignIn.css */
+
+.password-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  transition: all 0.3s ease;
+}
+
+.password-fields.signup-mode {
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.password-fields.signup-mode .input-group {
+  width: 48%;
+}
+
+/* Responsive adjustment */
+@media (max-width: 768px) {
+  .password-fields.signup-mode {
+    flex-direction: column;
+  }
+  
+  .password-fields.signup-mode .input-group {
+    width: 100%;
+  }
+}
+
