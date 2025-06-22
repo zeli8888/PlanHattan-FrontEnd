@@ -20,14 +20,14 @@ function Discover() {
 
           <div className='title-container'>
             <h3>Add Title</h3>
-            <div class="input-box">
+            <div className="input-box">
               <input type="text" placeholder="Eg. House, office" />
             </div>
           </div>
 
           <div className="time-container">
               <h3>Add Time slot</h3>
-              <div class="time-slot">
+              <div className="time-slot">
                 <select>
                   <option>29</option>
                   <option>30</option>
@@ -56,9 +56,9 @@ function Discover() {
               </div>
         </div>
 
-        <div class="buttons">
-          <button class="btn">Predict Busyness</button>
-          <button class="btn">Add To MyPlans</button>
+        <div className="buttons">
+          <button className="btn">Predict Busyness</button>
+          <button className="btn">Add To MyPlans</button>
         </div>
       </div>
       <InterestSelector/>

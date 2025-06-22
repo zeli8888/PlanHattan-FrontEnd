@@ -1,5 +1,7 @@
 import React from "react";
 import './InterestSelector.css'
+import { useState } from "react";
+
 import {
   Landmark,
   Binoculars,
@@ -21,6 +23,13 @@ const interests = [
 ];
 
 const InterestSelector = () => {
+
+  const [selectedId, setSelectedId] = useState(null);
+
+  const handleSelect = (id) => {
+    setSelectedId(id);
+  };
+
   return (
     <div className="interest-container">
       <h2 className="title">Discover by Interest</h2>
@@ -30,7 +39,9 @@ const InterestSelector = () => {
 
       <div className="icon-grid">
         {interests.map(({ label, icon: Icon }, idx) => (
-          <div className="icon-card" key={idx}>
+          <div  className={`icon-card ${selectedId === idx ? "selected" : ""}`}
+                key={idx} 
+                onClick={() => handleSelect(idx)}>
             <div className="icon"><Icon size={28} /></div>
             <span className="icon-label">{label}</span>
           </div>
