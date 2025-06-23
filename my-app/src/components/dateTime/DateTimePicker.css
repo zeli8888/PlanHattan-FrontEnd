@@ -1,0 +1,218 @@
+/* DateTime Picker Container */
+.date-time-picker {
+  display: flex;
+  gap: 12px;
+  position: relative;
+}
+
+/* Date and Time Displays */
+.date-display,
+.time-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 1rem;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.date-display:hover,
+.time-display:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Calendar Popup */
+.calendar-popup {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 16px;
+  width: 280px;
+  z-index: 100;
+  margin-top: 8px;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.calendar-header h4 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.calendar-header button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+}
+
+.calendar-header button:hover {
+  background: #f5f5f5;
+}
+
+.calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  margin-bottom: 8px;
+  font-size: 12px;
+  color: #666;
+  font-weight: 500;
+}
+
+.calendar-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.calendar-day {
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.calendar-day:hover {
+  background: #f5f5f5;
+}
+
+.calendar-day.selected {
+  background: #4a54e1;
+  color: white;
+  font-weight: 500;
+}
+
+.calendar-day.empty {
+  visibility: hidden;
+}
+
+.calendar-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #eee;
+}
+
+.calendar-actions button {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.calendar-actions button:last-child {
+  background: #4a54e1;
+  color: white;
+}
+
+/* Time Picker Styles */
+.time-picker-popup {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 16px;
+  width: 280px;
+  z-index: 100;
+}
+
+.time-columns {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.time-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.time-option {
+  width: 100%;
+  padding: 8px;
+  text-align: center;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.time-option:hover {
+  background: #f5f5f5;
+}
+
+.time-option.selected {
+  background: #4a54e1;
+  color: white;
+  font-weight: 500;
+}
+
+.time-actions {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 16px;
+  border-top: 1px solid #eee;
+}
+
+.time-actions button {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.cancel-btn {
+  background: #f5f5f5;
+  color: #333;
+}
+
+.cancel-btn:hover {
+  background: #e0e0e0;
+}
+
+.now-btn {
+  background: #f0f7ff;
+  color: #4a54e1;
+}
+
+.now-btn:hover {
+  background: #e0ecff;
+}
+
+.save-btn {
+  background: #4a54e1;
+  color: white;
+}
+
+.save-btn:hover {
+  background: #3a44d1;
+}

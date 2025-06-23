@@ -1,9 +1,20 @@
 import PlannerLayout from './PlannerLayout';
 import './Discover.css'
 import { Search } from 'lucide-react';
+import { useState } from 'react';
 import InterestSelector from './InterestSelector';
+import DateTimePicker from '../../components/dateTime/DateTimePicker';
 
 function Discover() {
+  const [dateTime, setDateTime] = useState({
+    date: new Date(),
+    time: {
+      hours: 11,
+      minutes: 30,
+      period: 'PM'
+    }
+  });
+
   return (
     <PlannerLayout>
       <div className='search-container'>
@@ -26,34 +37,12 @@ function Discover() {
           </div>
 
           <div className="time-container">
-              <h3>Add Time slot</h3>
-              <div className="time-slot">
-                <select>
-                  <option>29</option>
-                  <option>30</option>
-                </select>
-                <select>
-                  <option>09</option>
-                  <option>10</option>
-                </select>
-                <select>
-                  <option>2025</option>
-                  <option>2026</option>
-                </select>
-                <select>
-                  <option>11</option>
-                  <option>12</option>
-                </select>
-                <select>
-                  <option>09</option>
-                  <option>10</option>
-                </select>
-                <select>
-                  <option>PM</option>
-                  <option>AM</option>
-                </select>
-              </div>
-              </div>
+            <h3>Add Time slot</h3>
+            <DateTimePicker 
+              value={dateTime}
+              onChange={setDateTime}
+            />
+          </div>
         </div>
 
         <div className="buttons">
