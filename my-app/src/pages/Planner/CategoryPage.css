@@ -1,0 +1,17 @@
+.category-page {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.category-page h1 {
+  color: #4a54e1;
+  margin-bottom: 20px;
+}
+
+.category-content {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
