@@ -1,38 +1,64 @@
+/* Base styles */
 .planner-page {
   height: 100vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  position: relative;
 }
 
+/* Navbar styles */
 .planner-page > :first-child {
   flex-shrink: 0;
 }
 
+/* Main layout container */
 .planner-layout {
   display: flex;
   flex: 1;
-  min-height: 0; 
-  box-sizing: border-box;
+  min-height: 0;
+  width: 100%;
 }
 
+/* Map panel - always takes exactly 50% width */
 .planner-left-map {
-  flex: 1;
+  flex: 0 0 50%;
   min-width: 0;
   background-color: #eef1ff;
   overflow: hidden;
   position: relative;
 }
 
-
+/* Content panel - takes remaining 50% */
 .planner-right {
-  flex: 1;
+  flex: 0 0 50%;
   min-width: 0;
-  padding: 1rem;
+  padding: 1.5rem;
   background-color: #fff;
   overflow-y: auto;
   position: relative;
+}
+
+/* Content container inside right panel */
+.planner-right-content {
+  max-width: 900px;
+  margin: 0 auto;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1440px) {
+  .planner-right {
+    padding: 1.25rem;
+  }
+}
+
+@media (max-width: 1280px) {
+  .planner-right {
+    padding: 1rem;
+  }
 }
 
 @media (max-width: 1024px) {
@@ -42,13 +68,19 @@
   
   .planner-left-map,
   .planner-right {
-    min-height: 50vh;
-    min-width: 100%;
+    flex: 0 0 50vh;
+    width: 100%;
   }
 }
 
 @media (max-width: 768px) {
   .planner-right {
-    padding: 0.5rem;
+    padding: 0.75rem;
+  }
+  
+  .planner-left-map,
+  .planner-right {
+    flex: 0 0 auto;
+    min-height: 50vh;
   }
 }

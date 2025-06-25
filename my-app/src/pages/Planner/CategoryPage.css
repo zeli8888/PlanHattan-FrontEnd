@@ -1,17 +1,159 @@
 .category-page {
-  padding: 20px;
   max-width: 1200px;
   margin: 0 auto;
 }
 
-.category-page h1 {
-  color: #4a54e1;
-  margin-bottom: 20px;
+.suggested-container {
+  margin-bottom: 2rem;
 }
 
-.category-content {
+.header {
+  margin-bottom: 1.5rem;
+}
+
+.header h2 {
+  color: #333;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  span{
+    color: #4a54e1;
+  }
+}
+
+.time-picker-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.time-picker-wrapper span {
+  font-size: 1rem;
+  color: #555;
+}
+
+.sub-header {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.sort-label {
+  font-size: 1rem;
+  color: #555;
+}
+
+.sort-types{
+  color: #4a54e1;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.place-card {
   background: white;
   border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.place-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+.image-wrapper {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+}
+
+.image-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.place-card:hover .image-wrapper img {
+  transform: scale(1.05);
+}
+
+.busy-badge {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  background: rgba(0,0,0,0.7);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+}
+
+.busy-badge span {
+  color: #ff6b6b;
+  font-weight: bold;
+}
+
+.info {
+  padding: 1.5rem;
+}
+
+.info h4 {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.location {
+  color: #666;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .card-grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .category-page {
+    padding: 1.5rem;
+  }
+  
+  .header h2 {
+    font-size: 1.5rem;
+  }
+  
+  .card-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .category-page {
+    padding: 1rem;
+  }
+  
+  .card-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .sub-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
 }

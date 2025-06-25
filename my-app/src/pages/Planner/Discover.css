@@ -87,3 +87,44 @@ h3{
   background: #373dc4;
 }
 
+@media (max-width: 768px) {
+  .search-container {
+    width: 95%;
+    padding: 0.5rem;
+    gap: 1rem;
+  }
+
+  .title-time {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .title-container, .time-container {
+    min-width: 100%;
+  }
+
+  .buttons {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .btn {
+    min-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .search-box input,
+  .input-box input {
+    padding: 0.8rem;
+    font-size: 0.9rem;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  h3 {
+    font-size: 1.1rem;
+  }
+}
