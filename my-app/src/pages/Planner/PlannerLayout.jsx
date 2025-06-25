@@ -8,7 +8,7 @@ export default function PlannerLayout({ children }) {
     <div className="planner-page">
       <Navbar />
       <div className="planner-layout">
-        <div className="planner-left">
+        <div className="planner-left-map">
           <MapPanel />
         </div>
         <div className="planner-right">

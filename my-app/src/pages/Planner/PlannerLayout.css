@@ -1,35 +1,54 @@
 .planner-page {
-  height: calc(100vh - 30px);
+  height: 100vh;
   display: flex;
   flex-direction: column;
-  overflow: hidden; 
+  overflow: hidden;
+  position: relative;
 }
 
-/* === Layout Wrapper === */
+.planner-page > :first-child {
+  flex-shrink: 0;
+}
+
 .planner-layout {
   display: flex;
   flex: 1;
+  min-height: 0; 
   box-sizing: border-box;
 }
 
-/* === Left Panel (Map) === */
-.planner-left {
+.planner-left-map {
   flex: 1;
-  min-width: 50%;
+  min-width: 0;
   background-color: #eef1ff;
-  border-radius: 20px;
   overflow: hidden;
+  position: relative;
 }
 
-/* === Right Panel (Details) === */
+
 .planner-right {
   flex: 1;
-  min-width: 50%;
+  min-width: 0;
   padding: 1rem;
-  padding-left: 2rem;
   background-color: #fff;
   overflow-y: auto;
-  border-radius: 12px;
+  position: relative;
 }
 
+@media (max-width: 1024px) {
+  .planner-layout {
+    flex-direction: column;
+  }
+  
+  .planner-left-map,
+  .planner-right {
+    min-height: 50vh;
+    min-width: 100%;
+  }
+}
 
+@media (max-width: 768px) {
+  .planner-right {
+    padding: 0.5rem;
+  }
+}
