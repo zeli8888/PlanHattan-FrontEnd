@@ -126,6 +126,99 @@
   gap: 0.5rem;
 }
 
+.sort-types {
+  cursor: pointer;
+  transition: color 0.2s ease;
+  margin-left: 15px;
+}
+
+.sort-types:hover {
+  color: #2a36d1;
+}
+
+.sort-types.active {
+  color: #4a54e1;
+  font-weight: 600;
+}
+
+.sort-types::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid currentColor;
+  opacity: 0.6;
+  transition: all 0.2s ease;
+}
+
+.sort-types.active::after {
+  opacity: 1;
+}
+
+.sort-types[aria-sort="ascending"]::after {
+  border-top: none;
+  border-bottom: 5px solid currentColor;
+}
+
+/* Add these to your existing CategoryLayout.css */
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.place-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+
+.card-grid.sorting-active .place-card {
+  animation: cardSorting 0.5s ease-in-out;
+}
+
+@keyframes cardSorting {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.place-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+  z-index: 1;
+  transition: all 0.3s ease;
+}
+
+.image-wrapper img {
+  transition: transform 0.5s ease;
+}
+
+.place-card:hover .image-wrapper img {
+  transform: scale(1.05);
+    transition: all 0.3s ease;
+
+}
+
+
 @media (min-width: 1600px) {
   .image-wrapper {
     height: 240px; 
@@ -199,3 +292,4 @@
     bottom: 0.8rem;
   }
 }
+

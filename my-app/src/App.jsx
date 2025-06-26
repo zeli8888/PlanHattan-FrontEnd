@@ -24,7 +24,7 @@ function App() {
       <Route path="/plan" element={<Discover />}/>
       <Route path="/plan/category/landmarks-attractions" element={<LandmarkAttraction />} />
       <Route path="/plan/category/Museums-Galleries" element={<MuseumsGalleries />} />
-      <Route path="/plan/category/Cafe-Restuarants" element={<CafeRestuarants />} />
+      <Route path="/plan/category/Cafe-restaurants" element={<CafeRestuarants />} />
       <Route path="/plan/category/Nightlife-Bars" element={<NightlifeBars />} />
       <Route path="/plan/category/Shopping-Boutiques" element={<ShoppingBoutique />} />
       <Route path="/plan/category/live-music" element={<LiveMusic />} />
