@@ -6,6 +6,7 @@ import ReactCardFlip from 'react-card-flip';
 import { FiArrowRight } from "react-icons/fi";
 import { FiArrowLeft } from "react-icons/fi";
 import TimePicker from '../../../components/dateTime/TimePicker';
+import CardTilt from '../../../components/features/CardTilt';
 
 const CategoryLayout = ({  
   displayName, 
@@ -148,16 +149,18 @@ const CategoryLayout = ({
                   height: '100%',
                   minHeight: '330px' 
                 }}
+                
               >
               {/* Front of Card */}
-              <div className="place-card">
+              <CardTilt id={place.id} className="place-card"
+              >
                 <div className="image-wrapper">
                   <img src={place.image} alt={place.name} />
                   {showBusyness && (
-                    <div className="busy-badge">Busyness: <span style={{ color: getBusynessColor(place.busy) }}>{place.busy}</span></div>
+                    <div className="busy-badge">Busyness: <span style={{ color: getBusynessColor(place.busy), fontWeight: 900 }}>{place.busy}</span></div>
                   )}
                   {showDistance && (
-                    <div className="distance-badge">Distance: <span style={{ color: getDistanceColor(place.distance) }}>{place.distance}</span></div>
+                    <div className="distance-badge">Distance: <span style={{ color: getDistanceColor(place.distance), fontWeight: 900 }}>{place.distance}</span></div>
                   )}
                 </div>
                 <div className="info">
@@ -165,7 +168,7 @@ const CategoryLayout = ({
                   <p className="location"><i className="fas fa-map-marker-alt"></i> {place.location}</p>
                   <div className="flip-button-front" onClick={() => handleCardClick(place.id)}><FiArrowRight size={25} color="#fff" className='arrow' /></div>
                 </div>
-              </div>
+              </CardTilt>
 
               {/* Back of Card */}
               <div className="place-card back" >

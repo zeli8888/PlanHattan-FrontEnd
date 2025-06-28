@@ -5,14 +5,16 @@
   overflow: hidden; 
 }
 
-/* === Layout Wrapper === */
 .planner-layout {
   display: flex;
   flex: 1;
   box-sizing: border-box;
 }
 
-/* === Left Panel (Map) === */
+.navbar-logo span{
+  color: #804AE0;
+}
+
 .planner-left {
   flex: 1;
   min-width: 45%;
@@ -22,7 +24,6 @@
   overflow: hidden;
 }
 
-/* === Right Panel (Details) === */
 .planner-right {
   flex: 1;
   min-width: 50%;
@@ -61,34 +62,35 @@
   border: none;
   border-radius: 25px;
   font-weight: 600;
-  box-shadow: 0 25px 49px rgba(74, 84, 225, 0.4);
+  box-shadow: 0 4px 15px rgba(128, 74, 224, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   cursor: pointer;
   font-size: 0.9rem;
-  background-color: #4a54e1;
+  background-color: #804AE0;
   color: white;
 }
 
 .signin-btn {
   width: 40%;
   padding: 0.9rem;
-  background-color: #4a54e1;
+  background-color: #804AE0;
   color: white;
   border: none;
   border-radius: 25px;
   font-weight: 700;
-  box-shadow: 0 25px 49px rgba(74, 84, 225, 0.4);
+  box-shadow: 0 4px 15px rgba(128, 74, 224, 0.3);
   cursor: pointer;
   font-size: 1rem;
   margin-bottom: 1rem;
 }
 
-.google-btn:hover{
-  background: #373dc4;
-    
+.google-btn:hover, .signin-btn:hover {
+  background: linear-gradient(45deg, #804AE0, #9D6BFF);
+  box-shadow: 0 6px 20px rgba(128, 74, 224, 0.4);
+  transform: translateY(-2px);
 }
 
 .divider {
@@ -134,7 +136,7 @@
 }
 
 .remember-forgot a {
-  color: #4a54e1;
+  color: #804AE0;
   text-decoration: none;
   font-weight: 500;
 }
@@ -145,7 +147,7 @@
 }
 
 .footer a {
-  color: #4a54e1;
+  color: #804AE0;
   text-decoration: none;
   font-weight: 500;
 }
@@ -273,18 +275,6 @@
   }
 }
 
-/* Button hover effect */
-.signin-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 35px 49px rgba(74, 84, 225, 0.4);
-}
-
-.signin-btn:active {
-  transform: translateY(0);
-}
-
- 
-/* Add these to your existing SignIn.css */
 
 .password-fields {
   display: flex;
