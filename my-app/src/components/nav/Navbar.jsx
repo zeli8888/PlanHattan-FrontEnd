@@ -1,4 +1,4 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation,useNavigate } from 'react-router-dom';
 import './Navbar.css';
 import profilePic from '../../assests/profilePic.jpg'
 
@@ -10,10 +10,15 @@ const navItems = [
 
 function Navbar() {
   const location = useLocation();
+  const navigate = useNavigate();
 
+  const handleHomeNavigate = () => {
+    navigate('/');
+  }
+  
   return (
     <nav className="navbar">
-      <div className="navbar-logo">
+      <div className="navbar-logo" onClick={handleHomeNavigate}>
         PLAN<span>HATTAN</span>
       </div>
 

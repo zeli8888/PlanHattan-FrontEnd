@@ -71,7 +71,7 @@ h3{
 }
 
 .btn {
-  background: #4a54e1;
+  background-color: #631BE5;
   color: white;
   border: none;
   width: 30%;
@@ -80,11 +80,13 @@ h3{
   cursor: pointer;
   font-size: 15px;
   font-weight: bold;
-  box-shadow: 5px 5px 13px rgba(0,0,0,0.3);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
 }
 
 .btn:hover {
-  background: #373dc4;
+  transform: scale(1.05);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
 }
 
 @media (max-width: 768px) {

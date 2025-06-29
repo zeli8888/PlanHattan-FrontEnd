@@ -4,12 +4,15 @@ import { BrowserRouter } from 'react-router-dom';
 import { MapProvider } from './contexts/MapContext.jsx';
 import App from './App.jsx';
 import './index.css';
+import { MyPlansProvider } from './contexts/MyPlansProvider.jsx';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>
       <MapProvider>
+        <MyPlansProvider>
         <App />
+        </MyPlansProvider>
       </MapProvider>
     </BrowserRouter>
   </React.StrictMode>

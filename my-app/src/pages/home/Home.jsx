@@ -47,7 +47,7 @@ function Home() {
             </div>
           </div>
           <div className="auth-buttons">
-            <button className="hsignup-btn" onClick={handleSignRoute}>SignUp</button>
+            <button className="hsignup-btn" onClick={handleSignRoute}>Register</button>
             <button className="hsignin-btn" onClick={handleSignRoute}>SignIn</button>
           </div>
         </nav>

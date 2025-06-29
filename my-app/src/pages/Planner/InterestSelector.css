@@ -77,19 +77,19 @@
 }
 
 .go-btn {
-  background: #4a54e1;
+  background-color: #631BE5;
   color: white;
   font-weight: bold;
   border: none;
   padding: 0.6rem 1.5rem;
   border-radius: 999px;
-  box-shadow: 0 4px 25px rgba(102, 112, 255, 0.3);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
   cursor: pointer;
   transition: background 0.2s;
 }
 
 .go-btn:hover {
-  background: #373dc4;
-  transform: scale(1.1);
-  transition: all 0.3s
+  transform: scale(1.05);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
 }

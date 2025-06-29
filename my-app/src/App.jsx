@@ -3,7 +3,9 @@ import Home from './pages/home/Home.jsx'
 import Discover from './pages/planner/Discover.jsx';
 import MyPlans from './pages/planner/MyPlans.jsx';
 import Friends from './pages/planner/Friends.jsx';
+import Loading from './components/features/LoadingPage.jsx';
 import { Routes, Route } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import SignIn from './pages/login-signup/SignIn.jsx';
 import IconTest from './pages/planner/test.jsx';
 import LandmarkAttraction from './pages/planner/Categories/LandmarkAttraction.jsx';
@@ -15,7 +17,19 @@ import LiveMusic from './pages/planner/Categories/LiveMusic.jsx';
 import Cruises from './pages/planner/Categories/Cruises.jsx';
 
 function App() {
+  const [isLoading, setIsLoading] = useState(true);
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (isLoading) {
+    return <Loading />;
+  }
   return (
     <Routes>
       <Route path="/" element={<Home />} />

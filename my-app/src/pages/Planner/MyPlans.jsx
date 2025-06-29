@@ -1,34 +1,43 @@
 import PlannerLayout from './PlannerLayout';
 import './MyPlans.css';
 import { FiTrash2 } from 'react-icons/fi';
-import { useState } from 'react';
-import { initialPlans } from './plansData.js'; 
-
+import { useState, useEffect } from 'react';
+import { useMyPlans } from '../../contexts/MyPlansProvider';
 
 function MyPlans() {
-  // Initial sample data - sorted by date and time
-
-  const [plans, setPlans] = useState(initialPlans);
+  const { plans, deletePlan } = useMyPlans();
   const [deletingId, setDeletingId] = useState(null);
 
+  const mapLocations = plans.map(plan => ({
+    id: plan.id,
+    name: plan.place,
+    coordinates: plan.coordinates,
+    image: plan.areaImage,
+    location: plan.area,
+    busy: plan.predicted
+  }));
 
-const handleDelete = (index) => {
-    setDeletingId(index);
+  useEffect(() => {
+    console.log('Plans updated:', plans);
+  }, [plans]);
+
+  const handleDelete = (id) => {
+    setDeletingId(id);
     setTimeout(() => {
-      setPlans(prev => prev.filter((_, i) => i !== index));
+      deletePlan(id);
       setDeletingId(null);
-    }, 300); // Match this duration with your CSS transition
+    }, 300);
   };
 
   const getPredictionColor = (percentage) => {
     const value = parseInt(percentage);
-    if (value >= 80) return '#ff4d4f'; // Red
-    if (value >= 40) return '#faad14'; // Orange/Yellow
-    return '#52c41a'; // Green
+    if (value >= 80) return '#ff4d4f';
+    if (value >= 40) return '#faad14';
+    return '#52c41a';
   };
 
   return (
-    <PlannerLayout>
+    <PlannerLayout locations={mapLocations}>
       <div className="my-plans-container">
         <div className="my-plans-header">
           <h2>My Plans</h2>
@@ -47,8 +56,8 @@ const handleDelete = (index) => {
               </tr>
             </thead>
             <tbody>
-              {plans.map((plan, index) => (
-                <tr key={index} className={`plan-row ${deletingId === index ? 'deleting' : ''}`}>
+              {plans.map((plan) => (
+                <tr key={plan.id} className={`plan-row ${deletingId === plan.id ? 'deleting' : ''}`}>
                   <td>
                     <div className="place-cell">
                       <div className="area-image-container">
@@ -65,20 +74,19 @@ const handleDelete = (index) => {
                   <td>{plan.time}</td>
                   <td>
                     <div 
-                        className="prediction-bar" 
-                        style={{ 
-                          '--percentage': plan.predicted,
-                          '--text-color': getPredictionColor(plan.predicted)
-                        }}
-                      >
-                        {plan.predicted}
-                      </div>
-
+                      className="prediction-bar" 
+                      style={{ 
+                        '--percentage': plan.predicted,
+                        '--text-color': getPredictionColor(plan.predicted)
+                      }}
+                    >
+                      {plan.predicted}
+                    </div>
                   </td>
                   <td>
                     <button 
                       className="delete-btn"
-                      onClick={() => handleDelete(index)}
+                      onClick={() => handleDelete(plan.id)}
                     >
                       <FiTrash2 />
                     </button>
@@ -93,4 +101,4 @@ const handleDelete = (index) => {
   );
 }
 
-export default MyPlans
+export default MyPlans;

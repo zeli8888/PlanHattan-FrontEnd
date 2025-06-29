@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import PlannerLayout from '../PlannerLayout';
 import DateTimePicker from '../../../components/dateTime/DateTimePicker';
 import './CategoryLayout.css';
@@ -7,6 +7,7 @@ import { FiArrowRight } from "react-icons/fi";
 import { FiArrowLeft } from "react-icons/fi";
 import TimePicker from '../../../components/dateTime/TimePicker';
 import CardTilt from '../../../components/features/CardTilt';
+import { useMyPlans } from '../../../contexts/MyPlansProvider';
 
 const CategoryLayout = ({  
   displayName, 
@@ -24,6 +25,18 @@ const CategoryLayout = ({
       period: now.getHours() >= 12 ? 'PM' : 'AM'
     }
   });
+  
+  const [selectedMapLocation, setSelectedMapLocation] = useState(null);
+
+  useEffect(() => {
+  if (selectedMapLocation) {
+    setFlippedCards(prev => ({
+      ...prev,
+      [selectedMapLocation.id]: true
+    }));
+  }
+}, [selectedMapLocation]);
+
 
   const [cardDateTime, setCardDateTime] = useState({
     date: new Date(),
@@ -85,7 +98,7 @@ const CategoryLayout = ({
       direction = sortConfig.direction === 'asc' ? 'desc' : 'asc';
     }
     setSortConfig({ key, direction });
-    setCurrentPage(1); // Reset to first page when sorting changes
+    setCurrentPage(1); 
   };
 
   const handleCardClick = (id) => {
@@ -102,8 +115,37 @@ const CategoryLayout = ({
     }));
   };
 
+
+  const { addPlan } = useMyPlans();
+  
+  const handleAddToMyPlans = (place) => {
+  if (!place) {
+    console.error('No place provided to add to My Plans');
+    return;
+  }
+  
+  addPlan({
+    place: place.name,
+    area: place.location,
+    areaImage: place.image,
+    date: cardDateTime.date.toLocaleDateString(),
+    time: `${cardDateTime.time.hours}:${cardDateTime.time.minutes.toString().padStart(2, '0')} ${cardDateTime.time.period}`,
+    predicted: place.busy,
+    coordinates: place.coordinates
+  });
+  
+  console.log({place})
+};
+
   return (
-    <PlannerLayout>
+    <PlannerLayout locations={locations}
+    selectedLocation={selectedMapLocation}
+    onMarkerClick={(location) => {
+      setSelectedMapLocation(location);
+    }}
+    onPopupClose={() => {
+      setSelectedMapLocation(null);
+    }}>
       <div className="category-page">
         <div className="suggested-container">
           <div className="header">
@@ -211,7 +253,7 @@ const CategoryLayout = ({
                       showAllColumns={true} 
                       />
                   </div>
-                  <button className="save-time-btn">Add to MyPlans</button>
+                  <button className="save-time-btn" onClick={() => {handleAddToMyPlans(place); handleCardClick(place.id)}}>Add to MyPlans</button>
                 </div>
                 </div>
             </ReactCardFlip>
