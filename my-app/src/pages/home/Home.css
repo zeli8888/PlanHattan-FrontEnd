@@ -1,8 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700&display=swap');
 
+
 .hero-container {
-  padding-left: 1rem;
-  padding-right: 1rem;
+  padding: 0 1rem 1rem 1rem;
   height: 95vh;
   color: white;
   display: flex;
@@ -17,10 +17,121 @@
   background-color: #ffffff;
 }
 
+/* Navbar Styles */
+.nav-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 50px;
+  background-color: #ffffff;
+  position: relative;
+}
+
+.logo {
+  color: #100A1C;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  flex: 1;
+}
+
+.desktop-nav {
+  display: flex;
+  justify-content: center;
+  flex: 2;
+}
+
+.nav-links {
+  display: flex;
+  gap: 30px;
+  background-color: #F9F8FB;
+  padding: 12px 25px;
+  border-radius: 15px;
+}
+
+.auth-buttons {
+  display: flex;
+  gap: 15px;
+  flex: 1;
+  justify-content: flex-end;
+}
+
+/* Mobile Styles */
+.hamburger-btn {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #100A1C;
+  z-index: 1001;
+  position: absolute;
+  right: 20px;
+}
+
+.mobile-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  z-index: 1000;
+  transform: translateY(-100%);
+  transition: transform 0.3s ease-in-out;
+}
+
+.mobile-nav.open {
+  transform: translateY(0);
+}
+
+.mobile-nav-links {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  text-align: center;
+}
+
+.mobile-auth-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+@media (max-width: 800px) {
+  .nav-container {
+    padding: 10px 20px;
+  }
+  
+  .hamburger-btn {
+    display: block;
+  }
+  
+  .desktop-nav {
+    display: none;
+  }
+  
+  .auth-buttons {
+    display: none;
+  }
+}
+
+@media (min-width: 801px) {
+  .mobile-nav {
+    display: none;
+  }
+}
+
 .logo {
     color: #100A1C;
   font-size: 24px;
   font-weight: bold;
+  cursor: pointer;
 }
 
 .logoSpan{
@@ -108,14 +219,34 @@
 
 
 .trust-section {
-  height: 100vh;
-  padding: 3rem 25px 0 2rem;
+  min-height: 100vh;
+  padding: 2rem 25px;
   text-align: center;
-  margin: auto;
-  display: flex;            
-  flex-direction: column;   
-  min-height: 0;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
   position: relative;
+  overflow: hidden; /* Prevent overflow */
+}
+
+.features-container {
+  width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  margin-bottom: 2rem; /* Add space before mission statement */
+}
+
+.mission-statement {
+  width: 100%;
+  max-width: 700px;
+  font-size: 2rem;
+  font-weight: 500;
+  padding: 2rem;
+  text-align: center;
+  color: #100A1C;
+  margin: 2rem auto; /* Center with margin instead of absolute positioning */
 }
 
 .trust-section h2 {
@@ -151,28 +282,28 @@
 
 .itinerary-icon {
   width: 100%;
-  height: 80%; /* Reduced from 90% to allow more text space */
+  height: 80%;
   display: flex;
   justify-content: center;
   align-items: center;
   overflow: hidden;
-  border-radius: 8px 8px 0 0; /* Only round top corners */
+  border-radius: 8px 8px 0 0; 
 }
 
 .itinerary-icon img {
   width: 100%;
   height: 100%;
-  object-fit: cover; /* Ensures proper image scaling */
+  object-fit: cover; 
 }
 
 .itinerary-content {
-  height: 20%; /* Dedicated space for text */
+  height: 20%; 
   padding: 10px;
   text-align: start;
   display: flex;
   flex-direction: column;
-  justify-content: center; /* Better vertical alignment */
-  gap: 12px; /* Space between elements */
+  justify-content: center; 
+  gap: 12px; 
 }
 
 .itinerary-content h3 {
@@ -180,7 +311,7 @@
   margin: 0;
   line-height: 1.3;
   display: -webkit-box;
-  -webkit-line-clamp: 2; /* Limits to 2 lines */
+  -webkit-line-clamp: 2; 
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -191,21 +322,21 @@
   color: #666;
   line-height: 1.4;
   display: -webkit-box;
-  -webkit-line-clamp: 3; /* Limits to 3 lines */
+  -webkit-line-clamp: 3; 
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
 .hmap-card, .feature-card {
-  width: 300px; /* Unified width */
-  height: 250px; /* Fixed height */
+  width: 300px; 
+  height: 250px;
   display: flex;
   flex-direction: column;
   background: #fff;
   border-radius: 10px;
-  overflow: hidden; /* Contains all child elements */
+  overflow: hidden; 
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-  position: relative; /* For absolute positioning if needed */
+  position: relative; 
 }
 
 .feature-card {
@@ -214,28 +345,28 @@
 
 .feature-icon {
   width: 100%;
-  height: 65%; /* Reduced from 90% to allow more text space */
+  height: 65%;
   display: flex;
   justify-content: center;
   align-items: center;
   overflow: hidden;
-  border-radius: 8px 8px 0 0; /* Only round top corners */
+  border-radius: 8px 8px 0 0; 
 }
 
 .feature-icon img {
   width: 100%;
   height: 100%;
-  object-fit: cover; /* Ensures proper image scaling */
+  object-fit: cover;
 }
 
 .feature-content {
-  height: 35%; /* Dedicated space for text */
+  height: 35%; 
   padding: 12px 15px;
   text-align: start;
   display: flex;
   flex-direction: column;
-  justify-content: space-between; /* Better space distribution */
-  overflow: hidden; /* Prevents text overflow */
+  justify-content: space-between; 
+  overflow: hidden; 
 }
 
 .feature-content h3 {
@@ -306,6 +437,133 @@
 .itinerary-icon img,
 .feature-icon img {
   transition: transform 0.5s ease;
+}
+
+.destinations-section {
+  height: 95vh;
+  padding: 2rem 25px 0 2rem;
+  text-align: center;
+}
+
+.destinations-section h2 {
+  font-size: 3.5rem;
+  max-width: 700px;
+  text-align: start;
+  color: #333;
+  margin-left: 20px;
+  flex-shrink: 0;  
+}
+
+.destinations-header .subtitle {
+  font-size: 2.5rem;
+  color: #804AE0;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  margin-left: 20px;
+  flex-shrink: 0; 
+  text-align: start;
+}
+
+.destinations-header .description {
+  font-size: 1.1rem;
+  color: #666;
+  max-width: 800px;
+  margin-left: 20px;
+  text-align: start;
+  margin-bottom: 4rem;
+}
+
+.destinations-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.destination-card {
+  cursor: pointer;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  height: 380px; 
+  display: flex;
+  flex-direction: column;
+}
+
+.destination-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+}
+
+.destination-image {
+  height: 300px;
+  background-size: cover;
+  background-position: center;
+  margin-bottom: 10px;
+}
+
+.destination-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+@media (max-width: 768px) {
+  .destinations-section {
+    padding: 2rem 0.5rem;
+    min-height: auto;
+  }
+  
+  .destinations-header {
+    padding: 0 0.5rem;
+  }
+  
+  .destinations-grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    padding: 0 0.5rem;
+  }
+  
+  .destination-card {
+    height: 350px;
+  }
+  
+  .destination-image {
+    height: 220px;
+  }
+}
+
+@media (max-width: 480px) {
+  .destinations-header h2 {
+    font-size: 2.5rem;
+  }
+  
+  .destinations-header .subtitle {
+    font-size: 2rem;
+  margin-bottom: 1rem;
+  }
+  
+  .destinations-header .description {
+    font-size: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .destinations-grid {
+    grid-template-columns: 1fr;
+    max-width: 350px;
+  }
+  
+  .destination-card {
+    height: 320px;
+  }
+  
+  .destination-image {
+    height: 200px;
+  }
 }
 
 @media (max-width: 1200px) {

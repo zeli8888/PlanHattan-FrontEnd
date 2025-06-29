@@ -69,14 +69,14 @@
   gap: 8px;
   cursor: pointer;
   font-size: 0.9rem;
-  background-color: #804AE0;
+  background-color: #631BE5;
   color: white;
 }
 
 .signin-btn {
   width: 40%;
   padding: 0.9rem;
-  background-color: #804AE0;
+  background-color: #631BE5;
   color: white;
   border: none;
   border-radius: 25px;
@@ -88,7 +88,7 @@
 }
 
 .google-btn:hover, .signin-btn:hover {
-  background: linear-gradient(45deg, #804AE0, #9D6BFF);
+  background: linear-gradient(45deg, #631BE5, #9D6BFF);
   box-shadow: 0 6px 20px rgba(128, 74, 224, 0.4);
   transform: translateY(-2px);
 }
