@@ -4,6 +4,7 @@ import img3 from "../../../assests/statue.jpg";
 import img2 from "../../../assests/rockfellar.jpg";
 import img4 from "../../../assests/times.jpg";
 import { useMyPlans } from '../../../contexts/MyPlansProvider';
+import { useLocation } from 'react-router-dom';
 
 const landmarksData = [
   {
@@ -102,12 +103,29 @@ const landmarksData = [
 
 export default function LandmarkAttraction() {
     const { addPlan } = useMyPlans();
+    const { state } = useLocation();
+
+    const locations = state?.pois 
+    ? state.pois.map(poi => ({
+        id: poi.id,
+        name: poi.name,
+        coordinates: [poi.longitude, poi.latitude],
+        image: poi.imageUrl || '/default-landmark.jpg',
+        location: poi.address || 'New York, NY',
+        busy: `${poi.busyness || 50}%`,
+        distance: `${poi.distance || 5}km`
+      }))
+    : landmarksData;
+
   return (
     <CategoryLayout 
       categoryName="landmarks-attractions"
       displayName="Landmarks & Attractions"
-      locations={landmarksData}
+      locations={locations}
       onAddToMyPlans={addPlan}
+      showBusyness={true}
+      showSorting={true}
+      showDistance={true}
     />
   );
 }

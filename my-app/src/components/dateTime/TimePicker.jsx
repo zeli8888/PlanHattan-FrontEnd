@@ -30,18 +30,28 @@ const TimePicker = ({ value, onChange }) => {
 
   const handleHoursChange = (e) => {
     const val = e.target.value.replace(/\D/g, '');
-    setHours(val);
     
-    // Auto-advance to minutes when 2 digits entered
-    if (val.length >= 2) {
-      minutesRef.current.focus();
-      minutesRef.current.select();
+    // Prevent input if it would exceed 12
+    if (val === '' || (parseInt(val, 10) >= 1 && parseInt(val, 10) <= 12)) {
+      setHours(val);
+      
+      // Auto-advance to minutes when 2 digits entered or when hour is > 1 and user types second digit
+      if (val.length >= 2 || (val.length === 1 && parseInt(val, 10) > 1)) {
+        setTimeout(() => {
+          minutesRef.current.focus();
+          minutesRef.current.select();
+        }, 0);
+      }
     }
   };
 
   const handleMinutesChange = (e) => {
     const val = e.target.value.replace(/\D/g, '');
-    setMinutes(val.padStart(2, '0'));
+    
+    // Prevent input if it would exceed 59
+    if (val === '' || (parseInt(val, 10) >= 0 && parseInt(val, 10) <= 59)) {
+      setMinutes(val.padStart(val.length === 1 ? 1 : 2, '0'));
+    }
   };
 
   const commitChanges = () => {
@@ -70,6 +80,57 @@ const TimePicker = ({ value, onChange }) => {
     commitChanges();
   };
 
+  const handleHoursKeyDown = (e) => {
+    // Allow navigation and editing keys
+    if (['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.key)) {
+      return;
+    }
+    
+    // Move to minutes on Enter
+    if (e.key === 'Enter') {
+      minutesRef.current.focus();
+      minutesRef.current.select();
+      return;
+    }
+    
+    // Only allow numeric input
+    if (!/\d/.test(e.key)) {
+      e.preventDefault();
+      return;
+    }
+    
+    // Check if the new value would be valid
+    const currentValue = e.target.value;
+    const newValue = currentValue + e.key;
+    const numValue = parseInt(newValue, 10);
+    
+    if (numValue > 12) {
+      e.preventDefault();
+    }
+  };
+
+  const handleMinutesKeyDown = (e) => {
+    // Allow navigation and editing keys
+    if (['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.key)) {
+      return;
+    }
+    
+    // Only allow numeric input
+    if (!/\d/.test(e.key)) {
+      e.preventDefault();
+      return;
+    }
+    
+    // Check if the new value would be valid
+    const currentValue = e.target.value;
+    const newValue = currentValue + e.key;
+    const numValue = parseInt(newValue, 10);
+    
+    if (numValue > 59) {
+      e.preventDefault();
+    }
+  };
+
   const togglePeriod = () => {
     const newPeriod = period === 'AM' ? 'PM' : 'AM';
     setPeriod(newPeriod);
@@ -91,6 +152,7 @@ const TimePicker = ({ value, onChange }) => {
             value={hours}
             onChange={handleHoursChange}
             onBlur={handleHoursBlur}
+            onKeyDown={handleHoursKeyDown}
             onClick={(e) => e.target.select()}
             className="time-input"
             maxLength={2}
@@ -103,6 +165,7 @@ const TimePicker = ({ value, onChange }) => {
             value={minutes}
             onChange={handleMinutesChange}
             onBlur={handleMinutesBlur}
+            onKeyDown={handleMinutesKeyDown}
             onClick={(e) => e.target.select()}
             className="time-input"
             maxLength={2}

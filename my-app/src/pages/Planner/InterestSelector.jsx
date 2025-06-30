@@ -13,15 +13,36 @@ import {
   Ship,
 } from "lucide-react";
 
-// Create a URL-friendly name mapping
+// Create a URL-friendly name mapping and POI type mapping
 const categoryMapping = {
-  "Museums, Galleries": "museums-galleries",
-  "Landmarks, Attractions": "landmarks-attractions",
-  "Cafe, Restaurants": "cafe-restaurants",
-  "Nightlife, Bars": "nightlife-bars",
-  "Shopping, Boutiques": "shopping-boutiques",
-  "Live Music": "live-music",
-  "Cruises": "cruises"
+  "Museums, Galleries": {
+    url: "museums-galleries",
+    poiType: "museum"
+  },
+  "Landmarks, Attractions": {
+    url: "landmarks-attractions", 
+    poiType: "attraction"
+  },
+  "Cafe, Restaurants": {
+    url: "cafe-restaurants",
+    poiType: "restaurant"
+  },
+  "Nightlife, Bars": {
+    url: "nightlife-bars",
+    poiType: "bar"
+  },
+  "Shopping, Boutiques": {
+    url: "shopping-boutiques",
+    poiType: "shopping"
+  },
+  "Live Music": {
+    url: "live-music",
+    poiType: "music"
+  },
+  "Cruises": {
+    url: "cruises",
+    poiType: "cruise"
+  }
 };
 
 const interests = [
@@ -44,8 +65,15 @@ const InterestSelector = () => {
 
   const handleGo = () => {
     if (selectedCategory) {
-      const urlFriendlyName = categoryMapping[selectedCategory];
-      navigate(`/plan/category/${urlFriendlyName}`);
+      const categoryInfo = categoryMapping[selectedCategory];
+      
+      // Navigate with state containing the POI type for API calls
+      navigate(`/plan/category/${categoryInfo.url}`, {
+        state: {
+          poiType: categoryInfo.poiType,
+          categoryName: selectedCategory
+        }
+      });
     }
   };
 

@@ -70,6 +70,85 @@
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
+.checkmark-badge {
+  position: absolute;
+  top: 0.8rem;
+  right: 0.8rem;
+  background: #52c41a;
+  border-radius: 50%;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(82, 196, 26, 0.3);
+  z-index: 10;
+  animation: checkmarkAppear 0.5s ease-in-out;
+}
+
+@keyframes checkmarkAppear {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.category-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.empty-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px;
+  color: #666;
+}
+.empty-state button{
+    background-color: #631BE5;
+  color: white;
+  border: none;
+  width: 30%;
+  padding: 0.6rem 1.5rem;
+  border-radius: 1rem;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: bold;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+}
+
+.empty-state p:first-child {
+  font-size: 1.3rem;
+  font-weight: 500;
+}
+
+.sort-types {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sort-types.active {
+  color: #52c41a;
+  font-weight: 600;
+}
+
+.sort-types:hover {
+  color: #73d13d;
+}
 .place-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 6px 20px rgba(0,0,0,0.15);
@@ -224,6 +303,158 @@
   100% {
     transform: scale(1);
     opacity: 1;
+  }
+}
+
+
+/* .visiting-time-display {
+  background: #3a44d1;
+  border-radius: 12px;
+  padding: 15px 20px;
+
+  text-align: center;
+} */
+
+.visiting-time-display {
+  color: #3a44d1;
+  margin-bottom: 20px;
+  padding: 10px 20px;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-shadow: 0 10px 10px rgba(102, 126, 234, 0.3);
+}
+
+.departure-box {
+  background: white;
+  border-radius: 12px;
+  padding: 10px;
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+}
+
+.departure-box:hover {
+  border-color: #667eea;
+  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.15);
+}
+
+.departure-box h4 {
+  margin: 0 0 15px 0;
+  color: #495057;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.departure-select {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #dee2e6;
+  border-radius: 8px;
+  background: white;
+  font-size: 14px;
+  font-weight: 500;
+  color: #495057;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 12px center;
+  background-repeat: no-repeat;
+  background-size: 16px;
+  padding-right: 40px;
+}
+
+.departure-select:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.departure-select:hover {
+  border-color: #adb5bd;
+}
+
+.departure-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.add-to-plans-btn {
+  background-color: #4a54e1;
+  color: white;
+  border: none;
+  padding: 14px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 12px rgba(82, 196, 26, 0.3);
+}
+
+.add-to-plans-btn:hover {
+  background: #3a44d1;
+  transform: translateY(-2px);
+}
+
+.add-to-plans-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(82, 196, 26, 0.3);
+}
+
+.back-to-time-btn {
+  background: transparent;
+  color: #6c757d;
+  border: 2px solid #dee2e6;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.back-to-time-btn:hover {
+  background: #f8f9fa;
+  border-color: #adb5bd;
+  color: #495057;
+  transform: translateY(-1px);
+}
+
+.back-to-time-btn:active {
+  transform: translateY(0);
+}
+
+@media (max-width: 768px) {
+  .visiting-time-display {
+    padding: 12px 16px;
+  }
+  
+  .visiting-time-display h4 {
+    font-size: 14px;
+  }
+  
+  .departure-box {
+    padding: 16px;
+  }
+  
+  .departure-select {
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+  
+  .add-to-plans-btn,
+  .back-to-time-btn {
+    padding: 12px 20px;
+    font-size: 13px;
   }
 }
 

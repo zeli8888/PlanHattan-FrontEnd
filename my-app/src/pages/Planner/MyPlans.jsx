@@ -9,7 +9,7 @@ function MyPlans() {
   const [deletingId, setDeletingId] = useState(null);
 
   const mapLocations = plans.map(plan => ({
-    id: plan.id,
+    id: plan.placeId || plan.id, 
     name: plan.place,
     coordinates: plan.coordinates,
     image: plan.areaImage,
@@ -45,56 +45,62 @@ function MyPlans() {
         </div>
         
         <div className="plans-scroll-container">
-          <table className="plans-table">
-            <thead>
-              <tr>
-                <th>PLACE</th>
-                <th>PLANNED ON</th>
-                <th>PLANNED AT</th>
-                <th>PREDICTED</th>
-                <th>ACTION</th>
-              </tr>
-            </thead>
-            <tbody>
-              {plans.map((plan) => (
-                <tr key={plan.id} className={`plan-row ${deletingId === plan.id ? 'deleting' : ''}`}>
-                  <td>
-                    <div className="place-cell">
-                      <div className="area-image-container">
-                        <img 
-                          src={plan.areaImage} 
-                          alt={plan.area} 
-                          className="area-image"
-                        />
-                      </div>
-                      {plan.place}
-                    </div>
-                  </td>
-                  <td>{plan.date}</td>
-                  <td>{plan.time}</td>
-                  <td>
-                    <div 
-                      className="prediction-bar" 
-                      style={{ 
-                        '--percentage': plan.predicted,
-                        '--text-color': getPredictionColor(plan.predicted)
-                      }}
-                    >
-                      {plan.predicted}
-                    </div>
-                  </td>
-                  <td>
-                    <button 
-                      className="delete-btn"
-                      onClick={() => handleDelete(plan.id)}
-                    >
-                      <FiTrash2 />
-                    </button>
-                  </td>
+          {plans.length === 0 ? (
+            <div className="empty-state">
+              <p>No plans added till now</p>
+            </div>
+          ) : (
+            <table className="plans-table">
+              <thead>
+                <tr>
+                  <th>PLACE</th>
+                  <th>PLANNED ON</th>
+                  <th>PLANNED AT</th>
+                  <th>PREDICTED</th>
+                  <th>ACTION</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {plans.map((plan) => (
+                  <tr key={plan.id} className={`plan-row ${deletingId === plan.id ? 'deleting' : ''}`}>
+                    <td>
+                      <div className="place-cell">
+                        <div className="area-image-container">
+                          <img 
+                            src={plan.areaImage} 
+                            alt={plan.area} 
+                            className="area-image"
+                          />
+                        </div>
+                        {plan.place}
+                      </div>
+                    </td>
+                    <td>{plan.date}</td>
+                    <td>{plan.time}</td>
+                    <td>
+                      <div 
+                        className="prediction-bar" 
+                        style={{ 
+                          '--percentage': plan.predicted,
+                          '--text-color': getPredictionColor(plan.predicted)
+                        }}
+                      >
+                        {plan.predicted}
+                      </div>
+                    </td>
+                    <td>
+                      <button 
+                        className="delete-btn"
+                        onClick={() => handleDelete(plan.id)}
+                      >
+                        <FiTrash2 />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
     </PlannerLayout>
