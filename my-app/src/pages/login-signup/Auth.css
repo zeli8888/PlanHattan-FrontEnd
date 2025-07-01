@@ -153,15 +153,12 @@
 }
 
 .icon{
-  background: white;
+  background: #fff;
   width: 20px;
   height: 20px;
-  color: black;
   border-radius: 50%;
   font-weight: bold;
 }
-
-/* Add these to your existing SignIn.css */
 
 /* Form title animation */
 .form-title {
@@ -275,7 +272,6 @@
   }
 }
 
-
 .password-fields {
   display: flex;
   flex-direction: column;
@@ -332,4 +328,3 @@
     width: 100%;
   }
 }
-

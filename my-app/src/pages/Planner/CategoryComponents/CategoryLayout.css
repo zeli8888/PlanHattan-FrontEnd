@@ -3,6 +3,34 @@
   margin: 0 auto;
 }
 
+.header-title-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.back-to-discover-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+  color: #333;
+  flex-shrink: 0; 
+}
+
+.back-to-discover-btn:hover {
+  background-color: #f0f0f0;
+}
+
+.back-to-discover-btn:active {
+  background-color: #e0e0e0;
+}
+
 .suggested-container {
   margin-bottom: 2rem;
 }
@@ -14,10 +42,16 @@
 .header h2 {
   color: #333;
   font-size: 1.5rem;
+  margin: 0; 
   margin-bottom: 1rem;
-  span{
-    color: #4a54e1;
-  }
+}
+
+.header h2 span {
+  color: #4a54e1;
+}
+
+.header-title-container h2 {
+  margin-bottom: 0; 
 }
 
 .time-picker-wrapper {
@@ -141,14 +175,7 @@
   transition: all 0.2s ease;
 }
 
-.sort-types.active {
-  color: #52c41a;
-  font-weight: 600;
-}
 
-.sort-types:hover {
-  color: #73d13d;
-}
 .place-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 6px 20px rgba(0,0,0,0.15);

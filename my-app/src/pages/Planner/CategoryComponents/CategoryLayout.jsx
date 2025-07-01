@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import PlannerLayout from '../PlannerLayout';
 import DateTimePicker from '../../../components/dateTime/DateTimePicker';
 import './CategoryLayout.css';
@@ -17,6 +18,8 @@ const CategoryLayout = ({
   showSorting = true,
   showDistance = true
 }) => {
+  const navigate = useNavigate();
+  
   const now = new Date();
   const [dateTime, setDateTime] = useState({
     date: new Date(),
@@ -67,10 +70,9 @@ const CategoryLayout = ({
   const indexOfLastCard = currentPage * cardsPerPage;
   const indexOfFirstCard = indexOfLastCard - cardsPerPage;
 
-  const getBusynessColor = (percentage) => {
-    const value = parseInt(percentage);
-    if (value >= 80) return '#ff4d4f'; 
-    if (value >= 40) return '#faad14'; 
+  const getBusynessColor = (busyness) => {
+    if (busyness === 'high') return '#ff4d4f'; 
+    if (busyness === 'medium') return '#faad14'; 
     return '#52c41a'; 
   };
 
@@ -137,8 +139,9 @@ const CategoryLayout = ({
   
   const currentCards = [...filteredLocations].sort((a, b) => {
     if (sortConfig.key === 'busyness') {
-      const aValue = parseInt(a.busy);
-      const bValue = parseInt(b.busy);
+      const busyMapper = {'low': 1, 'medium': 2, 'high': 3}
+      const aValue = busyMapper[a.busy]
+      const bValue = busyMapper[b.busy]
       return sortConfig.direction === 'asc' ? aValue - bValue : bValue - aValue;
     } else {
       const aValue = parseFloat(a.distance);
@@ -235,6 +238,11 @@ const CategoryLayout = ({
     return plans.length === 0 ? 'Current Location' : 'Home';
   };
 
+  // Navigation handler
+  const handleBackToDiscover = () => {
+    navigate('/plan'); // Adjust this path to match your actual discover route
+  };
+
   return (
     <PlannerLayout locations={locations}
       selectedLocation={selectedMapLocation}
@@ -247,7 +255,16 @@ const CategoryLayout = ({
       <div className="category-page">
         <div className="suggested-container">
           <div className="header">
-            <h2>Suggested Places for <span>{displayName}</span></h2>
+            <div className="header-title-container">
+              <button 
+                className="back-to-discover-btn" 
+                onClick={handleBackToDiscover}
+                title="Back to Discover"
+              >
+                <FiArrowLeft size={24} />
+              </button>
+              <h2>Suggested Places for <span>{displayName}</span></h2>
+            </div>
             {showBusyness && (
               <div className="time-picker-wrapper">
                 <span>Predict Busyness At</span>
@@ -372,9 +389,9 @@ const CategoryLayout = ({
                             </thead>
                             <tbody>
                               {[
-                                { time: '1:00 PM', busyness: '26%', timeValue: { hours: 1, minutes: 0, period: 'PM' } },
-                                { time: '2:00 PM', busyness: '63%', timeValue: { hours: 2, minutes: 0, period: 'PM' } },
-                                { time: '3:00 PM', busyness: '86%', timeValue: { hours: 3, minutes: 0, period: 'PM' } }
+                                { time: '1:00 PM', busyness: 'low', timeValue: { hours: 1, minutes: 0, period: 'PM' } },
+                                { time: '2:00 PM', busyness: 'high', timeValue: { hours: 2, minutes: 0, period: 'PM' } },
+                                { time: '3:00 PM', busyness: 'medium', timeValue: { hours: 3, minutes: 0, period: 'PM' } }
                               ].map((item, index) => (
                                 <tr key={index}>
                                   <td>{item.time}</td>

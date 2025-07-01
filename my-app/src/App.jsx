@@ -15,6 +15,7 @@ import NightlifeBars from './pages/planner/Categories/NightlifeBars.jsx';
 import ShoppingBoutique from './pages/planner/Categories/ShoppingBoutique.jsx';
 import LiveMusic from './pages/planner/Categories/LiveMusic.jsx';
 import Cruises from './pages/planner/Categories/Cruises.jsx';
+import AuthContainer from './pages/login-signup/AuthContainer.jsx';
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -34,7 +35,8 @@ function App() {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/test" element={<IconTest />} />
-      <Route path="/signin" element={<SignIn/>}/>
+      <Route path="/signin" element={<AuthContainer initialView="signin" />} />
+      <Route path="/signup" element={<AuthContainer initialView="signup" />} />
       <Route path="/plan" element={<Discover />}/>
       <Route path="/plan/category/landmarks-attractions" element={<LandmarkAttraction />} />
       <Route path="/plan/category/Museums-Galleries" element={<MuseumsGalleries />} />

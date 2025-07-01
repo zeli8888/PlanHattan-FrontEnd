@@ -1,13 +1,10 @@
 import React, { useState } from 'react';
-import './SignIn.css';
+import './Auth.css';
 
-const SignIn = () => {
-  const [isLogin, setIsLogin] = useState(true);
+const SignIn = ({ onSwitchToSignUp }) => {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: ''
+    username: '',
+    password: ''
   });
 
   const handleChange = (e) => {
@@ -20,7 +17,8 @@ const SignIn = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(formData);
+    console.log('Sign In Data:', formData);
+    // Add your sign in logic here
   };
 
   return (
@@ -36,49 +34,33 @@ const SignIn = () => {
 
         <div className="planner-right">
           <div className="container">
-            <h2 className={`form-title ${isLogin ? 'login' : 'signup'}`}>
-              {isLogin ? 'Sign in to' : 'Create an account on'} <span>PlanHattan</span>
+            <h2 className="form-title login">
+              Sign in to <span>PlanHattan</span>
             </h2>
 
             <div className="social-buttons">
               <button className="google-btn">
-                <span className="icon">G</span> {isLogin ? 'Sign in' : 'Sign up'} with Google
+                <span className="icon" style={{background: 'white', color: 'black'}}>G</span> Sign in with Google
               </button>
             </div>
 
             <hr className="divider" />
-            <p className="or">Or {isLogin ? 'sign in' : 'sign up'} using your email address</p>
+            <p className="or">Or sign in using your email address</p>
 
             <form onSubmit={handleSubmit}>
-              {/* Name Field - Only in Signup */}
-              <div className={`input-group name-field ${!isLogin ? 'visible' : ''}`}>
-                <label>Full Name</label>
-                <input 
-                  type="text" 
-                  name="name"
-                  placeholder="John Doe" 
-                  value={formData.name}
-                  onChange={handleChange}
-                  required={!isLogin}
-                />
-              </div>
-
-              {/* Email Field - Always visible */}
               <div className="input-group email-field">
-                <label>Your Email</label>
+                <label>Username</label>
                 <input 
                   type="email" 
                   name="email"
-                  placeholder="tourist@gmail.com" 
-                  value={formData.email}
+                  placeholder="heisenberg" 
+                  value={formData.username}
                   onChange={handleChange}
                   required
                 />
               </div>
 
-              {/* Password Fields Container */}
-              <div className={`password-container ${isLogin ? 'login' : 'signup'}`}>
-                {/* Password Field - Always visible */}
+              <div className="password-container login">
                 <div className="input-group password-field">
                   <label>Password</label>
                   <input 
@@ -90,38 +72,24 @@ const SignIn = () => {
                     required
                   />
                 </div>
-
-                {/* Confirm Password - Only in Signup */}
-                <div className={`input-group confirm-field ${!isLogin ? 'visible' : ''}`}>
-                  <label>Confirm Password</label>
-                  <input 
-                    type="password" 
-                    name="confirmPassword"
-                    placeholder="********" 
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                    required={!isLogin}
-                  />
-                </div>
               </div>
 
-              {/* Remember Me - Only in Login */}
-              <div className={`remember-forgot ${isLogin ? 'visible' : ''}`}>
+              <div className="remember-forgot visible">
                 <label><input type="checkbox" /> Remember me</label>
                 <a href="#">Forgot password?</a>
               </div>
 
               <button type="submit" className="signin-btn">
-                {isLogin ? 'Sign In' : 'Sign Up'}
+                Sign In
               </button>
 
               <p className="footer">
-                {isLogin ? 'New user?' : 'Already have an account?'}{' '}
+                New user?{' '}
                 <a href="#" onClick={(e) => {
                   e.preventDefault();
-                  setIsLogin(!isLogin);
+                  onSwitchToSignUp();
                 }}>
-                  {isLogin ? 'Create an account' : 'Sign in'}
+                  Create an account
                 </a>
               </p>
             </form>

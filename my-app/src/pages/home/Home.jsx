@@ -3,6 +3,7 @@ import './Home.css';
 import homeImages from './HomeImages';
 import { useNavigate } from 'react-router-dom';
 import { useRef, useState } from 'react';
+import AuthContainer from '../login-signup/AuthContainer';
 
 function Home() {
 
@@ -11,14 +12,21 @@ function Home() {
     const trustSectionRef = useRef(null);
     const destinationsRef = useRef(null);
 
-    const handleSignRoute = () => {
-      navigate('/signin');
-    };
+  const handleSignUpRoute = () => {
+    navigate('/signup');
+  };
+
+  const handleSignInRoute = () => {
+    navigate('/signin');
+  };
 
     const handlePlanRoute = () => {
       navigate('/plan');
     }
 
+    const handleHomeRoute = () => {
+      navigate('/');
+    }
     const scrollToSection = (ref) => {
     ref.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -33,7 +41,7 @@ function Home() {
       <div className="hero-container">
         {/* Navigation Bar */}
         <nav className="n">
-          <div className="logo">PLAN<span className='logoSpan'>HATTAN</span></div>
+          <div className="logo" onClick={handleHomeRoute}>PLAN<span className='logoSpan'>HATTAN</span></div>
           {/* Hamburger Button */}
           <button className="hamburger-btn" onClick={toggleMenu}>
             ☰
@@ -47,8 +55,8 @@ function Home() {
             </div>
           </div>
           <div className="auth-buttons">
-            <button className="hsignup-btn" onClick={handleSignRoute}>Register</button>
-            <button className="hsignin-btn" onClick={handleSignRoute}>SignIn</button>
+            <button className="hsignup-btn" onClick={handleSignUpRoute}>Register</button>
+            <button className="hsignin-btn" onClick={handleSignInRoute}>SignIn</button>
           </div>
         </nav>
 
@@ -60,8 +68,8 @@ function Home() {
             <a href="/pricing" onClick={() => setIsMenuOpen(false)}>About Us</a>
           </div>
           <div className="mobile-auth-buttons">
-            <button className="hsignup-btn" onClick={() => { handleSignRoute(); setIsMenuOpen(false); }}>SignUp</button>
-            <button className="hsignin-btn" onClick={() => { handleSignRoute(); setIsMenuOpen(false); }}>SignIn</button>
+            <button className="hsignup-btn" onClick={() => { handleSignUpRoute(); setIsMenuOpen(false); }}>SignUp</button>
+            <button className="hsignin-btn" onClick={() => { handleSignInRoute(); setIsMenuOpen(false); }}>SignIn</button>
           </div>
         </div>
         

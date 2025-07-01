@@ -13,7 +13,7 @@ const landmarksData = [
     coordinates: [-73.9632, 40.7794],
     image: img1,
     location: "Liberty Island, NY",
-    busy: "50%",
+    busy: "low",
     distance: "2km",
   },
   {
@@ -22,7 +22,7 @@ const landmarksData = [
     coordinates: [-74.0445, 40.6892],
     image: img2,
     location: "20 W 34th St, NY",
-    busy: "85%",
+    busy: "high",
     distance: "14km",
   },
   {
@@ -31,7 +31,7 @@ const landmarksData = [
     coordinates: [-73.9632, 40.7794],
     image: img3,
     location: "20 W 34th St, NY",
-    busy: "24%",
+    busy: "medium",
     distance: "6km",
   },
   {
@@ -39,7 +39,7 @@ const landmarksData = [
     name: "Empire State Building",
     image: img4,
     location: "20 W 34th St, NY",
-    busy: "40%",
+    busy: "low",
     distance: "1.5km",
   },
 
@@ -48,7 +48,7 @@ const landmarksData = [
     name: "Empire State Building",
     image: img4,
     location: "20 W 34th St, NY",
-    busy: "40%",
+    busy: "low",
     distance: "1.5km",
   },
     {
@@ -56,7 +56,7 @@ const landmarksData = [
     name: "Empire State Building",
     image: img4,
     location: "20 W 34th St, NY",
-    busy: "40%",
+    busy: "low",
     distance: "1.5km",
   },
     {
@@ -64,7 +64,7 @@ const landmarksData = [
     name: "Empire State Building",
     image: img4,
     location: "20 W 34th St, NY",
-    busy: "40%",
+    busy: "medium",
     distance: "1.5km",
   },
     {
@@ -72,7 +72,7 @@ const landmarksData = [
     name: "Empire State Building",
     image: img4,
     location: "20 W 34th St, NY",
-    busy: "40%",
+    busy: "medium",
     distance: "1.5km",
   },
     {
@@ -80,7 +80,7 @@ const landmarksData = [
     name: "Empire State Building",
     image: img4,
     location: "20 W 34th St, NY",
-    busy: "40%",
+    busy: "medium",
     distance: "1.5km",
   },
     {
@@ -88,7 +88,7 @@ const landmarksData = [
     name: "Empire State Building",
     image: img4,
     location: "20 W 34th St, NY",
-    busy: "40%",
+    busy: "high",
     distance: "1.5km",
   },
     {
@@ -96,7 +96,7 @@ const landmarksData = [
     name: "Empire State Building",
     image: img4,
     location: "20 W 34th St, NY",
-    busy: "40%",
+    busy: "high",
     distance: "1.5km",
   }
 ];
