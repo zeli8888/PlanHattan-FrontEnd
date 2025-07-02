@@ -2,7 +2,7 @@ import CategoryLayout from '../CategoryComponents/CategoryLayout';
 import img1 from "../../../assests/brooklyn.jpg";
 import img3 from "../../../assests/statue.jpg";
 
-const CruisesData = [
+const CafeData = [
   {
     id: 1,
     name: "Statue of Liberty",
@@ -39,12 +39,12 @@ const CruisesData = [
   // Add more landmarks as needed
 ];
 
-export default function Cruises() {
+export default function Cafe() {
   return (
     <CategoryLayout 
-      categoryName="Cruises"
-      displayName="Cruises"
-      locations={CruisesData}
+      categoryName="Cafe"
+      displayName="Cafe"
+      locations={CafeData}
     />
   );
 }

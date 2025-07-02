@@ -5,7 +5,6 @@ import { registerUser } from '../../api/RegisterUserApi';
 const SignUp = ({ onSwitchToSignIn }) => {
   const [formData, setFormData] = useState({
     username: '',
-    email: '',
     password: '',
     confirmPassword: ''
   });
@@ -34,9 +33,7 @@ const SignUp = ({ onSwitchToSignIn }) => {
     try {
       const registrationData = {
         userName: formData.username,
-        email: formData.email,
         password: formData.password,
-        userPicture: '' 
       };
 
       console.log('Attempting registration with:', registrationData);
@@ -91,18 +88,6 @@ const SignUp = ({ onSwitchToSignIn }) => {
                   name="username"
                   placeholder="heisenberg" 
                   value={formData.username}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-
-              <div className="input-group email-field">
-                <label>Your Email</label>
-                <input 
-                  type="email" 
-                  name="email"
-                  placeholder="tourist@gmail.com" 
-                  value={formData.email}
                   onChange={handleChange}
                   required
                 />

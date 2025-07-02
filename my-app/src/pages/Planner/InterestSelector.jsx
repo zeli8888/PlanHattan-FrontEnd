@@ -8,51 +8,44 @@ import {
   Binoculars,
   Utensils,
   Glasses,
-  ShoppingCart,
-  Guitar,
-  Ship,
+  Coffee,
+  TreeDeciduous
 } from "lucide-react";
 
-// Create a URL-friendly name mapping and POI type mapping
 const categoryMapping = {
-  "Museums, Galleries": {
-    url: "museums-galleries",
+  "Museums": {
+    url: "museums",
     poiType: "museum"
   },
-  "Landmarks, Attractions": {
-    url: "landmarks-attractions", 
+  "Attractions": {
+    url: "attractions", 
     poiType: "attraction"
   },
-  "Cafe, Restaurants": {
-    url: "cafe-restaurants",
+  "Cafe": {
+    url: "cafe",
     poiType: "restaurant"
   },
-  "Nightlife, Bars": {
-    url: "nightlife-bars",
+  "Parks": {
+    url: "parks",
     poiType: "bar"
   },
-  "Shopping, Boutiques": {
-    url: "shopping-boutiques",
-    poiType: "shopping"
+  "Nightlife Pubs": {
+    url: "nightlife-pubs",
+    poiType: "pub"
   },
-  "Live Music": {
-    url: "live-music",
-    poiType: "music"
+    "Restaurants": {
+    url: "restaurants",
+    poiType: "Restaurants"
   },
-  "Cruises": {
-    url: "cruises",
-    poiType: "cruise"
-  }
 };
 
 const interests = [
-  { label: "Museums, Galleries", icon: Landmark },
-  { label: "Landmarks, Attractions", icon: Binoculars },
-  { label: "Cafe, Restaurants", icon: Utensils },
-  { label: "Nightlife, Bars", icon: Glasses },
-  { label: "Shopping, Boutiques", icon: ShoppingCart },
-  { label: "Live Music", icon: Guitar },
-  { label: "Cruises", icon: Ship },
+  { label: "Attractions", icon: Binoculars },
+  { label: "Cafe", icon: Coffee },
+  { label: "Museums", icon: Landmark },
+  { label: "Parks", icon: TreeDeciduous },
+  { label: "Nightlife Pubs", icon: Glasses },
+  { label: "Restaurants", icon: Utensils },
 ];
 
 const InterestSelector = () => {

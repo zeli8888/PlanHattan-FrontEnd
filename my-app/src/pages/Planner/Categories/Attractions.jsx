@@ -6,7 +6,7 @@ import img4 from "../../../assests/times.jpg";
 import { useMyPlans } from '../../../contexts/MyPlansProvider';
 import { useLocation } from 'react-router-dom';
 
-const landmarksData = [
+const AttractionData = [
   {
     id: 1,
     name: "Statue of Liberty",
@@ -101,7 +101,7 @@ const landmarksData = [
   }
 ];
 
-export default function LandmarkAttraction() {
+export default function Attractions() {
     const { addPlan } = useMyPlans();
     const { state } = useLocation();
 
@@ -115,12 +115,12 @@ export default function LandmarkAttraction() {
         busy: `${poi.busyness || 50}%`,
         distance: `${poi.distance || 5}km`
       }))
-    : landmarksData;
+    : AttractionData;
 
   return (
     <CategoryLayout 
-      categoryName="landmarks-attractions"
-      displayName="Landmarks & Attractions"
+      categoryName="attractions"
+      displayName="Attractions"
       locations={locations}
       onAddToMyPlans={addPlan}
       showBusyness={true}

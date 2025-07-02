@@ -1,8 +1,6 @@
 import CategoryLayout from '../CategoryComponents/CategoryLayout';
-import img1 from "../../../assests/brooklyn.jpg";
-import img3 from "../../../assests/statue.jpg";
 
-const CafeRestuarantsData = [
+const RestuarantsData = [
 {    id: 1,
     name: "Statue of Liberty",
     coordinates: [-74.0445, 40.6892],
@@ -112,12 +110,12 @@ const CafeRestuarantsData = [
   }
 ];
 
-export default function CafeRestuarants() {
+export default function Restuarants() {
   return (
     <CategoryLayout 
-      categoryName="Cafe-Restuarants"
-      displayName="Cafe & Restuarants"
-      locations={CafeRestuarantsData}
+      categoryName="Restuarants"
+      displayName="Restuarants"
+      locations={RestuarantsData}
     />
   );
 }

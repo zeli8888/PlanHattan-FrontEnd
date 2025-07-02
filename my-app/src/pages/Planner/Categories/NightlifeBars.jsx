@@ -42,8 +42,8 @@ const NightlifeBarsData = [
 export default function NightlifeBars() {
   return (
     <CategoryLayout 
-      categoryName="Nightlife-Bars"
-      displayName="Nightlife & bars"
+      categoryName="Nightlife-Pubs"
+      displayName="Nightlife & Pubs"
       locations={NightlifeBarsData}
     />
   );

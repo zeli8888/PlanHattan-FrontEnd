@@ -2,7 +2,7 @@ import CategoryLayout from '../CategoryComponents/CategoryLayout';
 import img1 from "../../../assests/brooklyn.jpg";
 import img3 from "../../../assests/statue.jpg";
 
-const ShoppingBoutiqueData = [
+const ParksData = [
   {
     id: 1,
     name: "Statue of Liberty",
@@ -36,15 +36,14 @@ const ShoppingBoutiqueData = [
     distance: "1.5km",
   }
 
-  // Add more landmarks as needed
 ];
 
-export default function ShoppingBoutique() {
+export default function Parks() {
   return (
     <CategoryLayout 
-      categoryName="Shopping-Boutique"
-      displayName="Shopping & Boutique"
-      locations={ShoppingBoutiqueData}
+      categoryName="Parks"
+      displayName="Parks"
+      locations={ParksData}
     />
   );
 }

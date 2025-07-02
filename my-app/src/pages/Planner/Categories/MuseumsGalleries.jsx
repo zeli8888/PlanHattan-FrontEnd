@@ -41,8 +41,8 @@ const MuseumsData = [
 export default function MuseumsGalleries() {
   return (
     <CategoryLayout 
-      categoryName="Museums-Galleries"
-      displayName="Museums & Galleries"
+      categoryName="Museums"
+      displayName="Museums"
       locations={MuseumsData}
     />
   );
