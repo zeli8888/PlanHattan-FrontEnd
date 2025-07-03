@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './Auth.css';
-import { registerUser } from '../../api/RegisterUserApi';
+import { authAPI } from '../../api/AuthApi'; 
 
 const SignUp = ({ onSwitchToSignIn }) => {
   const [formData, setFormData] = useState({
@@ -8,8 +8,10 @@ const SignUp = ({ onSwitchToSignIn }) => {
     password: '',
     confirmPassword: ''
   });
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -17,36 +19,69 @@ const SignUp = ({ onSwitchToSignIn }) => {
       ...prev,
       [name]: value
     }));
+    
+    // Clear error when user starts typing
+    if (error) setError('');
+  };
+
+  const validateForm = () => {
+    if (!formData.username.trim()) {
+      setError('Username is required');
+      return false;
+    }
+    
+    if (!formData.password) {
+      setError('Password is required');
+      return false;
+    }
+    
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      return false;
+    }
+    
+    if (formData.password.length < 6) {
+      setError('Password must be at least 6 characters long');
+      return false;
+    }
+    
+    return true;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
     
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match!');
-      return;
-    }
-
+    if (!validateForm()) return;
+    
     setIsLoading(true);
-
+    setError('');
+    setSuccess('');
+    
     try {
-      const registrationData = {
-        userName: formData.username,
-        password: formData.password,
-      };
-
-      console.log('Attempting registration with:', registrationData);
+      const result = await authAPI.register({
+        username: formData.username,
+        password: formData.password
+      });
       
-      const response = await registerUser(registrationData);
-      console.log('Registration successful:', response);
-      
-      alert('Registration successful! You can now sign in.');
-      onSwitchToSignIn();
-      
-    } catch (err) {
-      console.error('Registration error:', err);
-      setError(err.message || 'Registration failed. Please try again.');
+      if (result.success) {
+        setSuccess('Registration successful! You can now sign in.');
+        // Reset form
+        setFormData({
+          username: '',
+          password: '',
+          confirmPassword: ''
+        });
+        
+        // Optional: Auto-switch to sign in after successful registration
+        setTimeout(() => {
+          onSwitchToSignIn();
+        }, 2000);
+      } else {
+        setError(result.error || 'Registration failed. Please try again.');
+      }
+    } catch (error) {
+      setError(error);
+      console.log(error)
     } finally {
       setIsLoading(false);
     }
@@ -78,7 +113,31 @@ const SignUp = ({ onSwitchToSignIn }) => {
             <hr className="divider" />
             <p className="or">Or sign up using your email address</p>
 
-            {error && <div className="error-message">{error}</div>}
+            {error && (
+              <div className="error-message" style={{ 
+                color: '#ff4444', 
+                backgroundColor: '#ffebee', 
+                padding: '10px', 
+                borderRadius: '4px', 
+                marginBottom: '15px',
+                fontSize: '14px'
+              }}>
+                {error}
+              </div>
+            )}
+
+            {success && (
+              <div className="success-message" style={{ 
+                color: '#4caf50', 
+                backgroundColor: '#e8f5e8', 
+                padding: '10px', 
+                borderRadius: '4px', 
+                marginBottom: '15px',
+                fontSize: '14px'
+              }}>
+                {success}
+              </div>
+            )}
 
             <form onSubmit={handleSubmit}>
               <div className="input-group email-field">
@@ -90,6 +149,7 @@ const SignUp = ({ onSwitchToSignIn }) => {
                   value={formData.username}
                   onChange={handleChange}
                   required
+                  disabled={isLoading}
                 />
               </div>
 
@@ -103,6 +163,7 @@ const SignUp = ({ onSwitchToSignIn }) => {
                     value={formData.password}
                     onChange={handleChange}
                     required
+                    disabled={isLoading}
                   />
                 </div>
 
@@ -115,6 +176,7 @@ const SignUp = ({ onSwitchToSignIn }) => {
                     value={formData.confirmPassword}
                     onChange={handleChange}
                     required
+                    disabled={isLoading}
                   />
                 </div>
               </div>
@@ -123,8 +185,12 @@ const SignUp = ({ onSwitchToSignIn }) => {
                 type="submit" 
                 className="signin-btn"
                 disabled={isLoading}
+                style={{
+                  opacity: isLoading ? 0.6 : 1,
+                  cursor: isLoading ? 'not-allowed' : 'pointer'
+                }}
               >
-                {isLoading ? 'Creating account...' : 'Sign Up'}
+                {isLoading ? 'Creating Account...' : 'Create Account'}
               </button>
 
               <p className="footer">
