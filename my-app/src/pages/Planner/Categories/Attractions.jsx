@@ -1,127 +1,86 @@
 import CategoryLayout from '../CategoryComponents/CategoryLayout';
-import img1 from "../../../assests/brooklyn.jpg";
-import img3 from "../../../assests/statue.jpg";
-import img2 from "../../../assests/rockfellar.jpg";
-import img4 from "../../../assests/times.jpg";
+import PoiDataTransformer from '../CategoryComponents/PoiDataTransformer';
 import { useMyPlans } from '../../../contexts/MyPlansProvider';
 import { useLocation } from 'react-router-dom';
 
-const AttractionData = [
+// Import default images
+import img1 from "../../../assests/brooklyn.jpg";
+import img2 from "../../../assests/rockfellar.jpg";
+import img3 from "../../../assests/statue.jpg";
+import img4 from "../../../assests/times.jpg";
+
+// Fallback data for when API fails
+const FALLBACK_ATTRACTIONS = [
   {
     id: 1,
     name: "Statue of Liberty",
-    coordinates: [-73.9632, 40.7794],
+    coordinates: [-74.0445, 40.6892],
     image: img1,
     location: "Liberty Island, NY",
     busy: "low",
     distance: "2km",
+    source: 'fallback'
   },
   {
     id: 2,
     name: "Empire State Building",
-    coordinates: [-74.0445, 40.6892],
+    coordinates: [-73.9857, 40.7484],
     image: img2,
     location: "20 W 34th St, NY",
     busy: "high",
     distance: "14km",
+    source: 'fallback'
   },
   {
     id: 3,
-    name: "Empire State Building",
-    coordinates: [-73.9632, 40.7794],
+    name: "Brooklyn Bridge",
+    coordinates: [-73.9969, 40.7061],
     image: img3,
-    location: "20 W 34th St, NY",
+    location: "Brooklyn Bridge, NY",
     busy: "medium",
     distance: "6km",
+    source: 'fallback'
   },
   {
     id: 4,
-    name: "Empire State Building",
+    name: "Times Square",
+    coordinates: [-73.9855, 40.7580],
     image: img4,
-    location: "20 W 34th St, NY",
-    busy: "low",
-    distance: "1.5km",
-  },
-
-    {
-    id: 5,
-    name: "Empire State Building",
-    image: img4,
-    location: "20 W 34th St, NY",
-    busy: "low",
-    distance: "1.5km",
-  },
-    {
-    id: 6,
-    name: "Empire State Building",
-    image: img4,
-    location: "20 W 34th St, NY",
-    busy: "low",
-    distance: "1.5km",
-  },
-    {
-    id: 7,
-    name: "Empire State Building",
-    image: img4,
-    location: "20 W 34th St, NY",
-    busy: "medium",
-    distance: "1.5km",
-  },
-    {
-    id: 8,
-    name: "Empire State Building",
-    image: img4,
-    location: "20 W 34th St, NY",
-    busy: "medium",
-    distance: "1.5km",
-  },
-    {
-    id: 9,
-    name: "Empire State Building",
-    image: img4,
-    location: "20 W 34th St, NY",
-    busy: "medium",
-    distance: "1.5km",
-  },
-    {
-    id: 10,
-    name: "Empire State Building",
-    image: img4,
-    location: "20 W 34th St, NY",
+    location: "Times Square, NY",
     busy: "high",
-    distance: "1.5km",
-  },
-    {
-    id: 11,
-    name: "Empire State Building",
-    image: img4,
-    location: "20 W 34th St, NY",
-    busy: "high",
-    distance: "1.5km",
+    distance: "15km",
+    source: 'fallback'
   }
 ];
 
 export default function Attractions() {
-    const { addPlan } = useMyPlans();
-    const { state } = useLocation();
-
-    const locations = state?.pois 
-    ? state.pois.map(poi => ({
-        id: poi.id,
-        name: poi.name,
-        coordinates: [poi.longitude, poi.latitude],
-        image: poi.imageUrl || '/default-landmark.jpg',
-        location: poi.address || 'New York, NY',
-        busy: `${poi.busyness || 50}%`,
-        distance: `${poi.distance || 5}km`
-      }))
-    : AttractionData;
-
+  const { addPlan } = useMyPlans();
+  const { state } = useLocation();
+  
+  // Transform API data using the transformer
+  const locations = PoiDataTransformer.transformApiResponse(
+    state?.apiData,
+    'attraction',
+    FALLBACK_ATTRACTIONS
+  );
+  
+  // Validate the transformed data
+  const validatedLocations = PoiDataTransformer.validatePois(locations);
+  
+  // Get statistics for debugging
+  const stats = PoiDataTransformer.getDataStats(validatedLocations);
+  console.log('Attractions data stats:', stats);
+  
+  // Show error message if API call failed
+  if (state?.error) {
+    console.warn('API Error for attractions:', state.error);
+  }
+  
   return (
     <CategoryLayout 
       categoryName="attractions"
       displayName="Attractions"
-      locations={locations}
+      locations={validatedLocations}
       onAddToMyPlans={addPlan}
       showBusyness={true}
       showSorting={true}

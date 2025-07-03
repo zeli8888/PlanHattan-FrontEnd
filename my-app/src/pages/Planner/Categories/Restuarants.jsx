@@ -1,121 +1,90 @@
 import CategoryLayout from '../CategoryComponents/CategoryLayout';
+import PoiDataTransformer from '../CategoryComponents/PoiDataTransformer';
+import { useMyPlans } from '../../../contexts/MyPlansProvider';
+import { useLocation } from 'react-router-dom';
 
-const RestuarantsData = [
-{    id: 1,
+// Import default images
+import img1 from "../../../assests/brooklyn.jpg";
+import img2 from "../../../assests/rockfellar.jpg";
+import img3 from "../../../assests/statue.jpg";
+import img4 from "../../../assests/times.jpg";
+
+// Fallback data for when API fails
+const FALLBACK_ATTRACTIONS = [
+  {
+    id: 1,
     name: "Statue of Liberty",
     coordinates: [-74.0445, 40.6892],
-    image: "statue-liberty.jpg",
+    image: img1,
     location: "Liberty Island, NY",
-    busy: "78%",
-    distance: "5.2km"
+    busy: "low",
+    distance: "2km",
+    source: 'fallback'
   },
   {
     id: 2,
     name: "Empire State Building",
     coordinates: [-73.9857, 40.7484],
-    image: "empire-state.jpg",
+    image: img2,
     location: "20 W 34th St, NY",
-    busy: "65%",
-    distance: "1.8km"
+    busy: "high",
+    distance: "14km",
+    source: 'fallback'
   },
   {
     id: 3,
-    name: "Times Square",
-    coordinates: [-73.9851, 40.7580],
-    image: "times-square.jpg",
-    location: "Manhattan, NY",
-    busy: "92%",
-    distance: "0.5km"
+    name: "Brooklyn Bridge",
+    coordinates: [-73.9969, 40.7061],
+    image: img3,
+    location: "Brooklyn Bridge, NY",
+    busy: "medium",
+    distance: "6km",
+    source: 'fallback'
   },
   {
     id: 4,
-    name: "Central Park",
-    coordinates: [-73.9654, 40.7829],
-    image: "central-park.jpg",
-    location: "Manhattan, NY",
-    busy: "45%",
-    distance: "3.1km"
-  },
-  {
-    id: 5,
-    name: "Brooklyn Bridge",
-    coordinates: [-73.9969, 40.7061],
-    image: "brooklyn-bridge.jpg",
-    location: "New York, NY",
-    busy: "60%",
-    distance: "2.7km"
-  },
-  {
-    id: 6,
-    name: "Metropolitan Museum of Art",
-    coordinates: [-73.9632, 40.7794],
-    image: "met-museum.jpg",
-    location: "1000 5th Ave, NY",
-    busy: "55%",
-    distance: "4.3km"
-  },
-  {
-    id: 7,
-    name: "One World Trade Center",
-    coordinates: [-74.0134, 40.7127],
-    image: "one-world.jpg",
-    location: "285 Fulton St, NY",
-    busy: "70%",
-    distance: "6.0km"
-  },
-  {
-    id: 8,
-    name: "Rockefeller Center",
-    coordinates: [-73.9787, 40.7587],
-    image: "rockefeller.jpg",
-    location: "45 Rockefeller Plaza, NY",
-    busy: "75%",
-    distance: "1.2km"
-  },
-  {
-    id: 9,
-    name: "Grand Central Terminal",
-    coordinates: [-73.9772, 40.7527],
-    image: "grand-central.jpg",
-    location: "89 E 42nd St, NY",
-    busy: "85%",
-    distance: "0.8km"
-  },
-  {
-    id: 10,
-    name: "The High Line",
-    coordinates: [-74.0047, 40.7480],
-    image: "high-line.jpg",
-    location: "New York, NY",
-    busy: "40%",
-    distance: "3.5km"
-  },
-  {
-    id: 11,
-    name: "American Museum of Natural History",
-    coordinates: [-73.9740, 40.7813],
-    image: "natural-history.jpg",
-    location: "200 Central Park West, NY",
-    busy: "50%",
-    distance: "4.8km"
-  },
-  {
-    id: 12,
-    name: "Chrysler Building",
-    coordinates: [-73.9754, 40.7516],
-    image: "chrysler.jpg",
-    location: "405 Lexington Ave, NY",
-    busy: "30%",
-    distance: "1.0km"
+    name: "Times Square",
+    coordinates: [-73.9855, 40.7580],
+    image: img4,
+    location: "Times Square, NY",
+    busy: "high",
+    distance: "15km",
+    source: 'fallback'
   }
 ];
 
-export default function Restuarants() {
+export default function Restaurants() {
+  const { addPlan } = useMyPlans();
+  const { state } = useLocation();
+  
+  // Transform API data using the transformer
+  const locations = PoiDataTransformer.transformApiResponse(
+    state?.apiData,
+    'Restaurants',
+    FALLBACK_ATTRACTIONS
+  );
+  
+  // Validate the transformed data
+  const validatedLocations = PoiDataTransformer.validatePois(locations);
+  
+  // Get statistics for debugging
+  const stats = PoiDataTransformer.getDataStats(validatedLocations);
+  console.log('Attractions data stats:', stats);
+  
+  // Show error message if API call failed
+  if (state?.error) {
+    console.warn('API Error for attractions:', state.error);
+  }
+  
   return (
     <CategoryLayout 
-      categoryName="Restuarants"
-      displayName="Restuarants"
-      locations={RestuarantsData}
+      categoryName="Restaurants"
+      displayName="Restaurants"
+      locations={validatedLocations}
+      onAddToMyPlans={addPlan}
+      showBusyness={true}
+      showSorting={true}
+      showDistance={true}
     />
   );
 }

@@ -2,6 +2,7 @@ import React from "react";
 import './InterestSelector.css'
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { makeApiRequest } from "../../api/PoiApi";
 
 import {
   Landmark,
@@ -14,7 +15,7 @@ import {
 
 const categoryMapping = {
   "Museums": {
-    url: "museums",
+    url: "museum",
     poiType: "museum"
   },
   "Attractions": {
@@ -23,19 +24,19 @@ const categoryMapping = {
   },
   "Cafe": {
     url: "cafe",
-    poiType: "restaurant"
+    poiType: "cafe"
   },
   "Parks": {
-    url: "parks",
-    poiType: "bar"
+    url: "park",
+    poiType: "park"
   },
   "Nightlife Pubs": {
-    url: "nightlife-pubs",
+    url: "pubs",
     poiType: "pub"
   },
     "Restaurants": {
-    url: "restaurants",
-    poiType: "Restaurants"
+    url: "restaurant",
+    poiType: "restaurant"
   },
 };
 
@@ -51,22 +52,46 @@ const interests = [
 const InterestSelector = () => {
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSelect = (label) => {
     setSelectedCategory(label);
   };
 
-  const handleGo = () => {
+  const handleGo = async () => {
     if (selectedCategory) {
-      const categoryInfo = categoryMapping[selectedCategory];
+      setIsLoading(true);
       
-      // Navigate with state containing the POI type for API calls
-      navigate(`/plan/category/${categoryInfo.url}`, {
-        state: {
-          poiType: categoryInfo.poiType,
-          categoryName: selectedCategory
-        }
-      });
+      try {
+        const categoryInfo = categoryMapping[selectedCategory];
+        
+        // Make API request with the correct POI type
+        const apiResponse = await makeApiRequest(categoryInfo.poiType);
+        
+        console.log('API Response in InterestSelector:', apiResponse);
+        
+        // Navigate with state containing the API response
+        navigate(`/plan/category/${categoryInfo.url}`, {
+          state: {
+            apiData: apiResponse, // Pass the entire API response
+            poiType: categoryInfo.poiType,
+            categoryName: selectedCategory
+          }
+        });
+      } catch (error) {
+        console.error('Failed to fetch POIs:', error);
+        // Still navigate but without API data (will use fallback data)
+        const categoryInfo = categoryMapping[selectedCategory];
+        navigate(`/plan/category/${categoryInfo.url}`, {
+          state: {
+            poiType: categoryInfo.poiType,
+            categoryName: selectedCategory,
+            error: error.message
+          }
+        });
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -101,9 +126,9 @@ const InterestSelector = () => {
         <button 
           className={`go-btn ${!selectedCategory ? "disabled" : ""}`}
           onClick={handleGo}
-          disabled={!selectedCategory}
+          disabled={!selectedCategory || isLoading}
         >
-          GO
+          {isLoading ? "Loading..." : "GO"}
         </button>
       </div>
     </div>

@@ -137,6 +137,7 @@ const CategoryLayout = ({
     ? locations.filter(place => isPlaceInMyPlans(place))
     : locations;
   
+  // Calculate current page cards and total pages
   const currentCards = [...filteredLocations].sort((a, b) => {
     if (sortConfig.key === 'busyness') {
       const busyMapper = {'low': 1, 'medium': 2, 'high': 3}
@@ -244,14 +245,16 @@ const CategoryLayout = ({
   };
 
   return (
-    <PlannerLayout locations={locations}
+    <PlannerLayout 
+      locations={currentCards} // Pass only current page cards instead of all locations
       selectedLocation={selectedMapLocation}
       onMarkerClick={(location) => {
         setSelectedMapLocation(location);
       }}
       onPopupClose={() => {
         setSelectedMapLocation(null);
-      }}>
+      }}
+    >
       <div className="category-page">
         <div className="suggested-container">
           <div className="header">
