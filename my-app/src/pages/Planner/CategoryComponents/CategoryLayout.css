@@ -274,6 +274,7 @@
   font-weight: 600;
 }
 
+
 .sort-types::after {
   content: '';
   position: absolute;

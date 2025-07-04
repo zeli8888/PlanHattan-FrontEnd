@@ -15,6 +15,7 @@ import Restuarants from './pages/planner/Categories/Restuarants.jsx';
 import Parks from './pages/planner/Categories/Parks.jsx';
 import Cafe from './pages/planner/Categories/Cafe.jsx';
 import Museums from './pages/planner/Categories/Museum.jsx';
+import { LocationProvider } from './contexts/LocationContext.jsx';
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -31,6 +32,7 @@ function App() {
     return <Loading />;
   }
   return (
+     <LocationProvider>
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/test" element={<IconTest />} />
@@ -46,7 +48,7 @@ function App() {
       <Route path="/my-plans" element={<MyPlans />} />
       <Route path="/friends" element={<Friends />} />
     </Routes>
-
+    </LocationProvider>
   )
 }
 

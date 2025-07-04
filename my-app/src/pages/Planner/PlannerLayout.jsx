@@ -1,4 +1,4 @@
-// PlannerLayout.jsx
+// PlannerLayout.jsx - Updated to work with current location
 import MapPanel from '../../components/map/MapPanel';
 import Navbar from '../../components/nav/Navbar';
 import './PlannerLayout.css';
