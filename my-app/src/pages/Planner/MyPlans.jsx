@@ -3,10 +3,13 @@ import './MyPlans.css';
 import { FiTrash2 } from 'react-icons/fi';
 import { useState, useEffect } from 'react';
 import { useMyPlans } from '../../contexts/MyPlansProvider';
+import getUserPlans from '../../api/userplans/GetUserPlansApi'; // Import the API function
 
 function MyPlans() {
-  const { plans, deletePlan } = useMyPlans();
+  const { plans, deletePlan, setPlans } = useMyPlans(); // Add setPlans to update plans
   const [deletingId, setDeletingId] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const mapLocations = plans.map(plan => ({
     id: plan.placeId || plan.id, 
@@ -17,17 +20,63 @@ function MyPlans() {
     busy: plan.predicted
   }));
 
+  // Fetch user plans when component mounts
+  useEffect(() => {
+    const fetchUserPlans = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const userPlans = await getUserPlans();
+        
+        // Transform server response to match your frontend format
+        const transformedPlans = userPlans.map(plan => ({
+          id: plan.userPlanId,
+          placeId: plan.userPlanId,
+          place: plan.poiName,
+          area: plan.poiName, // You might want to get this from another source
+          areaImage: '', // You might want to get this from another source
+          date: new Date(plan.time).toLocaleDateString(),
+          time: new Date(plan.time).toLocaleTimeString('en-US', { 
+            hour: 'numeric', 
+            minute: '2-digit', 
+            hour12: true 
+          }),
+          predicted: plan.busyness,
+          coordinates: [plan.latitude, plan.longitude],
+          serverPlanId: plan.userPlanId
+        }));
+        
+        setPlans(transformedPlans);
+        
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserPlans();
+  }, []); // Empty dependency array means this runs once when component mounts
+
   useEffect(() => {
     console.log('Plans updated:', plans);
   }, [plans]);
 
-  const handleDelete = (id) => {
-    setDeletingId(id);
+const handleDelete = async (id) => {
+  setDeletingId(id);
+  
+  try {
+    await deletePlan(id);
+    
     setTimeout(() => {
-      deletePlan(id);
       setDeletingId(null);
     }, 300);
-  };
+  } catch (error) {
+    setDeletingId(null);
+    console.error('Failed to delete plan:', error);
+  }
+};
 
   const getPredictionColor = (percentage) => {
     const value = parseInt(percentage);
@@ -35,6 +84,37 @@ function MyPlans() {
     if (value >= 40) return '#faad14';
     return '#52c41a';
   };
+
+  if (loading) {
+    return (
+      <PlannerLayout locations={[]}>
+        <div className="my-plans-container">
+          <div className="my-plans-header">
+            <h2>My Plans</h2>
+          </div>
+          <div className="loading-state">
+            <p>Loading your plans...</p>
+          </div>
+        </div>
+      </PlannerLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <PlannerLayout locations={[]}>
+        <div className="my-plans-container">
+          <div className="my-plans-header">
+            <h2>My Plans</h2>
+          </div>
+          <div className="error-state">
+            <p>Error loading plans: {error}</p>
+            <button onClick={() => window.location.reload()}>Try Again</button>
+          </div>
+        </div>
+      </PlannerLayout>
+    );
+  }
 
   return (
     <PlannerLayout locations={mapLocations}>
@@ -67,7 +147,7 @@ function MyPlans() {
                       <div className="place-cell">
                         <div className="area-image-container">
                           <img 
-                            src={plan.areaImage} 
+                            src={plan.areaImage || '/default-image.jpg'} 
                             alt={plan.area} 
                             className="area-image"
                           />

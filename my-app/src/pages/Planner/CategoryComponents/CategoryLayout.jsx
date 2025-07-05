@@ -10,6 +10,7 @@ import { FiCheck } from "react-icons/fi";
 import TimePicker from '../../../components/dateTime/TimePicker';
 import CardTilt from '../../../components/features/CardTilt';
 import { useMyPlans } from '../../../contexts/MyPlansProvider';
+import postUserPlans from '../../../api/userplans/AddUserPlansApi';
 
 const CategoryLayout = ({  
   displayName, 
@@ -115,28 +116,26 @@ const CategoryLayout = ({
   };
 
   const { addPlan, plans, deletePlan, updatePlan } = useMyPlans();
-
-  // Function to check if a place is in MyPlans
   const isPlaceInMyPlans = (place) => {
-    return plans.some(plan => plan.placeId === place.id);
-  };
+  return plans.some(plan => 
+    plan.place === place.name || // Match by place name (most reliable)
+    plan.placeId === place.id    // Match by original placeId
+  );
+};
 
-  // Function to get the planned time for a place
-  const getPlannedTime = (place) => {
-    const planItem = plans.find(plan => plan.placeId === place.id);
-    return planItem ? planItem.time : null;
-  };
+// Updated getPlannedTime function
+const getPlannedTime = (place) => {
+  const planItem = plans.find(plan => 
+    plan.place === place.name || 
+    plan.placeId === place.id
+  );
+  return planItem ? planItem.time : null;
+};
 
-  // Function to get the plan for a place
-  const getPlanForPlace = (place) => {
-    return plans.find(plan => plan.placeId === place.id);
-  };
-  
-  // Filter locations based on showOnlySelected
-  const filteredLocations = showOnlySelected 
-    ? locations.filter(place => isPlaceInMyPlans(place))
-    : locations;
-  
+// Updated filter for showOnlySelected
+const filteredLocations = showOnlySelected 
+  ? locations.filter(place => isPlaceInMyPlans(place))
+  : locations;
   // Calculate current page cards and total pages
   const currentCards = [...filteredLocations].sort((a, b) => {
     if (sortConfig.key === 'busyness') {
@@ -161,45 +160,124 @@ const CategoryLayout = ({
     }));
   };
 
+  const [isLoading, setIsLoading] = useState(false);
   // Step 2: Add to MyPlans (final step)
-  const handleAddToMyPlans = (place) => {
-    if (!place) {
-      console.error('No place provided to add to My Plans');
-      return;
+const handleAddToMyPlans = async (place) => {
+  if (!place) {
+    console.error('No place provided to add to My Plans');
+    return;
+  }
+  
+  try {
+    setIsLoading(true);
+    
+    // Convert local time to UTC ISO 8601 timestamp
+    const localTime = `${cardDateTime.time.hours}:${cardDateTime.time.minutes.toString().padStart(2, '0')} ${cardDateTime.time.period}`;
+    
+    // Parse the 12-hour time format
+    let hours = parseInt(cardDateTime.time.hours);
+    const minutes = parseInt(cardDateTime.time.minutes);
+    
+    // Convert to 24-hour format
+    if (cardDateTime.time.period === 'PM' && hours !== 12) {
+      hours += 12;
+    } else if (cardDateTime.time.period === 'AM' && hours === 12) {
+      hours = 0;
     }
     
+    // Create a proper local datetime by combining date and time
+    const year = cardDateTime.date.getFullYear();
+    const month = cardDateTime.date.getMonth();
+    const day = cardDateTime.date.getDate();
+    
+    // Create local datetime
+    const localDateTime = new Date(year, month, day, hours, minutes, 0, 0);
+    
+    // Convert to UTC ISO 8601 timestamp (ends with 'Z')
+    const utcTimestamp = localDateTime.toISOString();
+    
+    // Prepare plan data for API
+    const planData = {
+      userPlanId: null,
+      place: place.name,
+      time: utcTimestamp,
+      predicted: place.busy,
+      coordinates: place.coordinates
+    };
+
+    // Post to server first
+    const response = await postUserPlans(planData);
+    
+    // IMPORTANT: Use the server's userPlanId as the main ID
+    const serverPlanId = response.userPlanId;
+    
+    // Add to local state with server ID as the main ID
     addPlan({
-      placeId: place.id,
+      id: serverPlanId, // Use server ID as main ID
+      placeId: place.id, // Keep original place ID for reference
       place: place.name,
       area: place.location,
       areaImage: place.image,
       date: cardDateTime.date.toLocaleDateString(),
-      time: `${cardDateTime.time.hours}:${cardDateTime.time.minutes.toString().padStart(2, '0')} ${cardDateTime.time.period}`,
+      time: localTime,
       predicted: place.busy,
       coordinates: place.coordinates,
-      departureLocation: departureLocation[place.id] || (plans.length === 0 ? 'Current Location' : 'Home')
+      departureLocation: departureLocation[place.id] || (plans.length === 0 ? 'Current Location' : 'Home'),
+      serverPlanId: serverPlanId // Also keep as serverPlanId for consistency
     });
-    
-    // Reset planning step for this place
-    setPlanningStep(prev => ({
-      ...prev,
-      [place.id]: undefined
-    }));
-    
-    setDepartureLocation(prev => ({
-      ...prev,
-      [place.id]: undefined
-    }));
-    
-    console.log({place});
-  };
+        
+  } catch (error) {
+    console.error('Failed to add plan:', error);
+    alert('Failed to add plan. Please try again.');
+    return;
+  } finally {
+    setIsLoading(false);
+  }
+  
+  // Reset planning step for this place
+  setPlanningStep(prev => ({
+    ...prev,
+    [place.id]: undefined
+  }));
+  
+  setDepartureLocation(prev => ({
+    ...prev,
+    [place.id]: undefined
+  }));
+};
 
-  const handleRemoveFromMyPlans = (place) => {
+// Updated getPlanForPlace function to better handle server IDs
+const getPlanForPlace = (place) => {
+  
+  const planItem = plans.find(plan => {
+    
+    // Match by place name first (most reliable)
+    // Then by original placeId
+    const matches = plan.place === place.name || 
+                   plan.placeId === place.id;
+    return matches;
+  });
+  
+  return planItem;
+};
+
+const handleRemoveFromMyPlans = async (place) => {
+  try {
     const planItem = getPlanForPlace(place);
-    if (planItem) {
-      deletePlan(planItem.id);
+    if (!planItem) {
+      console.error('Plan not found for removal');
+      return;
     }
-  };
+
+    await deletePlan(planItem.id);
+    
+    console.log('Plan removed successfully');
+  } catch (error) {
+    console.error('Failed to remove plan:', error);
+    // Show user-friendly error message
+    alert('Failed to remove plan. Please try again.');
+  }
+};
 
   const handleUpdatePlan = (place) => {
     const planItem = getPlanForPlace(place);
@@ -442,8 +520,8 @@ const CategoryLayout = ({
                             </select>
                           </div>
                           <div className="departure-buttons">
-                            <button className="add-to-plans-btn" onClick={() => {handleAddToMyPlans(place); handleCardClick(place.id)}}>
-                              Add to MyPlans
+                            <button className="add-to-plans-btn" onClick={() => {handleAddToMyPlans(place); handleCardClick(place.id)}} disabled={isLoading}>
+                                {isLoading ? 'Adding...' : 'Add to MyPlans'}
                             </button>
                             <button 
                               className="back-to-time-btn" 
