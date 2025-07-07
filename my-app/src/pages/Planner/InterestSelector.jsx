@@ -31,7 +31,7 @@ const categoryMapping = {
     poiType: "park"
   },
   "Nightlife Pubs": {
-    url: "pubs",
+    url: "pub",
     poiType: "pub"
   },
     "Restaurants": {

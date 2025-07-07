@@ -2,7 +2,7 @@ import './App.css'
 import Home from './pages/home/Home.jsx'
 import Discover from './pages/planner/Discover.jsx';
 import MyPlans from './pages/planner/MyPlans.jsx';
-import Friends from './pages/planner/Friends.jsx';
+import Recommendation from './pages/planner/Recommendation.jsx';
 import Loading from './components/features/LoadingPage.jsx';
 import { Routes, Route } from 'react-router-dom';
 import { useEffect, useState } from 'react';
@@ -46,7 +46,7 @@ function App() {
       <Route path="/plan/category/park" element={<Parks />} />
       <Route path="/plan/category/cafe" element={<Cafe />} />
       <Route path="/my-plans" element={<MyPlans />} />
-      <Route path="/friends" element={<Friends />} />
+      <Route path="/recommendation" element={<Recommendation />} />
     </Routes>
     </LocationProvider>
   )

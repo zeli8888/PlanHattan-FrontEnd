@@ -212,7 +212,18 @@
 .distance-badge {
   position: absolute;
   bottom: 0.8rem;
-  right: 1rem;
+  left: 1rem;
+  background: rgba(0,0,0,0.7);
+  color: white;
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+}
+
+.recommendation-badge {
+  position: absolute;
+  bottom: 0.8rem;
+  left: 1rem;
   background: rgba(0,0,0,0.7);
   color: white;
   padding: 0.4rem 1rem;

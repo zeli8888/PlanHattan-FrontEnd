@@ -6,6 +6,7 @@ import InterestSelector from './InterestSelector';
 import DateTimePicker from '../../components/dateTime/DateTimePicker';
 import { useLocation } from '../../contexts/LocationContext';
 import { useMyPlans } from '../../contexts/MyPlansProvider';
+import postUserPlans from '../../api/userplans/AddUserPlansApi';
 
 function Discover() {
   const { currentLocation, updateCurrentLocation } = useLocation();
@@ -194,37 +195,70 @@ function Discover() {
     }
   };
 
-  // Handle add to plans - Updated to match your desired structure
-  const handleAddToMyPlans = () => {
+  // Handle add user plans - Make API call and add to local plans
+  const handleAddUserPlans = async () => {
     if (!selectedPlace || !title) {
-      alert('Please select a place and add a title');
       return;
     }
     
-    addPlan({
-      placeId: selectedPlace.id,
-      place: selectedPlace.name,
-      area: selectedPlace.location,
-      areaImage: selectedPlace.image,
-      date: dateTime.date.toLocaleDateString(),
-      time: `${dateTime.time.hours}:${dateTime.time.minutes.toString().padStart(2, '0')} ${dateTime.time.period}`,
-      predicted: selectedPlace.busy,
-      coordinates: selectedPlace.coordinates,
-      departureLocation: departureLocation[selectedPlace.id] || (plans.length === 0 ? 'Current Location' : 'Home')
-    });
-    
-    // Optional: Clear form after adding
-    setSearchQuery('');
-    setSelectedPlace(null);
-    setTitle('');
-    setDateTime({
-      date: new Date(),
-      time: {
-        hours: 11,
-        minutes: 30,
-        period: 'PM'
+    try {
+      // Convert time to UTC
+      const localDateTime = new Date(dateTime.date);
+      let hours = dateTime.time.hours;
+      
+      // Convert to 24-hour format
+      if (dateTime.time.period === 'PM' && hours !== 12) {
+        hours += 12;
+      } else if (dateTime.time.period === 'AM' && hours === 12) {
+        hours = 0;
       }
-    });
+      
+      localDateTime.setHours(hours, dateTime.time.minutes, 0, 0);
+      const utcTime = localDateTime.toISOString();
+      
+      // Prepare plan data for API
+      const planData = {
+        place: selectedPlace.name,
+        time: utcTime,
+        predicted: selectedPlace.busy,
+        coordinates: selectedPlace.coordinates
+      };
+      
+      // Make API call
+      const response = await postUserPlans(planData);
+      console.log('Plan added successfully:', response);
+      
+      // Add to local plans context
+      addPlan({
+        placeId: selectedPlace.id,
+        place: selectedPlace.name,
+        area: selectedPlace.location,
+        areaImage: selectedPlace.image,
+        date: dateTime.date.toLocaleDateString(),
+        time: `${dateTime.time.hours}:${dateTime.time.minutes.toString().padStart(2, '0')} ${dateTime.time.period}`,
+        predicted: selectedPlace.busy,
+        coordinates: selectedPlace.coordinates,
+        departureLocation: departureLocation[selectedPlace.id] || (plans.length === 0 ? 'Current Location' : 'Home')
+      });
+      
+      // Clear form after successful addition
+      setSearchQuery('');
+      setSelectedPlace(null);
+      setTitle('');
+      setDateTime({
+        date: new Date(),
+        time: {
+          hours: 11,
+          minutes: 30,
+          period: 'PM'
+        }
+      });
+      
+      alert('Plan added successfully!');
+    } catch (error) {
+      console.error('Error adding plan:', error);
+      alert(`Error adding plan: ${error.message}`);
+    }
   };
 
   // Locations to pass to PlannerLayout (including selected place)
@@ -308,7 +342,7 @@ function Discover() {
           <button className="btn" disabled={!selectedPlace}>
             Predict Busyness
           </button>
-          <button className="btn" onClick={handleAddToMyPlans} disabled={!selectedPlace || !title}>
+          <button className="btn" onClick={handleAddUserPlans} disabled={!selectedPlace || !title}>
             Add To MyPlans
           </button>
         </div>

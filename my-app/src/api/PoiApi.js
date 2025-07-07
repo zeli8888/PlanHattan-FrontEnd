@@ -1,5 +1,8 @@
+import { useContext } from "react";
+
 // Enhanced API function with more configuration options
 export async function makeApiRequest(poiTypeName, options = {}) {
+    
     try {
         // Default options that can be overridden
         const defaultOptions = {

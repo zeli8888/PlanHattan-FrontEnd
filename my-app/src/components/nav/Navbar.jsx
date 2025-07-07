@@ -5,7 +5,7 @@ import profilePic from '../../assests/profilePic.jpg'
 const navItems = [
     { name: 'Discover', path: '/plan' },     
   { name: 'My Plans', path: '/my-plans' },
-  { name: 'Friends', path: '/friends' },
+  { name: 'Recommendation', path: '/recommendation' },
 ];
 
 function Navbar() {

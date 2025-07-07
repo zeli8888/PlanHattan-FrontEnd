@@ -84,6 +84,15 @@ const CategoryLayout = ({
     return '#52c41a'; 
   };
 
+  const getRecommendationColor = (recommendation) => {
+    if (typeof recommendation === 'number') {
+      if (recommendation >= 8) return '#52c41a'; // Green for high recommendation
+      if (recommendation >= 5) return '#faad14'; // Yellow for medium recommendation
+      return '#ff4d4f'; // Red for low recommendation
+    }
+    return '#faad14'; // Default to yellow if not a number
+  };
+
   const requestSort = (key) => {
     setIsSorting(true);
     setTimeout(() => setIsSorting(false), 500);
@@ -136,19 +145,24 @@ const getPlannedTime = (place) => {
 const filteredLocations = showOnlySelected 
   ? locations.filter(place => isPlaceInMyPlans(place))
   : locations;
+  
   // Calculate current page cards and total pages
-  const currentCards = [...filteredLocations].sort((a, b) => {
-    if (sortConfig.key === 'busyness') {
-      const busyMapper = {'low': 1, 'medium': 2, 'high': 3}
-      const aValue = busyMapper[a.busy]
-      const bValue = busyMapper[b.busy]
-      return sortConfig.direction === 'asc' ? aValue - bValue : bValue - aValue;
-    } else {
-      const aValue = parseFloat(a.distance);
-      const bValue = parseFloat(b.distance);
-      return sortConfig.direction === 'asc' ? aValue - bValue : bValue - aValue;
-    }
-  }).slice(indexOfFirstCard, indexOfLastCard);
+const currentCards = [...filteredLocations].sort((a, b) => {
+  if (sortConfig.key === 'busyness') {
+    const busyMapper = {'low': 1, 'medium': 2, 'high': 3}
+    const aValue = busyMapper[a.busy]
+    const bValue = busyMapper[b.busy]
+    return sortConfig.direction === 'asc' ? aValue - bValue : bValue - aValue;
+  } else if (sortConfig.key === 'recommendation') {
+    const aValue = parseFloat(a.recommendation) || 0;
+    const bValue = parseFloat(b.recommendation) || 0;
+    return sortConfig.direction === 'asc' ? aValue - bValue : bValue - aValue;
+  } else {
+    const aValue = parseFloat(a.distance);
+    const bValue = parseFloat(b.distance);
+    return sortConfig.direction === 'asc' ? aValue - bValue : bValue - aValue;
+  }
+}).slice(indexOfFirstCard, indexOfLastCard);
   
   const totalPages = Math.ceil(filteredLocations.length / cardsPerPage);
 
@@ -322,6 +336,9 @@ const handleRemoveFromMyPlans = async (place) => {
     navigate('/plan'); // Adjust this path to match your actual discover route
   };
 
+  // Helper function to check if locations have recommendation values
+  const hasRecommendationData = locations.some(place => place.recommendation !== undefined);
+
   return (
     <PlannerLayout 
       locations={currentCards} // Pass only current page cards instead of all locations
@@ -371,6 +388,14 @@ const handleRemoveFromMyPlans = async (place) => {
                 >
                   Near You {sortConfig.key === 'distance' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : ''}
                 </span>
+                {hasRecommendationData && (
+                  <span 
+                    className={`sort-types ${sortConfig.key === 'recommendation' ? 'active' : ''}`}
+                    onClick={() => requestSort('recommendation')}
+                  >
+                    Recommended {sortConfig.key === 'recommendation' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : ''}
+                  </span>
+                )}
                 <span 
                   className={`sort-types ${showOnlySelected ? 'active' : ''}`}
                   onClick={toggleSelectedPlaces}
@@ -411,11 +436,15 @@ const handleRemoveFromMyPlans = async (place) => {
                       <FiCheck size={20} color="#fff" />
                     </div>
                   )}
-                  {showBusyness && (
+                  {/* Conditional badge rendering based on current sort */}
+                  {showBusyness && sortConfig.key === 'busyness' && (
                     <div className="busy-badge">Busyness: <span style={{ color: getBusynessColor(place.busy), fontWeight: 900 }}>{place.busy}</span></div>
                   )}
-                  {showDistance && (
+                  {showDistance && sortConfig.key === 'distance' && (
                     <div className="distance-badge">Distance: <span style={{ color: getDistanceColor(place.distance), fontWeight: 900 }}>{place.distance}</span></div>
+                  )}
+                  {sortConfig.key === 'recommendation' && place.recommendation !== undefined && (
+                    <div className="recommendation-badge">Recommended: <span style={{ color: getRecommendationColor(Math.floor(place.recommendation * 10) /10), fontWeight: 900 }}>{Math.floor(place.recommendation * 10) /10}</span></div>
                   )}
                 </div>
                 <div className="info">
