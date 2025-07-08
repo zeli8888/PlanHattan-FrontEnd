@@ -2,7 +2,7 @@ import PlannerLayout from './PlannerLayout';
 import { useState, useEffect } from 'react';
 import './Recommendation.css';
 import TimePicker from '../../components/dateTime/TimePicker'
-
+import RequestRecommendation from '../../api/RecommendationApi'
 import {
   Landmark,
   Binoculars,
@@ -188,6 +188,8 @@ function Recommendation() {
     }
     
     console.log('Requesting recommendations for plans:', plans);
+    const res = RequestRecommendation(plans)
+    console.log(res)
     setShowRecommendations(true);
     showNotification('success', 'Recommendation Requested', 'Your recommendation request has been sent successfully!');
   };
