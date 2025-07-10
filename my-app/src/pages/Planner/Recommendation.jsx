@@ -1,5 +1,5 @@
 import PlannerLayout from './PlannerLayout';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './Recommendation.css';
 import TimePicker from '../../components/dateTime/TimePicker'
 import RequestRecommendation from '../../api/RecommendationApi'
@@ -16,7 +16,8 @@ import {
   Calendar,
   CheckCircle,
   Info,
-  ArrowLeft
+  ArrowLeft,
+  MapPin
 } from "lucide-react";
 
 const interests = [
@@ -27,6 +28,27 @@ const interests = [
   { label: "Nightlife Pubs", icon: Glasses },
   { label: "Restaurants", icon: Utensils },
 ];
+
+const categoryMapping = {
+  "Museums": {
+    poiType: "museum"
+  },
+  "Attractions": {
+    poiType: "attraction"
+  },
+  "Cafe": {
+    poiType: "cafe"
+  },
+  "Parks": {
+    poiType: "park"
+  },
+  "Nightlife Pubs": {
+    poiType: "pub"
+  },
+  "Restaurants": {
+    poiType: "restaurant"
+  },
+};
 
 function Recommendation() {
   const [searchType, setSearchType] = useState('custom');
@@ -39,7 +61,118 @@ function Recommendation() {
   const [dateError, setDateError] = useState(false);
   const [timeError, setTimeError] = useState(false);
   const [showRecommendations, setShowRecommendations] = useState(false);
+  const [recommendations, setRecommendations] = useState([]);
+  const [isLoadingRecommendations, setIsLoadingRecommendations] = useState(false);
+  
+  // Google Places API state
+  const [searchPredictions, setSearchPredictions] = useState([]);
+  const [showPredictions, setShowPredictions] = useState(false);
+  const [selectedPlace, setSelectedPlace] = useState(null);
+  const [isLoadingPlaceDetails, setIsLoadingPlaceDetails] = useState(false);
+  
+  // Refs for Google Places services
+  const autocompleteService = useRef(null);
+  const placesService = useRef(null);
+  const searchInputRef = useRef(null);
 
+  // Initialize Google Places services
+  useEffect(() => {
+    // Load Google Places API if not already loaded
+    if (!window.google) {
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_PLACES_API_KEY}&libraries=places`;
+      script.onload = () => {
+        autocompleteService.current = new window.google.maps.places.AutocompleteService();
+        const dummyDiv = document.createElement('div');
+        placesService.current = new window.google.maps.places.PlacesService(dummyDiv);
+      };
+      document.head.appendChild(script);
+    } else {
+      autocompleteService.current = new window.google.maps.places.AutocompleteService();
+      const dummyDiv = document.createElement('div');
+      placesService.current = new window.google.maps.places.PlacesService(dummyDiv);
+    }
+  }, []);
+
+  // Handle search input changes for Google Places autocomplete
+  const handleSearchInputChange = (e) => {
+    const value = e.target.value;
+    setCustomSearchQuery(value);
+    
+    if (value.length > 2 && autocompleteService.current) {
+      const request = {
+        input: value,
+        bounds: new window.google.maps.LatLngBounds(
+          new window.google.maps.LatLng(40.7009, -74.0186), // Southwest corner of Manhattan
+          new window.google.maps.LatLng(40.7831, -73.9712)  // Northeast corner of Manhattan
+        ),
+        strictBounds: true, // Only return results within bounds
+        types: ['establishment'], // Only return businesses/places
+        componentRestrictions: { country: 'us' }
+      };
+      
+      autocompleteService.current.getPlacePredictions(request, (predictions, status) => {
+        if (status === window.google.maps.places.PlacesServiceStatus.OK) {
+          setSearchPredictions(predictions || []);
+          setShowPredictions(true);
+        } else {
+          setSearchPredictions([]);
+          setShowPredictions(false);
+        }
+      });
+    } else {
+      setSearchPredictions([]);
+      setShowPredictions(false);
+    }
+  };
+
+  // Handle place selection from predictions
+  const handlePlaceSelect = (prediction) => {
+    setIsLoadingPlaceDetails(true);
+    setShowPredictions(false);
+    setCustomSearchQuery(prediction.description);
+    
+    // Get detailed place information
+    const request = {
+      placeId: prediction.place_id,
+      fields: ['name', 'formatted_address', 'geometry', 'types', 'place_id']
+    };
+    
+    placesService.current.getDetails(request, (place, status) => {
+      if (status === window.google.maps.places.PlacesServiceStatus.OK) {
+        setSelectedPlace({
+          name: place.name,
+          address: place.formatted_address,
+          latitude: place.geometry.location.lat(),
+          longitude: place.geometry.location.lng(),
+          placeId: place.place_id,
+          types: place.types
+        });
+        
+        // Auto-fill title if empty
+        if (!customTitleQuery) {
+          setCustomTitleQuery(place.name);
+        }
+      } else {
+        console.error('Place details request failed:', status);
+        showNotification('error', 'Place Details Error', 'Failed to get place details. Please try again.');
+      }
+      setIsLoadingPlaceDetails(false);
+    });
+  };
+
+  // Hide predictions when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (searchInputRef.current && !searchInputRef.current.contains(event.target)) {
+        setShowPredictions(false);
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+  
   // Auto-hide notification after 5 seconds
   useEffect(() => {
     if (notification) {
@@ -63,12 +196,16 @@ function Recommendation() {
     setSearchType('category');
     setCustomSearchQuery('');
     setCustomTitleQuery('');
+    setSelectedPlace(null);
+    setSearchPredictions([]);
+    setShowPredictions(false);
   };
 
   const handleSelect = (label) => {
     setSelectedCategory(label);
   };
 
+const uniqueId = crypto.randomUUID();
   const handleDateChange = (newDate) => {
     // If there are existing plans and the date is different, clear all plans
     if (plans.length > 0 && selectedDate && newDate !== selectedDate) {
@@ -80,7 +217,7 @@ function Recommendation() {
   };
 
   const now = new Date();
-    const [cardDateTime, setCardDateTime] = useState({
+  const [cardDateTime, setCardDateTime] = useState({
     date: new Date(),
     time: {
       hours: now.getHours() % 12 || 12,
@@ -89,17 +226,31 @@ function Recommendation() {
     }
   });
 
-    const handleCardTimeChange = (time) => {
+  const handleCardTimeChange = (time) => {
     setCardDateTime(prev => ({
       ...prev,
       time
     }));
-  };
+  };  
 
-  const formatTimeString = (hour, minute, ampm) => {
-    const paddedHour = hour.toString().padStart(2, '0');
-    const paddedMinute = minute.toString().padStart(2, '0');
-    return `${paddedHour}:${paddedMinute} ${ampm}`;
+  const formatTimeString = (hour, minute, period, dateObj) => {
+    let hrs = parseInt(hour, 10);
+    const mins = parseInt(minute, 10);
+
+    // Convert to 24-hour format
+    if (period === 'PM' && hrs !== 12) {
+      hrs += 12;
+    } else if (period === 'AM' && hrs === 12) {
+      hrs = 0;
+    }
+
+    const date = new Date(dateObj); 
+    date.setHours(hrs);
+    date.setMinutes(mins);
+    date.setSeconds(0);
+    date.setMilliseconds(0);
+
+    return date.toISOString(); 
   };
 
   const handleAddPlan = () => {
@@ -117,8 +268,13 @@ function Recommendation() {
       return;
     }
 
-    const timeString = formatTimeString(cardDateTime.time.hours, cardDateTime.time.minutes, cardDateTime.time.period);
-
+    const timeString = formatTimeString(
+      cardDateTime.time.hours, 
+      cardDateTime.time.minutes, 
+      cardDateTime.time.period, 
+      new Date(selectedDate)
+    );
+  
     // Check if time is already taken for the same date
     const timeExists = plans.some(plan => 
       plan.date === selectedDate && plan.time === timeString
@@ -131,13 +287,19 @@ function Recommendation() {
 
     if (searchType === 'custom' && (customSearchQuery.trim() || customTitleQuery.trim())) {
       const newPlan = {
-        id: Date.now(),
-        type: 'custom',
-        title: customTitleQuery.trim() || 'Custom Search',
-        location: customSearchQuery.trim() || 'Custom Location',
-        date: selectedDate,
+        id: uniqueId, // Add unique ID
+        poiName: customTitleQuery ? customTitleQuery : (customSearchQuery || selectedPlace.name),
+        zoneId: 0,
+        latitude: selectedPlace ? selectedPlace.latitude : null,
+        longitude: selectedPlace ? selectedPlace.longitude : null,
         time: timeString,
-        category: 'Custom'
+        poiTypeName: null,
+        date: selectedDate,
+        type: 'custom',
+        category: 'Custom',
+        title: customTitleQuery.trim() || (selectedPlace ? selectedPlace.name : 'Custom Search'),
+        location: selectedPlace ? selectedPlace.address : (customSearchQuery.trim() || 'Custom Location'),
+        placeId: selectedPlace ? selectedPlace.placeId : null,
       };
       
       setPlans([...plans, newPlan].sort((a, b) => {
@@ -147,19 +309,29 @@ function Recommendation() {
         return a.date.localeCompare(b.date);
       }));
       
+      // Reset form
       setCustomSearchQuery('');
       setCustomTitleQuery('');
+      setSelectedPlace(null);
+      setSearchPredictions([]);
+      setShowPredictions(false);
       showNotification('success', 'Plan Added', 'Your plan has been successfully added!');
       
     } else if (searchType === 'category' && selectedCategory) {
+      
       const newPlan = {
-        id: Date.now(),
-        type: 'category',
-        title: selectedCategory,
+        id: uniqueId, 
+        poiName: null,
+        zoneId: null,
+        latitude: null,
+        longitude: null,
+        time: timeString,
+        poiTypeName: categoryMapping[selectedCategory].poiType,
         location: `${selectedCategory} Location`,
         date: selectedDate,
-        time: timeString,
-        category: selectedCategory
+        category: selectedCategory,
+        title: selectedCategory,
+        type: 'category'
       };
       
       setPlans([...plans, newPlan].sort((a, b) => {
@@ -181,17 +353,29 @@ function Recommendation() {
     showNotification('info', 'Plan Removed', 'Your plan has been removed from the list.');
   };
 
-  const handleRequestRecommendation = () => {
+  const handleRequestRecommendation = async () => {
     if (plans.length < 3) {
       showNotification('warning', 'More Plans Needed', 'You need at least 3 plans to request recommendations.');
       return;
     }
     
+    setIsLoadingRecommendations(true);
     console.log('Requesting recommendations for plans:', plans);
-    const res = RequestRecommendation(plans)
-    console.log(res)
-    setShowRecommendations(true);
-    showNotification('success', 'Recommendation Requested', 'Your recommendation request has been sent successfully!');
+    
+    try {
+      const response = await RequestRecommendation(plans);
+      console.log('Recommendations received:', response);
+      
+      // Set the recommendations data
+      setRecommendations(response || []);
+      setShowRecommendations(true);
+      showNotification('success', 'Recommendations Loaded', 'Your personalized recommendations are ready!');
+    } catch (error) {
+      console.error('Error getting recommendations:', error);
+      showNotification('error', 'Recommendation Error', 'Failed to get recommendations. Please try again.');
+    } finally {
+      setIsLoadingRecommendations(false);
+    }
   };
 
   const handleBackToPlans = () => {
@@ -209,6 +393,32 @@ function Recommendation() {
     });
   };
 
+  const formatTimeForDisplay = (isoString) => {
+    const date = new Date(isoString);
+    return date.toLocaleTimeString('en-US', { 
+      hour: 'numeric', 
+      minute: '2-digit', 
+      hour12: true 
+    });
+  };
+
+  const convertPlansToLocations = (plans) => {
+  return plans
+    .filter(plan => plan.latitude && plan.longitude) // Only include plans with coordinates
+    .map(plan => ({
+      id: plan.id,
+      name: plan.title,
+      place: plan.title,
+      area: plan.location,
+      address: plan.location,
+      coordinates: [plan.longitude, plan.latitude], // Note: MapBox expects [lng, lat]
+      category: plan.category,
+      time: plan.time,
+      date: plan.date,
+      type: plan.type,
+      placeId: plan.placeId
+    }));
+};
   const getNotificationIcon = (type) => {
     switch (type) {
       case 'error':
@@ -224,10 +434,27 @@ function Recommendation() {
     }
   };
 
+  const getBusynessColor = (busyness) => {
+    switch (busyness?.toLowerCase()) {
+      case 'low':
+        return '#4ade80'; // green
+      case 'medium':
+        return '#facc15'; // yellow
+      case 'high':
+        return '#ef4444'; // red
+      default:
+        return '#94a3b8'; // gray
+    }
+  };
+
+  const getBusynessLabel = (busyness) => {
+    return busyness ? busyness.charAt(0).toUpperCase() + busyness.slice(1) : 'Unknown';
+  };
+
   const isAddButtonDisabled = plans.length >= 5;
 
   return (
-    <PlannerLayout>
+    <PlannerLayout locations={showRecommendations ? convertPlansToLocations(recommendations) : convertPlansToLocations(plans)}>
       <div className="recommendation-container">
         {notification && (
           <div className={`notification ${notification.type}`}>
@@ -267,13 +494,79 @@ function Recommendation() {
                 Based on your selected plans, here are our personalized recommendations for your day.
               </p>
               
-              {/* Placeholder for recommendation content */}
-              <div className="recommendations-placeholder">
-                <div className="loading-message">
-                  <div className="loading-spinner"></div>
-                  <p>Generating personalized recommendations...</p>
+              {isLoadingRecommendations ? (
+                <div className="recommendations-placeholder">
+                  <div className="loading-message">
+                    <div className="loading-spinner"></div>
+                    <p>Generating personalized recommendations...</p>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="recommendations-list">
+                  {recommendations.length > 0 ? (
+                    <>
+                      <div className="recommendations-table-header">
+                        <div className="table-header-row">
+                          <div className="header-cell">PLACE</div>
+                          <div className="header-cell">PLANNED ON</div>
+                          <div className="header-cell">PLANNED AT</div>
+                          <div className="header-cell">PREDICTED</div>
+                          <div className="header-cell">ACTION</div>
+                        </div>
+                      </div>
+                      <div className="recommendations-table-body">
+                        {recommendations.map((recommendation, index) => (
+                          <div key={index} className="recommendation-row">
+                            <div className="recommendation-cell place-cell">
+                              <div className="place-info">
+                                <div className="place-name">
+                                  {recommendation.poiName || 'Unknown Place'}
+                                </div>
+                              </div>
+                            </div>
+                            <div className="recommendation-cell date-cell">
+                              {new Date(selectedDate).toLocaleDateString('en-US')}
+                            </div>
+                            <div className="recommendation-cell time-cell">
+                              {formatTimeForDisplay(recommendation.time)}
+                            </div>
+                            <div className="recommendation-cell predicted-cell">
+                              <span 
+                                className="busyness-badge"
+                                style={{
+                                  backgroundColor: getBusynessColor(recommendation.busyness),
+                                  color: 'white',
+                                  padding: '2px 8px',
+                                  borderRadius: '12px',
+                                  fontSize: '12px',
+                                  fontWeight: '500'
+                                }}
+                              >
+                                {getBusynessLabel(recommendation.busyness)}
+                              </span>
+                            </div>
+                            <div className="recommendation-cell action-cell">
+                              <button 
+                                className="action-btn"
+                                onClick={() => {
+                                  // Add action handler here
+                                  console.log('Action clicked for:', recommendation);
+                                }}
+                              >
+                                View Details
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  ) : (
+                    <div className="no-recommendations">
+                      <p>No recommendations available at this time.</p>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         ) : (
@@ -342,14 +635,42 @@ function Recommendation() {
             
             <div className="pick-section">
               {searchType === 'custom' && (
-                <div className="custom-search-container">
-                  <input
-                    type="text"
-                    placeholder="What are you looking for?"
-                    value={customSearchQuery}
-                    onChange={(e) => setCustomSearchQuery(e.target.value)}
-                    className="custom-search-input"
-                  />
+                <div className="custom-search-container" ref={searchInputRef}>
+                  
+                    <input
+                      type="text"
+                      placeholder="Search places in Manhattan..."
+                      value={customSearchQuery}
+                      onChange={handleSearchInputChange}
+                      className="custom-search-input"
+                      disabled={isLoadingPlaceDetails}
+                    />
+                    {isLoadingPlaceDetails && (
+                      <div className="search-loading">
+                        <div className="loading-spinner-small"></div>
+                      </div>
+                    )}
+                    
+                    {/* Search predictions dropdown */}
+                    {showPredictions && searchPredictions.length > 0 && (
+                      <div className="search-predictions">
+                        {searchPredictions.map((prediction) => (
+                          <div
+                            key={prediction.place_id}
+                            className="prediction-item"
+                            onClick={() => handlePlaceSelect(prediction)}
+                          >
+                            <MapPin size={16} className="prediction-icon" />
+                            <div className="prediction-text">
+                              <div className="prediction-main">{prediction.structured_formatting.main_text}</div>
+                              <div className="prediction-secondary">{prediction.structured_formatting.secondary_text}</div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                 
+                  
                   <input
                     type="text"
                     placeholder="Add Title"
@@ -381,9 +702,9 @@ function Recommendation() {
                 <button 
                   className="add-btn-rec" 
                   onClick={handleAddPlan}
-                  disabled={isAddButtonDisabled}
+                  disabled={isAddButtonDisabled || isLoadingPlaceDetails}
                 >
-                  Add
+                  {isLoadingPlaceDetails ? 'Loading...' : 'Add'}
                 </button>
               )}
             </div>
@@ -396,8 +717,9 @@ function Recommendation() {
                     <button 
                       className="request-recommendation-btn"
                       onClick={handleRequestRecommendation}
+                      disabled={isLoadingRecommendations}
                     >
-                      Request Recommendation
+                      {isLoadingRecommendations ? 'Loading...' : 'Request Recommendation'}
                     </button>
                   )}
                 </div>
@@ -416,9 +738,15 @@ function Recommendation() {
                         <p className="plan-location">{plan.location}</p>
                         <div className="plan-datetime">
                           <span className="plan-date">{formatDate(plan.date)}</span>
-                          <span className="plan-time">{plan.time}</span>
+                          <span className="plan-time">{formatTimeForDisplay(plan.time)}</span>
                         </div>
                         <span className="plan-category">{plan.category}</span>
+                        {plan.latitude && plan.longitude && (
+                          <div className="plan-coordinates">
+                            <MapPin size={12} />
+                            <small>{plan.latitude.toFixed(6)}, {plan.longitude.toFixed(6)}</small>
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}

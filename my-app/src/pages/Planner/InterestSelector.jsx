@@ -3,6 +3,8 @@ import './InterestSelector.css'
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { makeApiRequest } from "../../api/PoiApi";
+import { useLocation } from '../../contexts/LocationContext';
+
 
 import {
   Landmark,
@@ -53,6 +55,7 @@ const InterestSelector = () => {
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const { currentLocation } = useLocation();
 
   const handleSelect = (label) => {
     setSelectedCategory(label);
@@ -65,8 +68,15 @@ const InterestSelector = () => {
       try {
         const categoryInfo = categoryMapping[selectedCategory];
         
-        // Make API request with the correct POI type
-        const apiResponse = await makeApiRequest(categoryInfo.poiType);
+        // Prepare location options for the API request
+        const locationOptions = {};
+        if (currentLocation?.latitude && currentLocation?.longitude) {
+          locationOptions.latitude = currentLocation.latitude.toString();
+          locationOptions.longitude = currentLocation.longitude.toString();
+        }
+        
+        // Make API request with the correct POI type and current location
+        const apiResponse = await makeApiRequest(categoryInfo.poiType, locationOptions);
         
         console.log('API Response in InterestSelector:', apiResponse);
         

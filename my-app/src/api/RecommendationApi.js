@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const RequestRecommendations = async (planData) => {
+const RequestRecommendations = async (plansArray) => {
   try {
     // Get CSRF token from localStorage
     const csrfToken = localStorage.getItem('csrfToken');
@@ -9,15 +9,20 @@ const RequestRecommendations = async (planData) => {
       throw new Error('CSRF token not found in localStorage');
     }
 
-    // Prepare the request payload
-    const payload = {
-      userPlanId: planData.userPlanId || null,
-      poiName: planData.place,
-      time: planData.time,
-      busyness: planData.predicted,
-      latitude: planData.coordinates?.lat || planData.coordinates[0] || null,
-      longitude: planData.coordinates?.lng || planData.coordinates[1] || null
-    };
+    // Transform the plans array to match your API expected format
+    const payload = plansArray.map(plan => ({
+      poiName: plan.poiName || null,
+      zoneId: plan.zoneId || 1,
+      latitude: plan.latitude || null,
+      longitude: plan.longitude || null,
+      time: plan.time,
+      transiType: null,
+      poiTypeName: plan.poiTypeName || null
+    }));
+
+    // Log the transformed payload
+    console.log('Transformed payload:', payload);
+    console.log('Payload JSON:', JSON.stringify(payload, null, 2));
 
     const requestConfig = {
       headers: {
@@ -28,14 +33,18 @@ const RequestRecommendations = async (planData) => {
       withCredentials: true // Include cookies for session-based auth
     };
 
+    // // Log the final request details
+    // console.log('Making API request with config:', requestConfig);
+
     // Make the POST request with clean payload
     const response = await axios.post(
       'https://planhattan.ddns.net/api/pois/recommendation',
-      payload,
+      payload, // This is now an array of plan objects
       requestConfig
     );
 
     console.log('Response Status:', response.status);
+    console.log('Response Data:', response.data);
 
     return response.data;
   } catch (error) {
@@ -43,13 +52,18 @@ const RequestRecommendations = async (planData) => {
     
     // Detailed error logging
     if (error.response) {
+      console.error('Error response data:', error.response.data);
+      console.error('Error response status:', error.response.status);
+      console.error('Error response headers:', error.response.headers);
       throw new Error(`Server error: ${error.response.status} - ${JSON.stringify(error.response.data)}`);
     } else if (error.request) {
+      console.error('Error request:', error.request);
       throw new Error('Network error: No response from server');
     } else {
+      console.error('Error message:', error.message);
       throw new Error(error.message || 'Unknown error occurred');
     }
   }
 };
 
-export default postUserPlans;
+export default RequestRecommendations;

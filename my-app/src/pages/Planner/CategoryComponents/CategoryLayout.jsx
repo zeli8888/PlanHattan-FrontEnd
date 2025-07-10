@@ -341,7 +341,7 @@ const handleRemoveFromMyPlans = async (place) => {
 
   return (
     <PlannerLayout 
-      locations={currentCards} // Pass only current page cards instead of all locations
+      locations={currentCards} 
       selectedLocation={selectedMapLocation}
       onMarkerClick={(location) => {
         setSelectedMapLocation(location);

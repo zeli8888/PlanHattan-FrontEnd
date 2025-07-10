@@ -170,7 +170,7 @@ const handleDelete = async (id) => {
                     </td>
                     <td>
                       <button 
-                        className="delete-btn"
+                        className="myPlans-delete-btn"
                         onClick={() => handleDelete(plan.id)}
                       >
                         <FiTrash2 />

@@ -4,13 +4,14 @@ import { useContext } from "react";
 export async function makeApiRequest(poiTypeName, options = {}) {
     
     try {
+
         // Default options that can be overridden
         const defaultOptions = {
             dateTime: new Date().toISOString(),
             limit: '30',
             transitType: 'walk',
-            latitude: '40.6991381066633',
-            longitude: '-74.0394915248490'
+            latitude: options.latitude || '40.6991381066633',
+             longitude: options.longitude || '-74.0394915248490'
         };
 
         // Merge provided options with defaults
