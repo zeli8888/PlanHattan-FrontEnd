@@ -32,10 +32,6 @@ export async function makeApiRequest(poiTypeName, options = {}, utcTimestamp, cu
         });
         
         const url = `https://planhattan.ddns.net/api/pois?${params.toString()}`;
-        
-        console.log('Making request to:', url);
-        console.log('Request parameters:', Object.fromEntries(params));
-        console.log('Using current location:', currentLocation ? currentLocation.name : 'Default location');
 
         const response = await fetch(url, {
             method: 'GET',

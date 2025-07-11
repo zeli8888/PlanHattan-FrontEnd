@@ -362,12 +362,9 @@ const uniqueId = crypto.randomUUID();
     }
     
     setIsLoadingRecommendations(true);
-    console.log('Requesting recommendations for plans:', plans);
     
     try {
-      const response = await RequestRecommendation(plans);
-      console.log('Recommendations received:', response);
-      
+      const response = await RequestRecommendation(plans);      
       // Set the recommendations data
       setRecommendations(response || []);
       setShowRecommendations(true);
@@ -396,8 +393,7 @@ const uniqueId = crypto.randomUUID();
         : null
     }));
 
-    const response = await postMultipleUserPlans(transformedRecommendations);
-    console.log('Recommendations added successfully:', response);
+    await postMultipleUserPlans(transformedRecommendations);
     showNotification('success', 'Plans Added', 'All recommendations have been added to your plans!');
   } catch (error) {
     console.error('Error adding recommendations to plans:', error);

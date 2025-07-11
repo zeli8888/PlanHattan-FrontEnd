@@ -99,22 +99,6 @@ const handleDelete = async (id) => {
     );
   }
 
-  if (error) {
-    return (
-      <PlannerLayout locations={[]}>
-        <div className="my-plans-container">
-          <div className="my-plans-header">
-            <h2>My Plans</h2>
-          </div>
-          <div className="error-state">
-            <p>Error loading plans: {error}</p>
-            <button onClick={() => window.location.reload()}>Try Again</button>
-          </div>
-        </div>
-      </PlannerLayout>
-    );
-  }
-
   return (
     <PlannerLayout locations={mapLocations}>
       <div className="my-plans-container">

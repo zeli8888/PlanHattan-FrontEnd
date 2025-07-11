@@ -226,27 +226,8 @@
   display: flex;
   flex-direction: column;
   position: relative;
-  overflow: hidden; /* Prevent overflow */
-}
-
-.features-container {
-  width: 100%;
-  flex: 1;
-  display: flex;
-  flex-direction: row;
-  gap: 10px;
-  margin-bottom: 2rem; /* Add space before mission statement */
-}
-
-.mission-statement {
-  width: 100%;
-  max-width: 700px;
-  font-size: 2rem;
-  font-weight: 500;
-  padding: 2rem;
-  text-align: center;
-  color: #100A1C;
-  margin: 2rem auto; /* Center with margin instead of absolute positioning */
+  overflow: hidden;
+  max-width: 1400px; /* Add max-width for very large screens */
 }
 
 .trust-section h2 {
@@ -256,28 +237,47 @@
   margin-bottom: 2rem;
   color: #333;
   margin-left: 20px;
-  flex-shrink: 0;  
+  flex-shrink: 0;
 }
 
 .features-container {
   width: 100%;
-  flex: 1;
   display: flex;
-  flex-direction: row;   
-  gap: 10px;  
+  flex-direction: row;
+  gap: 1rem; /* Increased gap for better spacing */
+  margin-bottom: 3rem;
+  justify-content: center; /* Center the cards */
+  align-items: stretch; /* Make cards same height */
+  flex-wrap: wrap; /* Allow wrapping on smaller screens */
 }
 
+/* Improved card sizing for better responsiveness */
 .itinerary-card {
-  width: 700px;
-  max-height: 500px;
+  flex: 1;
+  min-width: 350px;
+  max-width: 500px;
   min-height: 400px;
   display: flex;
   flex-direction: column;
   background: #fff;
   border-radius: 10px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  overflow: hidden; /* Crucial for containment */
+  overflow: hidden;
   transition: transform 0.3s ease;
+}
+
+.hmap-card, .feature-card {
+  flex: 1;
+  min-width: 280px;
+  max-width: 350px;
+  height: 280px; /* Increased height */
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  position: relative;
 }
 
 .itinerary-icon {
@@ -327,21 +327,6 @@
   overflow: hidden;
 }
 
-.hmap-card, .feature-card {
-  width: 300px; 
-  height: 250px;
-  display: flex;
-  flex-direction: column;
-  background: #fff;
-  border-radius: 10px;
-  overflow: hidden; 
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-  position: relative; 
-}
-
-.feature-card {
-  width: 380px;
-}
 
 .feature-icon {
   width: 100%;
@@ -703,6 +688,127 @@
   display: none;
 }
 
+@media (min-width: 1400px) {
+  .trust-section {
+    padding: 2rem 50px;
+  }
+  
+  .features-container {
+    gap: 3rem;
+    max-width: 1200px;
+    margin: 0 auto 3rem auto;
+  }
+  
+  .trust-section h2 {
+    font-size: 4rem;
+    margin-left: 50px;
+  }
+  
+  .mission-statement {
+    font-size: 2.2rem;
+    max-width: 900px;
+  }
+}
+
+@media (min-width: 1600px) {
+  .trust-section {
+    padding: 3rem 80px;
+  }
+  
+  .features-container {
+    gap: 4rem;
+  }
+  
+  .trust-section h2 {
+    font-size: 4.5rem;
+    margin-left: 80px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .features-container {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2rem;
+  }
+
+  .itinerary-card {
+    width: 100%;
+    max-width: 600px;
+    min-height: 350px;
+  }
+
+  .hmap-card, .feature-card {
+    width: 100%;
+    max-width: 350px;
+    min-width: 280px;
+  }
+
+  .mission-statement {
+    font-size: 1.8rem;
+    margin-top: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .trust-section {
+    height: auto;
+    padding: 2rem 1rem;
+  }
+
+  .trust-section h2 {
+    font-size: 2.5rem;
+    text-align: center;
+    margin-left: 0;
+    margin-bottom: 1.5rem;
+  }
+
+  .features-container {
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .itinerary-card,
+  .hmap-card,
+  .feature-card {
+    width: 100%;
+    max-width: 400px;
+    min-height: 300px;
+  }
+
+  .mission-statement {
+    font-size: 1.4rem;
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .trust-section {
+    padding: 1.5rem 0.5rem;
+  }
+
+  .trust-section h2 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+
+  .features-container {
+    gap: 1rem;
+  }
+
+  .itinerary-card,
+  .hmap-card,
+  .feature-card {
+    max-width: 350px;
+    min-height: 280px;
+  }
+
+  .mission-statement {
+    font-size: 1.2rem;
+    padding: 1rem;
+  }
+}
 
 @media (max-width: 768px) {
   .destinations-section {

@@ -20,10 +20,6 @@ const RequestRecommendations = async (plansArray) => {
       poiTypeName: plan.poiTypeName || null
     }));
 
-    // Log the transformed payload
-    console.log('Transformed payload:', payload);
-    console.log('Payload JSON:', JSON.stringify(payload, null, 2));
-
     const requestConfig = {
       headers: {
         'Content-Type': 'application/json',
@@ -42,9 +38,6 @@ const RequestRecommendations = async (plansArray) => {
       payload, // This is now an array of plan objects
       requestConfig
     );
-
-    console.log('Response Status:', response.status);
-    console.log('Response Data:', response.data);
 
     return response.data;
   } catch (error) {

@@ -276,7 +276,7 @@ function MapPanel({
         type: 'line',
         source: 'manhattan-zones',
         paint: {
-          'line-color': '#627BC1',
+          'line-color': '#fff',
           'line-width': 2,
           'line-opacity': 0.8
         }
@@ -357,9 +357,6 @@ function MapPanel({
       map.on('click', 'zones-fill', (e) => {
         if (e.features.length > 0) {
           const clickedZone = e.features[0];
-          
-          console.log('Zone clicked - ID:', clickedZone.id);
-          console.log('Zone clicked - Properties:', clickedZone.properties);
           
           // Get busyness level for this zone
           const zoneLocationID = clickedZone.properties.locationID;

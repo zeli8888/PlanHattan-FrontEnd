@@ -235,13 +235,7 @@ function Home() {
                     </div>
                 </div>
 
-                <div className="mission-statement">
-                    <p style={{color: '#100A1C'}}>
-                        We believe that <span className="highlight">planning a day</span> should be 
-                        <span className="highlight"> as exciting as the moment itself</span>—without the stress 
-                        of browsing endless websites, or <span className="highlight">getting stuck in the crowd.</span>
-                    </p>
-                </div>
+                
             </section>
             
             <section className="destinations-section" ref={destinationsRef}>
