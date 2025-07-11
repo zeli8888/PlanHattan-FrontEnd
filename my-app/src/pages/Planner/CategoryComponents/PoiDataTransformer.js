@@ -84,7 +84,6 @@ const formatCoordinates = (poiData) => {
 
 class PoiDataTransformer {
   static transformApiResponse(apiResponse, category, fallbackData = []) {
-    console.log('Transforming API response:', { apiResponse, category });
     if (!apiResponse) {
       console.log('No API response, using fallback data');
       return fallbackData;
@@ -92,19 +91,14 @@ class PoiDataTransformer {
 
     let rawPois = [];
     if (apiResponse.busynessDistanceRecommendationDTOS) {
-      console.log('Processing busynessDistanceRecommendationDTOS');
       rawPois = apiResponse.busynessDistanceRecommendationDTOS;
     } else if (apiResponse.pois) {
-      console.log('Processing pois array');
       rawPois = apiResponse.pois;
     } else if (Array.isArray(apiResponse)) {
-      console.log('Processing direct array');
       rawPois = apiResponse;
     } else if (apiResponse.data && Array.isArray(apiResponse.data)) {
-      console.log('Processing data array');
       rawPois = apiResponse.data;
     } else {
-      console.log('Unknown API structure, using fallback data');
       return fallbackData;
     }
 
@@ -125,6 +119,7 @@ class PoiDataTransformer {
           busy: mapBusynessValue(item.busyness || item.busy || poi.busyness || poi.busy || poi.crowdedness || 'medium'),
           distance: formatDistance(item.distance || poi.distance || 5),
           category: category,
+          rating: poi.userRating,
           source: 'api',
           ...(item.recommendation && { recommendation: item.recommendation }),
           ...(poi.poiDescription && { description: poi.poiDescription })
@@ -144,8 +139,6 @@ class PoiDataTransformer {
         };
       }
     });
-
-    console.log(`Transformed ${transformedPois.length} POIs:`, transformedPois);
     return transformedPois;
   }
 

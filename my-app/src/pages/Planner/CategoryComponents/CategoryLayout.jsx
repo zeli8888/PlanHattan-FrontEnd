@@ -11,6 +11,7 @@ import TimePicker from '../../../components/dateTime/TimePicker';
 import CardTilt from '../../../components/features/CardTilt';
 import { useMyPlans } from '../../../contexts/MyPlansProvider';
 import postUserPlans from '../../../api/userplans/AddUserPlansApi';
+import { useLocation } from 'react-router-dom';
 
 const CategoryLayout = ({  
   displayName, 
@@ -20,7 +21,8 @@ const CategoryLayout = ({
   showDistance = true
 }) => {
   const navigate = useNavigate();
-  
+  const location = useLocation();
+  const zoneBusynessMap = location.state?.zoneBusynessMap || {};
   const now = new Date();
   const [dateTime, setDateTime] = useState({
     date: new Date(),
@@ -93,6 +95,16 @@ const CategoryLayout = ({
     return '#faad14'; // Default to yellow if not a number
   };
 
+  
+  const getRatingColor = (rating) => {
+    if (typeof rating === 'number') {
+      if (rating >= 4) return '#52c41a'; // Green for high 
+      if (rating >= 3 && rating < 4) return '#faad14'; // Yellow for medium 
+      return '#ff4d4f'; // Red for low recommendation
+    }
+    return '#fff'; // Default to yellow if not a number
+  };
+
   const requestSort = (key) => {
     setIsSorting(true);
     setTimeout(() => setIsSorting(false), 500);
@@ -139,15 +151,19 @@ const getPlannedTime = (place) => {
     plan.placeId === place.id
   );
   return planItem ? planItem.time : null;
-};
+};  
 
-// Updated filter for showOnlySelected
-const filteredLocations = showOnlySelected 
+const filteredAndSortedLocations = showOnlySelected 
   ? locations.filter(place => isPlaceInMyPlans(place))
   : locations;
-  
+
+// Filter out places without rating data when sorting by rating
+const finalFilteredLocations = sortConfig.key === 'rating' 
+  ? filteredAndSortedLocations.filter(place => place.rating !== undefined && place.rating !== null)
+  : filteredAndSortedLocations;
+
   // Calculate current page cards and total pages
-const currentCards = [...filteredLocations].sort((a, b) => {
+const currentCards = [...finalFilteredLocations].sort((a, b) => {
   if (sortConfig.key === 'busyness') {
     const busyMapper = {'low': 1, 'medium': 2, 'high': 3}
     const aValue = busyMapper[a.busy]
@@ -157,6 +173,10 @@ const currentCards = [...filteredLocations].sort((a, b) => {
     const aValue = parseFloat(a.recommendation) || 0;
     const bValue = parseFloat(b.recommendation) || 0;
     return sortConfig.direction === 'asc' ? aValue - bValue : bValue - aValue;
+  } else if (sortConfig.key === 'rating') {
+    const aValue = parseFloat(a.rating) || 0;
+    const bValue = parseFloat(b.rating) || 0;
+    return sortConfig.direction === 'asc' ? aValue - bValue : bValue - aValue;
   } else {
     const aValue = parseFloat(a.distance);
     const bValue = parseFloat(b.distance);
@@ -164,7 +184,7 @@ const currentCards = [...filteredLocations].sort((a, b) => {
   }
 }).slice(indexOfFirstCard, indexOfLastCard);
   
-  const totalPages = Math.ceil(filteredLocations.length / cardsPerPage);
+  const totalPages = Math.ceil(finalFilteredLocations.length / cardsPerPage);
 
   // Step 1: Choose departure location (replaces "Add to MyPlans")
   const handleChooseDepartureLocation = (place) => {
@@ -338,11 +358,12 @@ const handleRemoveFromMyPlans = async (place) => {
 
   // Helper function to check if locations have recommendation values
   const hasRecommendationData = locations.some(place => place.recommendation !== undefined);
-
+  const hasRatingData = locations.some(place => place.rating !== undefined && place.rating !== null);
   return (
     <PlannerLayout 
       locations={currentCards} 
       selectedLocation={selectedMapLocation}
+      zoneBusynessMap={zoneBusynessMap} 
       onMarkerClick={(location) => {
         setSelectedMapLocation(location);
       }}
@@ -386,8 +407,16 @@ const handleRemoveFromMyPlans = async (place) => {
                   className={`sort-types ${sortConfig.key === 'distance' ? 'active' : ''}`}
                   onClick={() => requestSort('distance')}
                 >
-                  Near You {sortConfig.key === 'distance' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : ''}
+                  Distance {sortConfig.key === 'distance' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : ''}
                 </span>
+                {hasRatingData && ( 
+                  <span 
+                    className={`sort-types ${sortConfig.key === 'rating' ? 'active' : ''}`}
+                    onClick={() => requestSort('rating')}
+                  >
+                    Rating {sortConfig.key === 'rating' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : ''}
+                  </span>
+                )}  
                 {hasRecommendationData && (
                   <span 
                     className={`sort-types ${sortConfig.key === 'recommendation' ? 'active' : ''}`}
@@ -445,6 +474,9 @@ const handleRemoveFromMyPlans = async (place) => {
                   )}
                   {sortConfig.key === 'recommendation' && place.recommendation !== undefined && (
                     <div className="recommendation-badge">Recommended: <span style={{ color: getRecommendationColor(Math.floor(place.recommendation * 10) /10), fontWeight: 900 }}>{Math.floor(place.recommendation * 10) /10}</span></div>
+                  )}
+                  {sortConfig.key === 'rating' && place.rating !== undefined && (
+                    <div className="rating-badge">Rating: <span style={{ color: getRatingColor(place.rating), fontWeight: 900 }}>{place.rating}</span></div>
                   )}
                 </div>
                 <div className="info">

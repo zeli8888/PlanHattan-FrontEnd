@@ -5,7 +5,6 @@ import { useState } from "react";
 import { makeApiRequest } from "../../api/PoiApi";
 import { useLocation } from '../../contexts/LocationContext';
 
-
 import {
   Landmark,
   Binoculars,
@@ -79,13 +78,15 @@ const InterestSelector = () => {
         const apiResponse = await makeApiRequest(categoryInfo.poiType, locationOptions);
         
         console.log('API Response in InterestSelector:', apiResponse);
+        console.log('Zone Busyness Map:', apiResponse.zoneBusynessMap);
         
-        // Navigate with state containing the API response
+        // Navigate with state containing the API response INCLUDING zoneBusynessMap
         navigate(`/plan/category/${categoryInfo.url}`, {
           state: {
             apiData: apiResponse, // Pass the entire API response
             poiType: categoryInfo.poiType,
-            categoryName: selectedCategory
+            categoryName: selectedCategory,
+            zoneBusynessMap: apiResponse.zoneBusynessMap // Explicitly pass zone busyness data
           }
         });
       } catch (error) {

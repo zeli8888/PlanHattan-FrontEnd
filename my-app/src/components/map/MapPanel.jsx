@@ -1,10 +1,11 @@
-// MapPanel.jsx - Updated with routing functionality
+// MapPanel.jsx - Enhanced with zone busyness coloring
 import './MapPanel.css';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Map, { Marker, Popup, Source, Layer } from 'react-map-gl/mapbox';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { useLocation } from '../../contexts/LocationContext';
 import { Navigation } from 'lucide-react';
+import mapboxgl from 'mapbox-gl';
 
 const TOKEN = import.meta.env.VITE_MAPBOX_TOKEN;
 
@@ -19,7 +20,6 @@ const SelectedMarker = () => (
   <svg width="32" height="46" viewBox="0 0 32 46" fill="#FF6B6B">
     <path d="M16 0C7.164 0 0 7.164 0 16c0 12 16 30 16 30s16-18 16-30C32 7.164 24.836 0 16 0zm0 24c-4.418 0-8-3.582-8-8s3.582-8 8-8 8 3.582 8 8-3.582 8-8 8z"/>
     <circle cx="16" cy="16" r="4" fill="white"/>
-    {/* Pulsing ring */}
     <circle cx="16" cy="16" r="12" fill="none" stroke="#FF6B6B" strokeWidth="2" opacity="0.6">
       <animate attributeName="r" values="12;16;12" dur="2s" repeatCount="indefinite" />
       <animate attributeName="opacity" values="0.6;0.2;0.6" dur="2s" repeatCount="indefinite" />
@@ -29,16 +29,12 @@ const SelectedMarker = () => (
 
 const CurrentLocationMarker = () => (
   <svg width="32" height="32" viewBox="0 0 32 32">
-    {/* Outer pulsing circle */}
     <circle cx="16" cy="16" r="14" fill="#FF6B6B" opacity="0.3">
       <animate attributeName="r" values="14;18;14" dur="2s" repeatCount="indefinite" />
       <animate attributeName="opacity" values="0.3;0.1;0.3" dur="2s" repeatCount="indefinite" />
     </circle>
-    {/* Inner circle */}
     <circle cx="16" cy="16" r="8" fill="#FF6B6B" />
-    {/* Center dot */}
     <circle cx="16" cy="16" r="3" fill="white" />
-    {/* Plus sign */}
     <path d="M16 8 L16 24 M8 16 L24 16" stroke="white" strokeWidth="2" />
   </svg>
 );
@@ -69,6 +65,96 @@ const GPSButton = ({ onClick, disabled }) => (
   </div>
 );
 
+// Helper function to calculate centroid of a polygon
+function calculateCentroid(coordinates) {
+  let x = 0;
+  let y = 0;
+  let count = 0;
+  
+  if (coordinates && coordinates.length > 0) {
+    const coords = Array.isArray(coordinates[0][0]) ? coordinates[0] : coordinates;
+    
+    coords.forEach(coord => {
+      if (coord && coord.length >= 2) {
+        x += coord[0];
+        y += coord[1];
+        count++;
+      }
+    });
+    
+    if (count > 0) {
+      return [x / count, y / count];
+    }
+  }
+  
+  return null;
+}
+
+// Helper function to get color based on busyness level
+function getBusynessColor(busynessLevel) {
+  const colors = {
+    low: '#52c41a',      // Green
+    medium: '#faad14',   // Orange
+    high: '#ff4d4f'      // Red
+  };
+  
+  return colors[busynessLevel?.toLowerCase()] || '#088F8F'; // Fixed: added default fallback
+}
+
+// Helper function to get opacity based on busyness level
+function getBusynessOpacity(busynessLevel) {
+  const opacities = {
+    low: 0.3,
+    medium: 0.5,
+    high: 0.7
+  };
+  
+  return opacities[busynessLevel?.toLowerCase()] || 0.3;
+}
+
+// Create a Mapbox GL expression for zone coloring
+function createZoneColorExpression(zoneBusynessMap) {  
+  if (!zoneBusynessMap || Object.keys(zoneBusynessMap).length === 0) {
+    return '#088F8F'; // Default color
+  }
+
+  const expression = ['case'];
+  
+  // Add conditions for each zone
+  Object.keys(zoneBusynessMap).forEach((zoneId) => {
+  const busynessLevel = zoneBusynessMap[zoneId];
+  const color = getBusynessColor(busynessLevel);
+    
+  // Convert locationID to string for comparison
+  expression.push(['==', ['to-string', ['get', 'locationID']], zoneId]);
+  expression.push(color);
+});
+  
+  expression.push('#088F8F'); // Default color
+  
+  return expression;
+}
+
+// Create a Mapbox GL expression for zone opacity
+function createZoneOpacityExpression(zoneBusynessMap) {
+  if (!zoneBusynessMap || Object.keys(zoneBusynessMap).length === 0) {
+    return 0.3; // Default opacity
+  }
+
+  const expression = ['case'];
+    
+  Object.keys(zoneBusynessMap).forEach((zoneId) => {
+    const busynessLevel = zoneBusynessMap[zoneId];
+    const opacity = getBusynessOpacity(busynessLevel);
+    
+    expression.push(['==', ['to-string', ['get', 'locationID']], zoneId]);
+    expression.push(opacity);
+  });
+  
+  expression.push(0.3); // Default opacity
+  return expression;
+}
+
 function MapPanel({ 
   locations = [],
   icon: Icon = DefaultMarker,
@@ -80,13 +166,21 @@ function MapPanel({
   },
   selectedLocation,
   onMarkerClick,
-  onPopupClose
+  onPopupClose,
+  geojsonFile,
+  onZoneClick,
+  zoneBusynessMap = {} // New prop for zone busyness data
 }) {
   const [viewport, setViewport] = useState(defaultViewport);
   const [mapRef, setMapRef] = useState(null);
   const [routeData, setRouteData] = useState(null);
   const [routeInfo, setRouteInfo] = useState(null);
+  const [selectedZone, setSelectedZone] = useState(null);
+  const [selectedZoneCoords, setSelectedZoneCoords] = useState(null);
+  const [zonesLoaded, setZonesLoaded] = useState(false);
+  const [error, setError] = useState(null);
   const { currentLocation } = useLocation();
+  const hoveredZoneId = useRef(null);
 
   // Filter locations with valid coordinates
   const locationsWithCoordinates = locations.filter(location => 
@@ -115,8 +209,8 @@ function MapPanel({
           geometry: route.geometry
         });
         setRouteInfo({
-          distance: (route.distance / 1000).toFixed(1), // Convert to km
-          duration: Math.round(route.duration / 60) // Convert to minutes
+          distance: (route.distance / 1000).toFixed(1),
+          duration: Math.round(route.duration / 60)
         });
       }
     } catch (error) {
@@ -126,7 +220,251 @@ function MapPanel({
     }
   };
 
-  // Handle route calculation when selected location changes
+  const loadManhattanZones = async () => {
+    if (!mapRef || zonesLoaded) return;
+
+    try {
+      let geojsonData;
+      
+      if (geojsonFile) {
+        const text = await geojsonFile.text();
+        geojsonData = JSON.parse(text);
+      } else {
+        const response = await fetch('/zones_with_busyness.geojson');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        geojsonData = await response.json();
+      }
+
+      const map = mapRef.getMap();
+
+      if (map.getSource('manhattan-zones')) {
+        map.getSource('manhattan-zones').setData(geojsonData);
+        return;
+      }
+
+      geojsonData.features.forEach((feature, index) => {
+        if (feature.id === undefined) {
+          feature.id = index;
+        }
+      });
+
+      map.addSource('manhattan-zones', {
+        type: 'geojson',
+        data: geojsonData
+      });
+
+      // Add fill layer with dynamic coloring based on busyness
+      map.addLayer({
+        id: 'zones-fill',
+        type: 'fill',
+        source: 'manhattan-zones',
+        paint: {
+          'fill-color': Object.keys(zoneBusynessMap).length > 0 
+            ? createZoneColorExpression(zoneBusynessMap) 
+            : '#088F8F',
+          'fill-opacity': Object.keys(zoneBusynessMap).length > 0 
+            ? createZoneOpacityExpression(zoneBusynessMap) 
+            : 0.3
+        }
+      });
+
+      // Add stroke layer
+      map.addLayer({
+        id: 'zones-stroke',
+        type: 'line',
+        source: 'manhattan-zones',
+        paint: {
+          'line-color': '#627BC1',
+          'line-width': 2,
+          'line-opacity': 0.8
+        }
+      });
+
+      // Add labels for zones
+      map.addLayer({
+        id: 'zones-labels',
+        type: 'symbol',
+        source: 'manhattan-zones',
+        layout: {
+          'text-field': ['get', 'name'],
+          'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+          'text-size': 12,
+          'text-anchor': 'center'
+        },
+        paint: {
+          'text-color': '#000',
+          'text-halo-color': '#fff',
+          'text-halo-width': 1
+        }
+      });
+// Force refresh with a more aggressive approach
+    setTimeout(() => {
+      if (map.getLayer('zones-fill') && Object.keys(zoneBusynessMap).length > 0) {
+        
+        // Remove and re-add the layer
+        map.removeLayer('zones-fill');
+        
+        map.addLayer({
+          id: 'zones-fill',
+          type: 'fill',
+          source: 'manhattan-zones',
+          paint: {
+            'fill-color': createZoneColorExpression(zoneBusynessMap),
+            'fill-opacity': createZoneOpacityExpression(zoneBusynessMap)
+          }
+        }, 'zones-stroke'); // Insert before stroke layer
+        
+      }
+    }, 100);
+      // Add hover effects
+      map.on('mouseenter', 'zones-fill', (e) => {
+        map.getCanvas().style.cursor = 'pointer';
+        
+        if (e.features.length > 0) {
+          const feature = e.features[0];
+          if (feature.id !== undefined) {
+            if (hoveredZoneId.current !== null) {
+              map.setFeatureState(
+                { source: 'manhattan-zones', id: hoveredZoneId.current },
+                { hover: false }
+              );
+            }
+            
+            hoveredZoneId.current = feature.id;
+            map.setFeatureState(
+              { source: 'manhattan-zones', id: hoveredZoneId.current },
+              { hover: true }
+            );
+          }
+        }
+      });
+
+      map.on('mouseleave', 'zones-fill', () => {
+        map.getCanvas().style.cursor = '';
+        
+        if (hoveredZoneId.current !== null) {
+          map.setFeatureState(
+            { source: 'manhattan-zones', id: hoveredZoneId.current },
+            { hover: false }
+          );
+          hoveredZoneId.current = null;
+        }
+      });
+
+      // Click event handler
+      map.on('click', 'zones-fill', (e) => {
+        if (e.features.length > 0) {
+          const clickedZone = e.features[0];
+          
+          console.log('Zone clicked - ID:', clickedZone.id);
+          console.log('Zone clicked - Properties:', clickedZone.properties);
+          
+          // Get busyness level for this zone
+          const zoneLocationID = clickedZone.properties.locationID;
+          const busynessLevel = zoneBusynessMap[zoneLocationID] || 'unknown';
+          
+          // Calculate centroid for popup positioning
+          let centroid = null;
+          if (clickedZone.geometry) {
+            if (clickedZone.geometry.type === 'Polygon') {
+              centroid = calculateCentroid(clickedZone.geometry.coordinates);
+            } else if (clickedZone.geometry.type === 'MultiPolygon') {
+              if (clickedZone.geometry.coordinates.length > 0) {
+                centroid = calculateCentroid(clickedZone.geometry.coordinates[0]);
+              }
+            }
+          }
+          
+          if (!centroid || isNaN(centroid[0]) || isNaN(centroid[1])) {
+            centroid = [e.lngLat.lng, e.lngLat.lat];
+          }
+          
+          // Add busyness level to zone properties for popup display
+          const zoneWithBusyness = {
+            ...clickedZone.properties,
+            busynessLevel: busynessLevel,
+            busynessColor: getBusynessColor(busynessLevel)
+          };
+          
+          setSelectedZone(zoneWithBusyness);
+          setSelectedZoneCoords(centroid);
+          
+          if (onZoneClick) {
+            onZoneClick({ ...clickedZone, busynessLevel });
+          }
+          
+          // Fit map to selected zone
+          const coordinates = [];
+          
+          if (clickedZone.geometry.type === 'Polygon') {
+            coordinates.push(...clickedZone.geometry.coordinates[0]);
+          } else if (clickedZone.geometry.type === 'MultiPolygon') {
+            clickedZone.geometry.coordinates.forEach(polygon => {
+              coordinates.push(...polygon[0]);
+            });
+          }
+          
+          if (coordinates.length > 0) {
+            const bounds = coordinates.reduce((bounds, coord) => {
+              return bounds.extend(coord);
+            }, new mapboxgl.LngLatBounds(coordinates[0], coordinates[0]));
+            
+            map.fitBounds(bounds, { padding: 50 });
+          }
+        }
+      });
+
+      setZonesLoaded(true);
+      setError(null);
+
+    } catch (error) {
+      console.error('Error loading Manhattan zones:', error);
+      setError('Failed to load zone data. Please check your GeoJSON file or network connection.');
+    }
+  };
+
+useEffect(() => {
+  if (mapRef && zonesLoaded && Object.keys(zoneBusynessMap).length > 0) {
+    const map = mapRef.getMap();
+    if (map.getLayer('zones-fill')) {
+      
+      // Remove and recreate the layer
+      map.removeLayer('zones-fill');
+      map.addLayer({
+        id: 'zones-fill',
+        type: 'fill',
+        source: 'manhattan-zones',
+        paint: {
+          'fill-color': createZoneColorExpression(zoneBusynessMap),
+          'fill-opacity': createZoneOpacityExpression(zoneBusynessMap)
+        }
+      }, 'zones-stroke');
+    }
+  }
+}, [zoneBusynessMap, mapRef, zonesLoaded]);
+
+  useEffect(() => {
+    if (mapRef && !zonesLoaded) {
+      const map = mapRef.getMap();
+      
+      if (map.isStyleLoaded()) {
+        loadManhattanZones();
+      } else {
+        map.on('style.load', loadManhattanZones);
+      }
+    }
+  }, [mapRef, geojsonFile, zonesLoaded]);
+
+  useEffect(() => {
+  if (mapRef && Object.keys(zoneBusynessMap).length > 0) {
+    // Force reload zones with new busyness data
+    setZonesLoaded(false);
+    loadManhattanZones();
+  }
+}, [zoneBusynessMap]);
+
   useEffect(() => {
     if (selectedLocation && currentLocation && currentLocation.coordinates) {
       fetchRoute(currentLocation.coordinates, selectedLocation.coordinates);
@@ -136,14 +474,12 @@ function MapPanel({
     }
   }, [selectedLocation, currentLocation]);
 
-  // Handle current location marker click
   const handleCurrentLocationClick = () => {
     if (currentLocation && onMarkerClick) {
       onMarkerClick(currentLocation);
     }
   };
 
-  // Handle GPS button click
   const handleGPSClick = () => {
     if (currentLocation && currentLocation.coordinates && mapRef) {
       mapRef.flyTo({
@@ -154,14 +490,12 @@ function MapPanel({
     }
   };
 
-  // Check if current location is already in the locations array
   const isCurrentLocationInLocations = currentLocation && locationsWithCoordinates.some(loc => 
     loc.id === currentLocation.id || 
     (loc.coordinates[0] === currentLocation.coordinates[0] && 
      loc.coordinates[1] === currentLocation.coordinates[1])
   );
 
-  // Center map on new locations
   useEffect(() => {
     if (locationsWithCoordinates.length > 0) {
       const newLocation = locationsWithCoordinates[locationsWithCoordinates.length - 1];
@@ -173,7 +507,6 @@ function MapPanel({
     }
   }, [locations]);
 
-  // Route layer style
   const routeLayer = {
     id: 'route',
     type: 'line',
@@ -191,6 +524,23 @@ function MapPanel({
 
   return (
     <div className="map-panel" style={{ position: 'relative' }}>
+      {error && (
+        <div className="error-message" style={{
+          position: 'absolute',
+          top: '10px',
+          left: '10px',
+          right: '10px',
+          zIndex: 1000,
+          backgroundColor: '#ff4d4f',
+          color: 'white',
+          padding: '10px',
+          borderRadius: '4px',
+          fontSize: '14px'
+        }}>
+          {error}
+        </div>
+      )}
+      
       <Map
         ref={setMapRef}
         mapboxAccessToken={TOKEN}
@@ -201,14 +551,12 @@ function MapPanel({
         projection="globe"
         {...viewport}
       >
-        {/* Route line */}
         {routeData && (
           <Source id="route" type="geojson" data={routeData}>
             <Layer {...routeLayer} />
           </Source>
         )}
 
-        {/* Regular location markers */}
         {locationsWithCoordinates.map((location) => {
           const isSelected = selectedLocation && selectedLocation.id === location.id;
           const MarkerComponent = isSelected ? SelectedMarker : Icon;
@@ -226,7 +574,6 @@ function MapPanel({
           );
         })}
 
-        {/* Current location marker - only show if it's not already in locations */}
         {currentLocation && currentLocation.coordinates && !isCurrentLocationInLocations && (
           <Marker
             key={`current-${currentLocation.id}`}
@@ -239,7 +586,6 @@ function MapPanel({
           </Marker>
         )}
 
-        {/* Show current location marker with different style if it's in locations */}
         {currentLocation && currentLocation.coordinates && isCurrentLocationInLocations && (
           <Marker
             key={`current-overlay-${currentLocation.id}`}
@@ -304,9 +650,9 @@ function MapPanel({
             )}
           </Popup>
         )}
+
       </Map>
 
-      {/* GPS Navigation Button */}
       <GPSButton 
         onClick={handleGPSClick}
         disabled={!currentLocation || !currentLocation.coordinates}
@@ -315,12 +661,6 @@ function MapPanel({
   );
 }
 
-// Helper function (can be moved to utils)
-function getBusynessColor(percentage) {
-  const value = parseInt(percentage);
-  if (value >= 80) return '#ff4d4f'; 
-  if (value >= 40) return '#faad14'; 
-  return '#52c41a'; 
-}
+
 
 export default MapPanel;

@@ -511,7 +511,6 @@ const uniqueId = crypto.randomUUID();
                           <div className="header-cell">PLANNED ON</div>
                           <div className="header-cell">PLANNED AT</div>
                           <div className="header-cell">PREDICTED</div>
-                          <div className="header-cell">ACTION</div>
                         </div>
                       </div>
                       <div className="recommendations-table-body">
@@ -545,17 +544,7 @@ const uniqueId = crypto.randomUUID();
                                 {getBusynessLabel(recommendation.busyness)}
                               </span>
                             </div>
-                            <div className="recommendation-cell action-cell">
-                              <button 
-                                className="action-btn"
-                                onClick={() => {
-                                  // Add action handler here
-                                  console.log('Action clicked for:', recommendation);
-                                }}
-                              >
-                                View Details
-                              </button>
-                            </div>
+                            
                           </div>
                         ))}
                       </div>
@@ -741,12 +730,6 @@ const uniqueId = crypto.randomUUID();
                           <span className="plan-time">{formatTimeForDisplay(plan.time)}</span>
                         </div>
                         <span className="plan-category">{plan.category}</span>
-                        {plan.latitude && plan.longitude && (
-                          <div className="plan-coordinates">
-                            <MapPin size={12} />
-                            <small>{plan.latitude.toFixed(6)}, {plan.longitude.toFixed(6)}</small>
-                          </div>
-                        )}
                       </div>
                     </div>
                   ))}

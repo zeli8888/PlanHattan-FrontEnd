@@ -1,4 +1,3 @@
-import { useContext } from "react";
 
 // Enhanced API function with more configuration options
 export async function makeApiRequest(poiTypeName, options = {}) {
@@ -46,12 +45,6 @@ export async function makeApiRequest(poiTypeName, options = {}) {
         
         const data = await response.json();
         
-        // Log to console with structured information
-        console.log('API Response received:', {
-            poiType: poiTypeName,
-            recordCount: data.busynessDistanceRecommendationDTOS?.length || data.pois?.length || 'unknown',
-            data: data
-        });
         
         // Return the data so it can be used
         return data;

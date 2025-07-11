@@ -67,9 +67,9 @@ export default function Attractions() {
   // Validate the transformed data
   const validatedLocations = PoiDataTransformer.validatePois(locations);
   
-  // Get statistics for debugging
-  const stats = PoiDataTransformer.getDataStats(validatedLocations);
-  console.log('Attractions data stats:', stats);
+  // // Get statistics for debugging
+  // const stats = PoiDataTransformer.getDataStats(validatedLocations);
+  // console.log('Attractions data stats:', stats);
   
   // Show error message if API call failed
   if (state?.error) {

@@ -4,7 +4,7 @@ import Navbar from '../../components/nav/Navbar';
 import './PlannerLayout.css';
 import { useState } from 'react';
 
-export default function PlannerLayout({ children, locations = [] }) {
+export default function PlannerLayout({ children, locations = [], zoneBusynessMap = {}  }) {
   const [selectedLocation, setSelectedLocation] = useState(null);
 
   const handleMarkerClick = (location) => {
@@ -25,6 +25,7 @@ export default function PlannerLayout({ children, locations = [] }) {
             selectedLocation={selectedLocation}
             onMarkerClick={handleMarkerClick}
             onPopupClose={handlePopupClose}
+            zoneBusynessMap={zoneBusynessMap}
           />
         </div>
         <div className="planner-right">
