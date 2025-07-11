@@ -1,0 +1,316 @@
+.interest-container {
+  margin-top: 2rem;
+  padding: 0 1rem;
+}
+
+.title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 0.3rem;
+}
+
+.subtitle {
+  color: #555;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+}
+
+.icon-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.icon-card {
+  width: 70px;
+  height: 100px;
+  padding: 1.2rem;
+  gap: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.icon-card:hover {
+  transform: scale(0.9);
+}
+
+.icon-card.selected {
+  transform: scale(1.1); 
+}
+
+.icon-card.selected .icon svg {
+  color: #373dc4;
+  background-color: white;
+}
+
+.icon {
+  box-shadow: 5px 8px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.icon-label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #1a1a1a;
+  line-height: 1.2;
+  margin-top: 0.4rem;
+  text-align: center;
+}
+
+.cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.search-label {
+  font-size: 1.2rem;
+  flex: 1;
+}
+
+.go-btn {
+  background-color: #631BE5;
+  color: white;
+  font-weight: bold;
+  border: none;
+  padding: 0.6rem 1.5rem;
+  border-radius: 999px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.go-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.go-btn:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* New slider container for animation */
+.slider-container {
+  position: relative;
+  overflow: hidden;
+  min-height: 130px;
+  padding: 5px;
+}
+
+.interest-panel {
+  width: 100%;
+  transition: transform 0.3s ease-in-out;
+}
+
+.interest-panel.slide-left {
+  transform: translateX(-110%);
+}
+
+.datetime-panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  transform: translateX(110%);
+  transition: transform 0.3s ease-in-out;
+}
+
+.datetime-panel.slide-in {
+  transform: translateX(0);
+}
+
+.datetime-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.back-btn:hover {
+  background-color: #f0f0f0;
+}
+
+.datetime-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.datetime-content {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  align-items: center;
+  min-height: 50px;
+}
+
+.int-date-input-group {
+  margin-top: 15px;
+}
+
+.planning-text {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.date-picker {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.date-picker.error {
+  border-color: #ff4444;
+}
+
+/* FIXED: Changed class name to avoid conflict with TimePicker */
+.interest-time-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.time-picker-section label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #333;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .interest-container {
+    padding: 0 0.5rem;
+  }
+  
+  .title {
+    font-size: 1.5rem;
+  }
+  
+  .subtitle {
+    font-size: 0.9rem;
+  }
+  
+  .icon-grid {
+    gap: 1rem;
+    justify-content: center;
+  }
+  
+  .icon-card {
+    width: 60px;
+    height: 85px;
+    padding: 0.8rem;
+  }
+  
+  .icon-label {
+    font-size: 0.75rem;
+  }
+  
+  .cta {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+  
+  .search-label {
+    font-size: 1rem;
+    text-align: center;
+  }
+  
+  .go-btn {
+    width: 100%;
+    padding: 0.8rem 1.5rem;
+  }
+  
+  .datetime-content {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .slider-container {
+    max-height: 180px;
+  }
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+  .icon-grid {
+    gap: 0.8rem;
+  }
+  
+  .icon-card {
+    width: 50px;
+    height: 75px;
+    padding: 0.6rem;
+  }
+  
+  .icon svg {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .icon-label {
+    font-size: 0.7rem;
+  }
+  
+  .planning-text {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+  
+  .date-picker {
+    width: 100%;
+  }
+}
+
+/* Tablet landscape */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .icon-grid {
+    justify-content: space-around;
+  }
+  
+  .icon-card {
+    width: 65px;
+    height: 90px;
+  }
+}
+
+/* Large screens */
+@media (min-width: 1200px) {
+  .interest-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+  }
+  
+  .icon-grid {
+    justify-content: space-around;
+  }
+}
