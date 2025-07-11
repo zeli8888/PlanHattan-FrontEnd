@@ -288,7 +288,6 @@ function Discover() {
             onFocus={() => predictions.length > 0 && setShowPredictions(true)}
             style={{ width: '80%' }} // Reduced by 20%
           />
-          <Search className='search-icon' onClick={handleSearch}/>
           <button 
             className="location-btn"
             onClick={handleSetCurrentLocation}

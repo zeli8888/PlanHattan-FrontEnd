@@ -1,17 +1,14 @@
-.time-picker-container {
-  display: inline-block;
-}
-
 .time-display {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 12px;
   background: white;
-  border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   cursor: pointer;
-  font-size: 14px;
+  padding: 0.8rem;
+  border: 2px solid #ddd;
+  border-radius: 12px;
+  font-size: 1rem;
 }
 
 .time-input-group {
@@ -19,6 +16,7 @@
   flex-direction: row;
   align-items: center;
   gap: 2px;
+  flex-wrap: nowrap;  /* Prevent wrapping */
 }
 
 .time-input {
@@ -29,6 +27,7 @@
   font-size: 14px;
   padding: 2px;
   outline: none;
+  flex-shrink: 0;  /* Prevent shrinking */
 }
 
 .time-input:focus {
@@ -39,6 +38,7 @@
 .time-separator {
   font-weight: bold;
   user-select: none;
+  flex-shrink: 0;  /* Prevent shrinking */
 }
 
 .period-toggle {
@@ -50,6 +50,8 @@
   cursor: pointer;
   font-size: 14px;
   transition: background 0.2s;
+  flex-shrink: 0;  /* Prevent shrinking */
+  white-space: nowrap;  /* Prevent text wrapping */
 }
 
 .period-toggle:hover {

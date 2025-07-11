@@ -126,7 +126,7 @@ function createZoneColorExpression(zoneBusynessMap) {
   const color = getBusynessColor(busynessLevel);
     
   // Convert locationID to string for comparison
-  expression.push(['==', ['to-string', ['get', 'locationID']], zoneId]);
+  expression.push(['==', ['to-string', ['get', 'LocationID']], zoneId]);
   expression.push(color);
 });
   
@@ -147,7 +147,7 @@ function createZoneOpacityExpression(zoneBusynessMap) {
     const busynessLevel = zoneBusynessMap[zoneId];
     const opacity = getBusynessOpacity(busynessLevel);
     
-    expression.push(['==', ['to-string', ['get', 'locationID']], zoneId]);
+    expression.push(['==', ['to-string', ['get', 'LocationID']], zoneId]);
     expression.push(opacity);
   });
   
@@ -288,7 +288,7 @@ function MapPanel({
         type: 'symbol',
         source: 'manhattan-zones',
         layout: {
-          'text-field': ['get', 'name'],
+          'text-field': ['get', 'zone'],
           'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
           'text-size': 12,
           'text-anchor': 'center'

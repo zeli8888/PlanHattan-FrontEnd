@@ -78,10 +78,9 @@ const handleDelete = async (id) => {
   }
 };
 
-  const getPredictionColor = (percentage) => {
-    const value = parseInt(percentage);
-    if (value >= 80) return '#ff4d4f';
-    if (value >= 40) return '#faad14';
+  const getPredictionColor = (value) => {
+    if (value === 'high') return '#ff4d4f';
+    if (value === 'medium') return '#faad14';
     return '#52c41a';
   };
 

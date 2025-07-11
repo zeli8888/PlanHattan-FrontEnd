@@ -124,9 +124,8 @@
   gap: 0.5rem;
 }
 
-.time-input-group {
+.rec-time-input-group {
   display: flex;
-  flex-direction: column;
   gap: 0.5rem;
 }
 
@@ -211,14 +210,6 @@
   color: #333;
 }
 
-.time-picker {
-  padding: 0.5rem;
-  border: 2px solid #ddd;
-  border-radius: 6px;
-  font-size: 1rem;
-  outline: none;
-  transition: all 0.3s ease;
-}
 
 .time-picker:focus {
   border-color: #631BE5;
@@ -241,11 +232,6 @@
   flex-wrap: wrap;
 }
 
-.custom-time-picker {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
 
 .time-select {
   padding: 0.5rem;
@@ -411,6 +397,29 @@
 
 .recommendations-table-header {
   margin-bottom: 10px;
+}
+
+.add-my-plans-rec {
+  background-color: #631BE5;  
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 20px;
+  width: 100%;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.add-my-plans-rec:hover {
+  transform: scale(1.02);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
 }
 
 .table-header-row {

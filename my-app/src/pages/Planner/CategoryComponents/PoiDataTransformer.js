@@ -41,7 +41,7 @@ const formatDistance = (distance) => {
     if (distance > 1000) {
       return `${(distance / 1000).toFixed(1)}km`;
     }
-    return `${distance.toFixed(0)}m`;
+    return `${distance.toFixed(0)}km`;
   }
   if (typeof distance === 'string') {
     if (distance.includes('km') || distance.includes('mi') || distance.includes('m')) {
@@ -112,6 +112,7 @@ class PoiDataTransformer {
         const poi = item.poi || item;
         return {
           id: poi.poiId || poi.id || `api_poi_${index + 1}`,
+          zoneId: poi.zone.zoneId,
           name: capitalizeWords(poi.poiName || poi.name || poi.title || `${category} ${index + 1}`),
           coordinates: formatCoordinates(item),
           image: poi.imageUrl || poi.image || poi.photo || getDefaultImage(category, index),

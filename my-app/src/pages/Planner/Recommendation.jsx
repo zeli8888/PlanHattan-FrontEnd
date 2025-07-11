@@ -3,6 +3,8 @@ import { useState, useEffect, useRef } from 'react';
 import './Recommendation.css';
 import TimePicker from '../../components/dateTime/TimePicker'
 import RequestRecommendation from '../../api/RecommendationApi'
+import postMultipleUserPlans from '../../api/userplans/AddMultipleUserPlans'; 
+
 import {
   Landmark,
   Binoculars,
@@ -382,6 +384,27 @@ const uniqueId = crypto.randomUUID();
     setShowRecommendations(false);
   };
 
+  const handleAddRecommendationsToPlans = async () => {
+  try {
+    const transformedRecommendations = recommendations.map(recommendation => ({
+      userPlanId: null, // or generate/assign appropriate IDs
+      place: recommendation.poiName || 'Unknown Place',
+      time: recommendation.time,
+      predicted: recommendation.busyness || 'unknown',
+      coordinates: recommendation.latitude && recommendation.longitude 
+        ? { lat: recommendation.latitude, lng: recommendation.longitude }
+        : null
+    }));
+
+    const response = await postMultipleUserPlans(transformedRecommendations);
+    console.log('Recommendations added successfully:', response);
+    showNotification('success', 'Plans Added', 'All recommendations have been added to your plans!');
+  } catch (error) {
+    console.error('Error adding recommendations to plans:', error);
+    showNotification('error', 'Error', 'Failed to add recommendations to plans. Please try again.');
+  }
+};
+
   const formatDate = (dateString) => {
     if (!dateString) return 'Date not set';
     const date = new Date(dateString);
@@ -548,6 +571,7 @@ const uniqueId = crypto.randomUUID();
                           </div>
                         ))}
                       </div>
+                      <button className="add-my-plans-rec" onClick={handleAddRecommendationsToPlans}>Add All to My Plans</button>
                     </>
                   ) : (
                     <div className="no-recommendations">
@@ -586,7 +610,7 @@ const uniqueId = crypto.randomUUID();
                   )}
                 </div>
                 
-                <div className="time-input-group">
+                <div className="rec-time-input-group">
                   <div className="time-picker-section">
                     <label htmlFor="time-picker">Time:</label>
                     <TimePicker 

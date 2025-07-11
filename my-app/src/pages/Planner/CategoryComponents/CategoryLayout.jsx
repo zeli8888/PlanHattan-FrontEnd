@@ -12,6 +12,8 @@ import CardTilt from '../../../components/features/CardTilt';
 import { useMyPlans } from '../../../contexts/MyPlansProvider';
 import postUserPlans from '../../../api/userplans/AddUserPlansApi';
 import { useLocation } from 'react-router-dom';
+import getUpcomingBusynessWithFallback from '../../../api/UpcomingBusynessApi';
+
 
 const CategoryLayout = ({  
   displayName, 
@@ -70,6 +72,8 @@ const CategoryLayout = ({
   const [departureLocation, setDepartureLocation] = useState({});
 
   // Calculate pagination values
+  const [currentPageGroup, setCurrentPageGroup] = useState(1);
+  const pagesPerGroup = 5;
   const indexOfLastCard = currentPage * cardsPerPage;
   const indexOfFirstCard = indexOfLastCard - cardsPerPage;
 
@@ -136,6 +140,46 @@ const CategoryLayout = ({
     }));
   };
 
+  const [upcomingBusyness, setUpcomingBusyness] = useState({});
+  const [busynessLoading, setBusynessLoading] = useState({});
+const handleGetUpcomingBusyness = async (place) => {
+  if (!place || upcomingBusyness[place.id]) {
+    // Skip if no place or data already fetched
+    console.log('Skipping busyness fetch for place:', place?.name || 'undefined place');
+    return;
+  }
+
+  console.log('Fetching busyness data for place:', place.name);
+  console.log('Using date:', dateTime.date.toISOString());
+  
+  setBusynessLoading(prev => ({ ...prev, [place.id]: true }));
+
+  try {
+    // Fetch busyness data using the API service
+    const busynessData = await getUpcomingBusynessWithFallback(
+      1, // zoneId - adjust based on your zone system
+      3, // predictedHours
+      dateTime.date.toISOString() // Use the selected date/time from the component
+    );
+    
+    setUpcomingBusyness(prev => ({
+      ...prev,
+      [place.id]: busynessData
+    }));
+    
+  } catch (error) {
+    console.error('❌ Error details:', error.message);    
+    // This shouldn't happen with the fallback API, but just in case
+    setUpcomingBusyness(prev => ({
+      ...prev,
+      [place.id]: []
+    }));
+  } finally {
+    setBusynessLoading(prev => ({ ...prev, [place.id]: false }));
+    console.log('✅ Busyness loading completed for place:', place.name);
+  }
+};
+
   const { addPlan, plans, deletePlan, updatePlan } = useMyPlans();
   const isPlaceInMyPlans = (place) => {
   return plans.some(plan => 
@@ -153,6 +197,19 @@ const getPlannedTime = (place) => {
   return planItem ? planItem.time : null;
 };  
 
+  const getVisiblePageNumbers = () => {
+    const startPage = (currentPageGroup - 1) * pagesPerGroup + 1;
+    const endPage = Math.min(startPage + pagesPerGroup - 1, totalPages);
+    return Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
+  };
+
+  // Add this helper function to handle page changes
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    // Calculate which page group this page belongs to
+    const newPageGroup = Math.ceil(pageNumber / pagesPerGroup);
+    setCurrentPageGroup(newPageGroup);
+  };
 const filteredAndSortedLocations = showOnlySelected 
   ? locations.filter(place => isPlaceInMyPlans(place))
   : locations;
@@ -241,7 +298,6 @@ const handleAddToMyPlans = async (place) => {
 
     // Post to server first
     const response = await postUserPlans(planData);
-    
     // IMPORTANT: Use the server's userPlanId as the main ID
     const serverPlanId = response.userPlanId;
     
@@ -359,6 +415,7 @@ const handleRemoveFromMyPlans = async (place) => {
   // Helper function to check if locations have recommendation values
   const hasRecommendationData = locations.some(place => place.recommendation !== undefined);
   const hasRatingData = locations.some(place => place.rating !== undefined && place.rating !== null);
+
   return (
     <PlannerLayout 
       locations={currentCards} 
@@ -486,7 +543,8 @@ const handleRemoveFromMyPlans = async (place) => {
                   {isPlaceInMyPlans(place) && (
                     <p className="planned-time" style={{fontWeight: 500, color: '#52c41a'}}>Planned at {getPlannedTime(place)}</p>
                   )}
-                  <div className="flip-button-front" onClick={() => handleCardClick(place.id)}>
+                  <div className="flip-button-front" onClick={() => {handleCardClick(place.id); handleGetUpcomingBusyness(place);}}>
+
                     <FiArrowRight size={25} color="#fff" className='arrow' />
                   </div>
                 </div>
@@ -530,23 +588,54 @@ const handleRemoveFromMyPlans = async (place) => {
                               </tr>
                             </thead>
                             <tbody>
-                              {[
+                            {busynessLoading[place.id] ? (
+                                <tr>
+                                  <td colSpan="3" style={{ textAlign: 'center', padding: '20px' }}>
+                                    Loading busyness data...
+                                  </td>
+                                </tr>
+                          ) : upcomingBusyness[place.id] && upcomingBusyness[place.id].length > 0 ? (
+                              upcomingBusyness[place.id].map((item, index) => (
+                                <tr key={index}>
+                                  <td>{item.time}</td>
+                                    <td style={{ color: getBusynessColor(item.busyness), fontWeight: "600" }}>
+                                      {item.busyness}
+                                    </td>
+                                  <td className="choose-column">
+                                    <button 
+                                      className="choose-btn" 
+                                      onClick={() => handleCardTimeChange(item.timeValue || {
+                                        hours: parseInt(item.time.split(':')[0]) || 12,
+                                        minutes: parseInt(item.time.split(':')[1]) || 0,
+                                        period: item.time.includes('PM') ? 'PM' : 'AM'
+                                      })}
+                                    >
+                                      Choose
+                                    </button>
+                                  </td>
+                                </tr>
+                              ))
+                            ) : (
+                              [
                                 { time: '1:00 PM', busyness: 'low', timeValue: { hours: 1, minutes: 0, period: 'PM' } },
                                 { time: '2:00 PM', busyness: 'high', timeValue: { hours: 2, minutes: 0, period: 'PM' } },
                                 { time: '3:00 PM', busyness: 'medium', timeValue: { hours: 3, minutes: 0, period: 'PM' } }
                               ].map((item, index) => (
                                 <tr key={index}>
                                   <td>{item.time}</td>
-                                  <td style={{ color: getBusynessColor(item.busyness), fontWeight: "600px" }}>
+                                  <td style={{ color: getBusynessColor(item.busyness), fontWeight: "600" }}>
                                     {item.busyness}
                                   </td>
                                   <td className="choose-column">
-                                    <button className="choose-btn" onClick={() => handleCardTimeChange(item.timeValue)}>Choose</button>
+                                    <button className="choose-btn" onClick={() => handleCardTimeChange(item.timeValue)}>
+                                      Choose
+                                    </button>
                                   </td>
                                 </tr>
-                              ))}
-                            </tbody>
-                          </table>
+                              ))
+                            )}
+                          </tbody>
+                        </table>
                           
                           <div className="time-box">
                             <h4>Visit At</h4>
@@ -605,7 +694,10 @@ const handleRemoveFromMyPlans = async (place) => {
         {totalPages > 1 && (
           <div className="pagination-controls">
             <button 
-              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              onClick={() => {
+                const newPage = Math.max(currentPage - 1, 1);
+                handlePageChange(newPage);
+              }}
               disabled={currentPage === 1}
               className="pagination-button"
             >
@@ -613,10 +705,10 @@ const handleRemoveFromMyPlans = async (place) => {
             </button>
             
             <div className="page-numbers">
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(number => (
+              {getVisiblePageNumbers().map(number => (
                 <button
                   key={number}
-                  onClick={() => setCurrentPage(number)}
+                  onClick={() => handlePageChange(number)}
                   className={`page-number ${currentPage === number ? 'active' : ''}`}
                 >
                   {number}
@@ -625,7 +717,10 @@ const handleRemoveFromMyPlans = async (place) => {
             </div>
             
             <button 
-              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+              onClick={() => {
+                const newPage = Math.min(currentPage + 1, totalPages);
+                handlePageChange(newPage);
+              }}
               disabled={currentPage === totalPages}
               className="pagination-button"
             >

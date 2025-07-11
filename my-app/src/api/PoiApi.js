@@ -1,16 +1,22 @@
-
 // Enhanced API function with more configuration options
-export async function makeApiRequest(poiTypeName, options = {}) {
+export async function makeApiRequest(poiTypeName, options = {}, utcTimestamp, currentLocation = null) {
     
     try {
+        let defaultLatitude = '40.6991381066633';
+        let defaultLongitude = '-74.0394915248490';
+        
+        if (currentLocation && currentLocation.coordinates) {
+            defaultLongitude = currentLocation.coordinates[0].toString();
+            defaultLatitude = currentLocation.coordinates[1].toString();
+        }
 
         // Default options that can be overridden
         const defaultOptions = {
-            dateTime: new Date().toISOString(),
-            limit: '30',
+            dateTime: utcTimestamp || new Date().toISOString(), 
+            limit: '100',
             transitType: 'walk',
-            latitude: options.latitude || '40.6991381066633',
-             longitude: options.longitude || '-74.0394915248490'
+            latitude: options.latitude || defaultLatitude,
+            longitude: options.longitude || defaultLongitude
         };
 
         // Merge provided options with defaults
@@ -29,6 +35,7 @@ export async function makeApiRequest(poiTypeName, options = {}) {
         
         console.log('Making request to:', url);
         console.log('Request parameters:', Object.fromEntries(params));
+        console.log('Using current location:', currentLocation ? currentLocation.name : 'Default location');
 
         const response = await fetch(url, {
             method: 'GET',
@@ -69,31 +76,31 @@ export const POI_TYPES = {
     PARK: 'park'
 };
 
-// Helper function for common use cases
-export async function getAttractions(options = {}) {
-    return makeApiRequest(POI_TYPES.ATTRACTION, options);
+// Helper functions updated to accept currentLocation parameter
+export async function getAttractions(options = {}, currentLocation = null) {
+    return makeApiRequest(POI_TYPES.ATTRACTION, options, undefined, currentLocation);
 }
 
-export async function getMuseums(options = {}) {
-    return makeApiRequest(POI_TYPES.MUSEUM, options);
+export async function getMuseums(options = {}, currentLocation = null) {
+    return makeApiRequest(POI_TYPES.MUSEUM, options, undefined, currentLocation);
 }
 
-export async function getRestaurants(options = {}) {
-    return makeApiRequest(POI_TYPES.RESTAURANT, options);
+export async function getRestaurants(options = {}, currentLocation = null) {
+    return makeApiRequest(POI_TYPES.RESTAURANT, options, undefined, currentLocation);
 }
 
-export async function getCafes(options = {}) {
-    return makeApiRequest(POI_TYPES.CAFE, options);
+export async function getCafes(options = {}, currentLocation = null) {
+    return makeApiRequest(POI_TYPES.CAFE, options, undefined, currentLocation);
 }
 
-export async function getBars(options = {}) {
-    return makeApiRequest(POI_TYPES.BAR, options);
+export async function getBars(options = {}, currentLocation = null) {
+    return makeApiRequest(POI_TYPES.BAR, options, undefined, currentLocation);
 }
 
-export async function getPubs(options = {}) {
-    return makeApiRequest(POI_TYPES.PUB, options);
+export async function getPubs(options = {}, currentLocation = null) {
+    return makeApiRequest(POI_TYPES.PUB, options, undefined, currentLocation);
 }
 
-export async function getParks(options = {}) {
-    return makeApiRequest(POI_TYPES.PARK, options);
+export async function getParks(options = {}, currentLocation = null) {
+    return makeApiRequest(POI_TYPES.PARK, options, undefined, currentLocation);
 }
