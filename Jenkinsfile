@@ -5,6 +5,10 @@ pipeline{
     version = '1.0'
   }
 
+  tools {
+    nodejs "NodeJS24" // Reference the NodeJS installation
+  }
+
   stages{
 
     stage('Build'){
