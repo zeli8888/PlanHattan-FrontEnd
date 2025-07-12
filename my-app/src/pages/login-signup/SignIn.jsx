@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import './Auth.css';
-import { authAPI, userStorage } from '../../api/AuthApi';
+import { authAPI } from '../../api/AuthApi';
+import { useAuth } from '../../contexts/AuthContext';
 
 const SignIn = ({ onSwitchToSignUp }) => {
   const [formData, setFormData] = useState({
@@ -12,7 +13,14 @@ const SignIn = ({ onSwitchToSignUp }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
+  const { login } = useAuth();
 
+  const from = location.state?.from || '/';
+
+    const handleHomeNavigate = () => {
+      navigate('/');
+  };
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -47,38 +55,29 @@ const SignIn = ({ onSwitchToSignUp }) => {
     setError('');
     
     try {
-      // Step 1: Login
       const loginResult = await authAPI.login({
         username: formData.username,
         password: formData.password
       });
       
       if (loginResult.success) {
-        // Step 2: Store user data
-        const userData = {
-          username: formData.username,
-          ...loginResult.data
-        };
-        userStorage.setUser(userData);
-        
-        // Step 3: Fetch CSRF token after successful login
         const csrfResult = await authAPI.getCsrfToken();
         
         if (csrfResult.success) {
-          // Store CSRF token
-          userStorage.setCsrfToken(csrfResult.token);
-          console.log('CSRF token obtained and stored successfully');
+          const userData = {
+            username: formData.username,
+            ...loginResult.data
+          };
           
-          // Navigate to home page
-          navigate('/');
+          login(userData, csrfResult.token);
+          console.log('Login successful with CSRF token');
+
+          // Navigate to the intended destination (from MyPlans or default to home)
+          navigate(from, { replace: true });
         } else {
           // Login was successful but CSRF token fetch failed
-          // You might want to handle this case differently based on your app's requirements
           console.warn('CSRF token fetch failed:', csrfResult.error);
           setError('Login successful but security token fetch failed. Please try again.');
-          
-          // Optional: Still navigate to home page if CSRF token is not critical for immediate use
-          // navigate('/');
         }
       } else {
         setError(loginResult.error || 'Login failed. Please check your credentials.');
@@ -94,7 +93,7 @@ const SignIn = ({ onSwitchToSignUp }) => {
   return (
     <div className="planner-page">
       <div className="navbar">
-        <div className="navbar-logo">
+        <div className="navbar-logo" onClick={handleHomeNavigate}>
           PLAN<span>HATTAN</span>
         </div>
       </div>

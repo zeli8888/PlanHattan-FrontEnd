@@ -30,7 +30,7 @@ function Home() {
 
     const handlePlanRoute = () => {
         navigate('/plan');
-    }
+    };
 
     const handleHomeRoute = () => {
         navigate('/');
@@ -41,35 +41,27 @@ function Home() {
         setIsLoggingOut(true);
         
         try {
-            console.log('=== LOGOUT PROCESS START FROM HOME ===');
             console.log('Current user:', userStorage.getUser());
             console.log('Current CSRF token:', userStorage.getCsrfToken());
             
             const result = await authAPI.logout();
             
-            console.log('=== LOGOUT RESULT FROM HOME ===');
             console.log('Logout result:', result);
             
             if (result.success) {
-                console.log('✅ Logout successful from Home component!');
                 console.log('Server response status:', result.status);
                 console.log('Server response data:', result.data);
                 
-                // Verify user data is cleared
                 console.log('User after logout:', userStorage.getUser());
                 console.log('CSRF token after logout:', userStorage.getCsrfToken());
                 
-                // Update local state
                 setUser(null);
                 setShowUserMenu(false);
                 
-                // Navigate to home page (refresh)
                 navigate('/');
             } else {
-                console.log('❌ Logout failed from Home component:', result.error);
                 console.log('Error status:', result.status);
                 
-                // Even if logout fails, user data should be cleared
                 console.log('User data cleared despite error:', !userStorage.getUser());
                 
                 // Still update local state and navigate
@@ -86,7 +78,6 @@ function Home() {
             navigate('/');
         } finally {
             setIsLoggingOut(false);
-            console.log('=== LOGOUT PROCESS END FROM HOME ===');
         }
     };
 
@@ -135,7 +126,7 @@ function Home() {
                                     </button>
                                     {showUserMenu && (
                                         <div className="user-dropdown">
-                                            <div className="user-dropdown-item" onClick={() => navigate('/profile')}>
+                                            <div className="user-dropdown-item">
                                                 Profile
                                             </div>
                                             <div className="user-dropdown-item" onClick={() => navigate('/my-plans')}>
@@ -201,8 +192,10 @@ function Home() {
             </div>
 
             <section className="trust-section" ref={trustSectionRef}>
-                <h2>Why trust PlanHattan with your Trip?</h2>
-            
+                <div className="trust-header">
+                    <h2>Why trust PlanHattan with your Trip?</h2>
+                </div>
+
                 <div className="features-container">
                     <div className="itinerary-card">
                         <div className="itinerary-icon">
@@ -214,28 +207,29 @@ function Home() {
                         </div>
                     </div>
 
-                    <div className="hmap-card">
-                        <div className="feature-icon">
-                            <img src={homeImages.paperMapIcon} alt="maps" />
+                    <div className="features-right">
+                        <div className="hmap-card">
+                            <div className="feature-icon">
+                                <img src={homeImages.paperMapIcon} alt="maps" />
+                            </div>
+                            <div className="feature-content">
+                                <h3>Local Insights & Less Busyness Gems</h3>
+                                <p>Discover places tourists often miss.</p>
+                            </div>
                         </div>
-                        <div className="feature-content">
-                            <h3>Local Insights & Less Busyness Gems</h3>
-                            <p>Discover places tourists often miss.</p>
-                        </div>
-                    </div>
 
-                    <div className="feature-card">
-                        <div className="feature-icon">
-                            <img src={homeImages.calenderIcon} alt="Perfect Timing" />
-                        </div>
-                        <div className="feature-content">
-                            <h3>Where To Go, When To Go – Perfectly Timed</h3>
-                            <p>Flights, hotels, activities in one place.</p>
+                        <div className="feature-card">
+                            <div className="feature-icon">
+                                <img src={homeImages.calenderIcon} alt="Perfect Timing" />
+                            </div>
+                            <div className="feature-content">
+                                <h3>Where To Go, When To Go – Perfectly Timed</h3>
+                                <p>Flights, hotels, activities in one place.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                
             </section>
             
             <section className="destinations-section" ref={destinationsRef}>

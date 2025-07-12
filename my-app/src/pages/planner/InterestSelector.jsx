@@ -3,7 +3,7 @@ import './InterestSelector.css'
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { makeApiRequest } from "../../api/PoiApi";
-import { useLocation } from '../../contexts/LocationContext';
+import { useCurrentLocation } from '../../contexts/LocationContext';
 import TimePicker from '../../components/dateTime/TimePicker'
 
 import {
@@ -57,7 +57,7 @@ const InterestSelector = () => {
   const [selectedCategory, setSelectedCategory] = useState('Attractions');
   const [isLoading, setIsLoading] = useState(false);
   const [showDateTimePicker, setShowDateTimePicker] = useState(false);
-  const { currentLocation } = useLocation();
+  const { currentLocation } = useCurrentLocation();
   const [dateError, setDateError] = useState(false);
   
   // Initialize selectedDate with today's date in YYYY-MM-DD format
@@ -231,38 +231,39 @@ const InterestSelector = () => {
 
         {/* Date Time Picker Panel */}
         <div className={`datetime-panel ${showDateTimePicker ? 'slide-in' : ''}`}>
-          <div className="datetime-header">
-            <button className="back-btn" onClick={handleBackToInterests}>
-              <ArrowLeft size={20} />
-            </button>
-            <h3>Select Date & Time</h3>
-          </div>
-          <div className="datetime-content">
-            <div className="int-date-input-group">
-                  <div className="planning-text">
-                    Planning on 
-                    <input 
-                      type="date" 
-                      className={`date-picker ${dateError ? 'error' : ''}`}
-                      placeholder="Select date"
-                      value={selectedDate}
-                      onChange={(e) => handleDateChange(e.target.value)}
-                    />
-                  </div>
+              <div className="datetime-header">
+                <button className="back-btn" onClick={handleBackToInterests}>
+                  <ArrowLeft size={20} />
+                </button>
+                <h3>Select Date & Time</h3>
               </div>
-              <div className="interest-time-input-group">
-                  <div className="time-picker-section">
-                    <label htmlFor="time-picker">Time:</label>
-                    <TimePicker 
-                      value={cardDateTime.time}  
-                      onChange={handleCardTimeChange}
-                      showAllColumns={true} 
-                    />
-                  </div>
-                </div>
-          </div>
-        </div>
+  <div className="datetime-content">
+  <div className="datetime-input-wrapper">
+    <div className="planning-text">
+      <span>Planning on</span>
+      <input 
+        id="date-picker"
+        type="date" 
+        className={`date-picker ${dateError ? 'error' : ''}`}
+        placeholder="Select date"
+        value={selectedDate}
+        onChange={(e) => handleDateChange(e.target.value)}
+      />
+    </div>
+    <div className="time-input-group">
+      <div className="time-picker-section">
+        <TimePicker 
+          id="time-picker"
+          value={cardDateTime.time}  
+          onChange={handleCardTimeChange}
+          showAllColumns={true} 
+        />
       </div>
+    </div>
+  </div>
+</div>
+</div>
+            </div>
 
       <div className="cta">
         <p className="search-label">

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './Auth.css';
 import { authAPI } from '../../api/AuthApi'; 
+import { useNavigate } from 'react-router-dom';
 
 const SignUp = ({ onSwitchToSignIn }) => {
   const [formData, setFormData] = useState({
@@ -12,7 +13,11 @@ const SignUp = ({ onSwitchToSignIn }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const navigate = useNavigate();
 
+    const handleHomeNavigate = () => {
+      navigate('/');
+  };
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -90,7 +95,7 @@ const SignUp = ({ onSwitchToSignIn }) => {
   return (
     <div className="planner-page">
       <div className="navbar">
-        <div className="navbar-logo">
+        <div className="navbar-logo" onClick={handleHomeNavigate}>
           PLAN<span>HATTAN</span>
         </div>
       </div>

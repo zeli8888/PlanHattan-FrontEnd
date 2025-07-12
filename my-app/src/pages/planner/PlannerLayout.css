@@ -6,12 +6,10 @@
   overflow: hidden;
 }
 
-/* Navbar styles */
 .planner-page > :first-child {
   flex-shrink: 0;
 }
 
-/* Main layout container */
 .planner-layout {
   display: flex;
   flex: 1;
@@ -19,7 +17,6 @@
   width: 100%;
 }
 
-/* Map panel - always takes exactly 50% width */
 .planner-left-map {
   flex: 0 0 50%;
   min-width: 0;
@@ -28,7 +25,6 @@
   position: relative;
 }
 
-/* Content panel - takes remaining 50% */
 .planner-right {
   flex: 0 0 50%;
   min-width: 0;
@@ -38,7 +34,6 @@
   position: relative;
 }
 
-/* Content container inside right panel */
 .planner-right-content {
   max-width: 900px;
   margin: 0 auto;
@@ -74,6 +69,10 @@
 }
 
 @media (max-width: 768px) {
+  .planner-page {
+    margin: 0 -2rem;
+  }
+  
   .planner-right {
     padding: 0.75rem;
   }
@@ -82,5 +81,10 @@
   .planner-right {
     flex: 0 0 auto;
     min-height: 50vh;
+  }
+  
+  .planner-left-map {
+    width: 100vw;
+    margin: 0;
   }
 }

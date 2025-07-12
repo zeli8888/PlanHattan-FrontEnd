@@ -2,11 +2,15 @@ import PlannerLayout from './PlannerLayout';
 import './MyPlans.css';
 import { FiTrash2 } from 'react-icons/fi';
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useMyPlans } from '../../contexts/MyPlansProvider';
-import getUserPlans from '../../api/userplans/GetUserPlansApi'; // Import the API function
+import { useAuth } from '../../contexts/AuthContext';
+import getUserPlans from '../../api/userplans/GetUserPlansApi';
 
 function MyPlans() {
-  const { plans, deletePlan, setPlans } = useMyPlans(); // Add setPlans to update plans
+  const { plans, deletePlan, setPlans } = useMyPlans();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const navigate = useNavigate();
   const [deletingId, setDeletingId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -20,22 +24,26 @@ function MyPlans() {
     busy: plan.predicted
   }));
 
-  // Fetch user plans when component mounts
+  // Fetch user plans when component mounts (only if authenticated)
   useEffect(() => {
     const fetchUserPlans = async () => {
+      if (!isAuthenticated || authLoading) {
+        setLoading(false);
+        return;
+      }
+
       try {
         setLoading(true);
         setError(null);
         
         const userPlans = await getUserPlans();
         
-        // Transform server response to match your frontend format
         const transformedPlans = userPlans.map(plan => ({
           id: plan.userPlanId,
           placeId: plan.userPlanId,
           place: plan.poiName,
-          area: plan.poiName, // You might want to get this from another source
-          areaImage: '', // You might want to get this from another source
+          area: plan.poiName,
+          areaImage: '',
           date: new Date(plan.time).toLocaleDateString(),
           time: new Date(plan.time).toLocaleTimeString('en-US', { 
             hour: 'numeric', 
@@ -57,26 +65,32 @@ function MyPlans() {
     };
 
     fetchUserPlans();
-  }, []); // Empty dependency array means this runs once when component mounts
+  }, [isAuthenticated, authLoading, setPlans]);
 
   useEffect(() => {
     console.log('Plans updated:', plans);
   }, [plans]);
 
-const handleDelete = async (id) => {
-  setDeletingId(id);
-  
-  try {
-    await deletePlan(id);
+  const handleDelete = async (id) => {
+    setDeletingId(id);
     
-    setTimeout(() => {
+    try {
+      await deletePlan(id);
+      
+      setTimeout(() => {
+        setDeletingId(null);
+      }, 300);
+    } catch (error) {
       setDeletingId(null);
-    }, 300);
-  } catch (error) {
-    setDeletingId(null);
-    console.error('Failed to delete plan:', error);
-  }
-};
+      console.error('Failed to delete plan:', error);
+    }
+  };
+
+  const handleSignInClick = () => {
+    navigate('/signin', { 
+      state: { from: '/my-plans' } 
+    });
+  };
 
   const getPredictionColor = (value) => {
     if (value === 'high') return '#ff4d4f';
@@ -84,7 +98,8 @@ const handleDelete = async (id) => {
     return '#52c41a';
   };
 
-  if (loading) {
+  // Show loading state while checking authentication or fetching data
+  if (authLoading || loading) {
     return (
       <PlannerLayout locations={[]}>
         <div className="my-plans-container">
@@ -93,6 +108,28 @@ const handleDelete = async (id) => {
           </div>
           <div className="loading-state">
             <p>Loading your plans...</p>
+          </div>
+        </div>
+      </PlannerLayout>
+    );
+  }
+
+  // Show unauthenticated state
+  if (!isAuthenticated) {
+    return (
+      <PlannerLayout locations={[]}>
+        <div className="my-plans-container">
+          <div className="my-plans-header">
+            <h2>My Plans</h2>
+          </div>
+          <div className="empty-state">
+            <p>Register or SignIn to view MyPlans</p>
+            <button 
+              className="signin-prompt-btn"
+              onClick={handleSignInClick}
+            >
+              Sign In
+            </button>
           </div>
         </div>
       </PlannerLayout>
@@ -113,21 +150,65 @@ const handleDelete = async (id) => {
               <p>No plans added till now</p>
             </div>
           ) : (
-            <table className="plans-table">
-              <thead>
-                <tr>
-                  <th>PLACE</th>
-                  <th>PLANNED ON</th>
-                  <th>PLANNED AT</th>
-                  <th>PREDICTED</th>
-                  <th>ACTION</th>
-                </tr>
-              </thead>
-              <tbody>
+            <>
+              {/* Desktop Table Layout */}
+              <table className="plans-table">
+                <thead>
+                  <tr>
+                    <th>PLACE</th>
+                    <th>PLANNED ON</th>
+                    <th>PLANNED AT</th>
+                    <th>PREDICTED</th>
+                    <th>ACTION</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {plans.map((plan) => (
+                    <tr key={plan.id} className={`plan-row ${deletingId === plan.id ? 'deleting' : ''}`}>
+                      <td>
+                        <div className="place-cell">
+                          <div className="area-image-container">
+                            <img 
+                              src={plan.areaImage || '/default-image.jpg'} 
+                              alt={plan.area} 
+                              className="area-image"
+                            />
+                          </div>
+                          {plan.place}
+                        </div>
+                      </td>
+                      <td>{plan.date}</td>
+                      <td>{plan.time}</td>
+                      <td>
+                        <div 
+                          className="prediction-bar" 
+                          style={{ 
+                            '--percentage': plan.predicted,
+                            '--text-color': getPredictionColor(plan.predicted)
+                          }}
+                        >
+                          {plan.predicted}
+                        </div>
+                      </td>
+                      <td>
+                        <button 
+                          className="myPlans-delete-btn"
+                          onClick={() => handleDelete(plan.id)}
+                        >
+                          <FiTrash2 />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              {/* Mobile Card Layout */}
+              <div className="plans-cards">
                 {plans.map((plan) => (
-                  <tr key={plan.id} className={`plan-row ${deletingId === plan.id ? 'deleting' : ''}`}>
-                    <td>
-                      <div className="place-cell">
+                  <div key={plan.id} className={`plan-card ${deletingId === plan.id ? 'deleting' : ''}`}>
+                    <div className="plan-card-header">
+                      <div className="plan-card-place">
                         <div className="area-image-container">
                           <img 
                             src={plan.areaImage || '/default-image.jpg'} 
@@ -135,34 +216,42 @@ const handleDelete = async (id) => {
                             className="area-image"
                           />
                         </div>
-                        {plan.place}
+                        <div className="plan-card-place-name">{plan.place}</div>
                       </div>
-                    </td>
-                    <td>{plan.date}</td>
-                    <td>{plan.time}</td>
-                    <td>
-                      <div 
-                        className="prediction-bar" 
-                        style={{ 
-                          '--percentage': plan.predicted,
-                          '--text-color': getPredictionColor(plan.predicted)
-                        }}
-                      >
-                        {plan.predicted}
-                      </div>
-                    </td>
-                    <td>
                       <button 
-                        className="myPlans-delete-btn"
+                        className="plan-card-delete"
                         onClick={() => handleDelete(plan.id)}
                       >
                         <FiTrash2 />
                       </button>
-                    </td>
-                  </tr>
+                    </div>
+                    
+                    <div className="plan-card-details">
+                      <div className="plan-card-detail">
+                        <div className="plan-card-detail-label">Planned On</div>
+                        <div className="plan-card-detail-value">{plan.date}</div>
+                      </div>
+                      <div className="plan-card-detail">
+                        <div className="plan-card-detail-label">Planned At</div>
+                        <div className="plan-card-detail-value">{plan.time}</div>
+                      </div>
+                      <div className="plan-card-detail plan-card-prediction">
+                        <div className="plan-card-detail-label">Predicted</div>
+                        <div 
+                          className="prediction-bar" 
+                          style={{ 
+                            '--percentage': plan.predicted,
+                            '--text-color': getPredictionColor(plan.predicted)
+                          }}
+                        >
+                          {plan.predicted}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 ))}
-              </tbody>
-            </table>
+              </div>
+            </>
           )}
         </div>
       </div>

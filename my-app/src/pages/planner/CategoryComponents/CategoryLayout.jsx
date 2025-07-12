@@ -36,6 +36,7 @@ const CategoryLayout = ({
   });
   
   const [selectedMapLocation, setSelectedMapLocation] = useState(null);
+  const [sortDropdownOpen, setSortDropdownOpen] = useState(false);
 
   useEffect(() => {
     if (selectedMapLocation) {
@@ -451,45 +452,132 @@ const handleRemoveFromMyPlans = async (place) => {
                 />
               </div>
             )}
-            {showSorting && (
-              <div className="sub-header">
-                <span className="sort-label">Sort By:</span>
-                <span 
-                  className={`sort-types ${sortConfig.key === 'busyness' ? 'active' : ''}`}
-                  onClick={() => requestSort('busyness')}
-                >
-                  Busyness {sortConfig.key === 'busyness' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : ''}
-                </span>
-                <span 
-                  className={`sort-types ${sortConfig.key === 'distance' ? 'active' : ''}`}
-                  onClick={() => requestSort('distance')}
-                >
-                  Distance {sortConfig.key === 'distance' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : ''}
-                </span>
-                {hasRatingData && ( 
-                  <span 
-                    className={`sort-types ${sortConfig.key === 'rating' ? 'active' : ''}`}
-                    onClick={() => requestSort('rating')}
-                  >
-                    Rating {sortConfig.key === 'rating' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : ''}
-                  </span>
-                )}  
-                {hasRecommendationData && (
-                  <span 
-                    className={`sort-types ${sortConfig.key === 'recommendation' ? 'active' : ''}`}
-                    onClick={() => requestSort('recommendation')}
-                  >
-                    Recommended {sortConfig.key === 'recommendation' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : ''}
-                  </span>
-                )}
-                <span 
-                  className={`sort-types ${showOnlySelected ? 'active' : ''}`}
-                  onClick={toggleSelectedPlaces}
-                >
-                  Selected Places {showOnlySelected}
-                </span>
-              </div>
+
+{showSorting && (
+  <div className="sub-header">
+    <span className="sort-label">Sort By:</span>
+    
+    {/* Desktop Sort Types */}
+    <div className="desktop-sort-types">
+      <span 
+        className={`sort-types ${sortConfig.key === 'busyness' ? 'active' : ''}`}
+        onClick={() => requestSort('busyness')}
+      >
+        Busyness {sortConfig.key === 'busyness' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : ''}
+      </span>
+      <span 
+        className={`sort-types ${sortConfig.key === 'distance' ? 'active' : ''}`}
+        onClick={() => requestSort('distance')}
+      >
+        Distance {sortConfig.key === 'distance' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : ''}
+      </span>
+      {hasRatingData && ( 
+        <span 
+          className={`sort-types ${sortConfig.key === 'rating' ? 'active' : ''}`}
+          onClick={() => requestSort('rating')}
+        >
+          Rating {sortConfig.key === 'rating' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : ''}
+        </span>
+      )}  
+      {hasRecommendationData && (
+        <span 
+          className={`sort-types ${sortConfig.key === 'recommendation' ? 'active' : ''}`}
+          onClick={() => requestSort('recommendation')}
+        >
+          Recommended {sortConfig.key === 'recommendation' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : ''}
+        </span>
+      )}
+      <span 
+        className={`sort-types ${showOnlySelected ? 'active' : ''}`}
+        onClick={toggleSelectedPlaces}
+      >
+        Selected Places {showOnlySelected}
+      </span>
+    </div>
+
+    {/* Mobile Sort Dropdown */}
+    <div className="sort-dropdown">
+      <button 
+        className={`sort-dropdown-button ${sortDropdownOpen ? 'active' : ''}`}
+        onClick={() => setSortDropdownOpen(!sortDropdownOpen)}
+      >
+        <span>
+          {sortConfig.key === 'busyness' && `Busyness ${sortConfig.direction === 'asc' ? '↑' : '↓'}`}
+          {sortConfig.key === 'distance' && `Distance ${sortConfig.direction === 'asc' ? '↑' : '↓'}`}
+          {sortConfig.key === 'rating' && `Rating ${sortConfig.direction === 'asc' ? '↑' : '↓'}`}
+          {sortConfig.key === 'recommendation' && `Recommended ${sortConfig.direction === 'asc' ? '↑' : '↓'}`}
+        </span>
+        <span className="sort-arrow">{sortDropdownOpen ? '▲' : '▼'}</span>
+      </button>
+      
+      {sortDropdownOpen && (
+        <div className="sort-dropdown-content">
+          <div 
+            className={`sort-dropdown-item ${sortConfig.key === 'busyness' ? 'active' : ''}`}
+            onClick={() => {
+              requestSort('busyness');
+              setSortDropdownOpen(false);
+            }}
+          >
+            <span>Busyness</span>
+            {sortConfig.key === 'busyness' && (
+              <span className="sort-arrow">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
             )}
+          </div>
+          <div 
+            className={`sort-dropdown-item ${sortConfig.key === 'distance' ? 'active' : ''}`}
+            onClick={() => {
+              requestSort('distance');
+              setSortDropdownOpen(false);
+            }}
+          >
+            <span>Distance</span>
+            {sortConfig.key === 'distance' && (
+              <span className="sort-arrow">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
+            )}
+          </div>
+          {hasRatingData && (
+            <div 
+              className={`sort-dropdown-item ${sortConfig.key === 'rating' ? 'active' : ''}`}
+              onClick={() => {
+                requestSort('rating');
+                setSortDropdownOpen(false);
+              }}
+            >
+              <span>Rating</span>
+              {sortConfig.key === 'rating' && (
+                <span className="sort-arrow">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
+              )}
+            </div>
+          )}
+          {hasRecommendationData && (
+            <div 
+              className={`sort-dropdown-item ${sortConfig.key === 'recommendation' ? 'active' : ''}`}
+              onClick={() => {
+                requestSort('recommendation');
+                setSortDropdownOpen(false);
+              }}
+            >
+              <span>Recommended</span>
+              {sortConfig.key === 'recommendation' && (
+                <span className="sort-arrow">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
+              )}
+            </div>
+          )}
+          <div 
+            className={`sort-dropdown-item ${showOnlySelected ? 'active' : ''}`}
+            onClick={() => {
+              toggleSelectedPlaces();
+              setSortDropdownOpen(false);
+            }}
+          >
+            <span>Selected Places</span>
+          </div>
+        </div>
+      )}
+    </div>
+  </div>
+)}
           </div>
         </div>
 
