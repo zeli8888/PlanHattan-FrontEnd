@@ -898,9 +898,6 @@
   }
 }
 
-/* Additional responsive improvements */
-
-/* Tablet and small desktop adjustments */
 @media (max-width: 1024px) {
   .recommendation-container {
     padding-left: 0.75rem;
@@ -1039,6 +1036,9 @@
 
 /* Small mobile devices */
 @media (max-width: 480px) {
+    html, body {
+    height: 100%;
+  }
   .recommendation-container {
     padding: 0.5rem;
   }

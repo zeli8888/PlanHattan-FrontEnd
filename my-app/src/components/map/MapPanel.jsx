@@ -3,7 +3,7 @@ import './MapPanel.css';
 import { useState, useEffect, useRef } from 'react';
 import Map, { Marker, Popup, Source, Layer } from 'react-map-gl/mapbox';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { useLocation } from '../../contexts/LocationContext';
+import { useCurrentLocation } from '../../contexts/LocationContext';
 import { Navigation } from 'lucide-react';
 import mapboxgl from 'mapbox-gl';
 
@@ -29,11 +29,11 @@ const SelectedMarker = () => (
 
 const CurrentLocationMarker = () => (
   <svg width="32" height="32" viewBox="0 0 32 32">
-    <circle cx="16" cy="16" r="14" fill="#FF6B6B" opacity="0.3">
+    <circle cx="16" cy="16" r="14" fill="#3B3B98" opacity="0.3">
       <animate attributeName="r" values="14;18;14" dur="2s" repeatCount="indefinite" />
       <animate attributeName="opacity" values="0.3;0.1;0.3" dur="2s" repeatCount="indefinite" />
     </circle>
-    <circle cx="16" cy="16" r="8" fill="#FF6B6B" />
+    <circle cx="16" cy="16" r="8" fill="#3B3B98" />
     <circle cx="16" cy="16" r="3" fill="white" />
     <path d="M16 8 L16 24 M8 16 L24 16" stroke="white" strokeWidth="2" />
   </svg>
@@ -179,7 +179,7 @@ function MapPanel({
   const [selectedZoneCoords, setSelectedZoneCoords] = useState(null);
   const [zonesLoaded, setZonesLoaded] = useState(false);
   const [error, setError] = useState(null);
-  const { currentLocation } = useLocation();
+  const { currentLocation } = useCurrentLocation();
   const hoveredZoneId = useRef(null);
 
   // Filter locations with valid coordinates

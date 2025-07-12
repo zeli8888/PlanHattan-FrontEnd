@@ -3,7 +3,7 @@ import React, { createContext, useContext, useState } from 'react';
 
 const LocationContext = createContext();
 
-export const useLocation = () => {
+export const useCurrentLocation = () => {
   const context = useContext(LocationContext);
   if (!context) {
     throw new Error('useLocation must be used within a LocationProvider');

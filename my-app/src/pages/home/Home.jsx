@@ -30,7 +30,7 @@ function Home() {
 
     const handlePlanRoute = () => {
         navigate('/plan');
-    }
+    };
 
     const handleHomeRoute = () => {
         navigate('/');
@@ -41,35 +41,27 @@ function Home() {
         setIsLoggingOut(true);
         
         try {
-            console.log('=== LOGOUT PROCESS START FROM HOME ===');
             console.log('Current user:', userStorage.getUser());
             console.log('Current CSRF token:', userStorage.getCsrfToken());
             
             const result = await authAPI.logout();
             
-            console.log('=== LOGOUT RESULT FROM HOME ===');
             console.log('Logout result:', result);
             
             if (result.success) {
-                console.log('✅ Logout successful from Home component!');
                 console.log('Server response status:', result.status);
                 console.log('Server response data:', result.data);
                 
-                // Verify user data is cleared
                 console.log('User after logout:', userStorage.getUser());
                 console.log('CSRF token after logout:', userStorage.getCsrfToken());
                 
-                // Update local state
                 setUser(null);
                 setShowUserMenu(false);
                 
-                // Navigate to home page (refresh)
                 navigate('/');
             } else {
-                console.log('❌ Logout failed from Home component:', result.error);
                 console.log('Error status:', result.status);
                 
-                // Even if logout fails, user data should be cleared
                 console.log('User data cleared despite error:', !userStorage.getUser());
                 
                 // Still update local state and navigate
@@ -86,7 +78,6 @@ function Home() {
             navigate('/');
         } finally {
             setIsLoggingOut(false);
-            console.log('=== LOGOUT PROCESS END FROM HOME ===');
         }
     };
 
@@ -135,7 +126,7 @@ function Home() {
                                     </button>
                                     {showUserMenu && (
                                         <div className="user-dropdown">
-                                            <div className="user-dropdown-item" onClick={() => navigate('/profile')}>
+                                            <div className="user-dropdown-item">
                                                 Profile
                                             </div>
                                             <div className="user-dropdown-item" onClick={() => navigate('/my-plans')}>

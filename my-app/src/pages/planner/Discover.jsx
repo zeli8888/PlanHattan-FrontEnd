@@ -4,13 +4,21 @@ import { Search, MapPin } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import InterestSelector from './InterestSelector';
 import DateTimePicker from '../../components/dateTime/DateTimePicker';
-import { useLocation } from '../../contexts/LocationContext';
+import { useCurrentLocation } from '../../contexts/LocationContext';
 import { useMyPlans } from '../../contexts/MyPlansProvider';
 import postUserPlans from '../../api/userplans/AddUserPlansApi';
+import { useAuth } from '../../contexts/AuthContext'; 
+import { useNavigate } from 'react-router-dom';
+import { fetchZoneBusyness } from '../../api/ZoneBusynessMap';
 
 function Discover() {
-  const { currentLocation, updateCurrentLocation } = useLocation();
+  const { currentLocation, updateCurrentLocation } = useCurrentLocation();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { addPlan, plans } = useMyPlans();
+  const navigate = useNavigate();
+  const [zoneBusynessMap, setZoneBusynessMap] = useState({});
+  const [isLoadingZoneData, setIsLoadingZoneData] = useState(true);
+
   const [dateTime, setDateTime] = useState({
     date: new Date(),
     time: {
@@ -19,7 +27,6 @@ function Discover() {
       period: 'PM'
     }
   });
-
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [predictions, setPredictions] = useState([]);
@@ -30,6 +37,25 @@ function Discover() {
   const searchInputRef = useRef(null);
   const autocompleteService = useRef(null);
   const placesService = useRef(null);
+
+  useEffect(() => {
+    const loadZoneBusynessData = async () => {
+      
+      try {
+        setIsLoadingZoneData(true);
+        const zoneBusynessData = await fetchZoneBusyness();
+        
+        setZoneBusynessMap(zoneBusynessData || {});
+      } catch (error) {
+        console.error('Failed to fetch zone busyness data:', error);
+        setZoneBusynessMap({});
+      } finally {
+        setIsLoadingZoneData(false);
+      }
+    };
+
+    loadZoneBusynessData();
+  }, []); 
 
   // Initialize Google Places services
   useEffect(() => {
@@ -195,8 +221,18 @@ function Discover() {
     }
   };
 
+    const handleSignInClick = () => {
+    // Store current location to redirect back after sign in
+    navigate('/signin', { 
+      state: { from: '/plan' } 
+    });
+  };
+
   // Handle add user plans - Make API call and add to local plans
   const handleAddUserPlans = async () => {
+    if(!isAuthenticated){
+      handleSignInClick()
+    }
     if (!selectedPlace || !title) {
       return;
     }
@@ -257,7 +293,7 @@ function Discover() {
       alert('Plan added successfully!');
     } catch (error) {
       console.error('Error adding plan:', error);
-      alert(`Error adding plan: ${error.message}`);
+      
     }
   };
 
@@ -265,7 +301,7 @@ function Discover() {
   const locations = selectedPlace ? [selectedPlace] : [];
 
   return (
-    <PlannerLayout locations={locations}>
+    <PlannerLayout locations={locations} zoneBusynessMap={zoneBusynessMap}>
       <div className='search-container'>
         <h1>Search a Place</h1>
         <p>Search places in Manhattan and add to MyPlans</p>

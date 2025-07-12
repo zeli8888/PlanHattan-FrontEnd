@@ -16,9 +16,11 @@ const SignIn = ({ onSwitchToSignUp }) => {
   const location = useLocation();
   const { login } = useAuth();
 
-  // Get the intended destination from location state, default to home
   const from = location.state?.from || '/';
 
+    const handleHomeNavigate = () => {
+      navigate('/');
+  };
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -53,18 +55,15 @@ const SignIn = ({ onSwitchToSignUp }) => {
     setError('');
     
     try {
-      // Step 1: Login
       const loginResult = await authAPI.login({
         username: formData.username,
         password: formData.password
       });
       
       if (loginResult.success) {
-        // Step 2: Fetch CSRF token after successful login
         const csrfResult = await authAPI.getCsrfToken();
         
         if (csrfResult.success) {
-          // Step 3: Update AuthContext with user data and CSRF token
           const userData = {
             username: formData.username,
             ...loginResult.data
@@ -94,7 +93,7 @@ const SignIn = ({ onSwitchToSignUp }) => {
   return (
     <div className="planner-page">
       <div className="navbar">
-        <div className="navbar-logo">
+        <div className="navbar-logo" onClick={handleHomeNavigate}>
           PLAN<span>HATTAN</span>
         </div>
       </div>
