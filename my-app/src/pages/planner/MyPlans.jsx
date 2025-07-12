@@ -5,10 +5,10 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMyPlans } from '../../contexts/MyPlansProvider';
 import { useAuth } from '../../contexts/AuthContext';
-import getUserPlans from '../../api/userplans/GetUserPlansApi'; // Import the API function
+import getUserPlans from '../../api/userplans/GetUserPlansApi';
 
 function MyPlans() {
-  const { plans, deletePlan, setPlans } = useMyPlans(); // Add setPlans to update plans
+  const { plans, deletePlan, setPlans } = useMyPlans();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [deletingId, setDeletingId] = useState(null);
@@ -27,7 +27,6 @@ function MyPlans() {
   // Fetch user plans when component mounts (only if authenticated)
   useEffect(() => {
     const fetchUserPlans = async () => {
-      // Don't fetch if not authenticated or still checking auth
       if (!isAuthenticated || authLoading) {
         setLoading(false);
         return;
@@ -39,13 +38,12 @@ function MyPlans() {
         
         const userPlans = await getUserPlans();
         
-        // Transform server response to match your frontend format
         const transformedPlans = userPlans.map(plan => ({
           id: plan.userPlanId,
           placeId: plan.userPlanId,
           place: plan.poiName,
-          area: plan.poiName, // You might want to get this from another source
-          areaImage: '', // You might want to get this from another source
+          area: plan.poiName,
+          areaImage: '',
           date: new Date(plan.time).toLocaleDateString(),
           time: new Date(plan.time).toLocaleTimeString('en-US', { 
             hour: 'numeric', 
@@ -67,7 +65,7 @@ function MyPlans() {
     };
 
     fetchUserPlans();
-  }, [isAuthenticated, authLoading, setPlans]); // Added dependencies
+  }, [isAuthenticated, authLoading, setPlans]);
 
   useEffect(() => {
     console.log('Plans updated:', plans);
@@ -89,9 +87,8 @@ function MyPlans() {
   };
 
   const handleSignInClick = () => {
-    // Store current location to redirect back after sign in
     navigate('/signin', { 
-      state: { from: '/myplans' } 
+      state: { from: '/my-plans' } 
     });
   };
 
@@ -125,16 +122,14 @@ function MyPlans() {
           <div className="my-plans-header">
             <h2>My Plans</h2>
           </div>
-          <div className="plans-scroll-container">
-            <div className="empty-state">
-              <p>Register or SignIn to view MyPlans</p>
-              <button 
-                className="signin-prompt-btn"
-                onClick={handleSignInClick}
-              >
-                Sign In
-              </button>
-            </div>
+          <div className="empty-state">
+            <p>Register or SignIn to view MyPlans</p>
+            <button 
+              className="signin-prompt-btn"
+              onClick={handleSignInClick}
+            >
+              Sign In
+            </button>
           </div>
         </div>
       </PlannerLayout>
@@ -156,61 +151,59 @@ function MyPlans() {
             </div>
           ) : (
             <>
-              {/* Desktop Table View */}
-              <div className="plans-table-desktop">
-                <table className="plans-table">
-                  <thead>
-                    <tr>
-                      <th>PLACE</th>
-                      <th>PLANNED ON</th>
-                      <th>PLANNED AT</th>
-                      <th>PREDICTED</th>
-                      <th>ACTION</th>
+              {/* Desktop Table Layout */}
+              <table className="plans-table">
+                <thead>
+                  <tr>
+                    <th>PLACE</th>
+                    <th>PLANNED ON</th>
+                    <th>PLANNED AT</th>
+                    <th>PREDICTED</th>
+                    <th>ACTION</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {plans.map((plan) => (
+                    <tr key={plan.id} className={`plan-row ${deletingId === plan.id ? 'deleting' : ''}`}>
+                      <td>
+                        <div className="place-cell">
+                          <div className="area-image-container">
+                            <img 
+                              src={plan.areaImage || '/default-image.jpg'} 
+                              alt={plan.area} 
+                              className="area-image"
+                            />
+                          </div>
+                          {plan.place}
+                        </div>
+                      </td>
+                      <td>{plan.date}</td>
+                      <td>{plan.time}</td>
+                      <td>
+                        <div 
+                          className="prediction-bar" 
+                          style={{ 
+                            '--percentage': plan.predicted,
+                            '--text-color': getPredictionColor(plan.predicted)
+                          }}
+                        >
+                          {plan.predicted}
+                        </div>
+                      </td>
+                      <td>
+                        <button 
+                          className="myPlans-delete-btn"
+                          onClick={() => handleDelete(plan.id)}
+                        >
+                          <FiTrash2 />
+                        </button>
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {plans.map((plan) => (
-                      <tr key={plan.id} className={`plan-row ${deletingId === plan.id ? 'deleting' : ''}`}>
-                        <td>
-                          <div className="place-cell">
-                            <div className="area-image-container">
-                              <img 
-                                src={plan.areaImage || '/default-image.jpg'} 
-                                alt={plan.area} 
-                                className="area-image"
-                              />
-                            </div>
-                            {plan.place}
-                          </div>
-                        </td>
-                        <td>{plan.date}</td>
-                        <td>{plan.time}</td>
-                        <td>
-                          <div 
-                            className="prediction-bar" 
-                            style={{ 
-                              '--percentage': plan.predicted,
-                              '--text-color': getPredictionColor(plan.predicted)
-                            }}
-                          >
-                            {plan.predicted}
-                          </div>
-                        </td>
-                        <td>
-                          <button 
-                            className="myPlans-delete-btn"
-                            onClick={() => handleDelete(plan.id)}
-                          >
-                            <FiTrash2 />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                  ))}
+                </tbody>
+              </table>
 
-              {/* Mobile Card View */}
+              {/* Mobile Card Layout */}
               <div className="plans-cards">
                 {plans.map((plan) => (
                   <div key={plan.id} className={`plan-card ${deletingId === plan.id ? 'deleting' : ''}`}>

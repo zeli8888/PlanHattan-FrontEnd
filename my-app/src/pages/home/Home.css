@@ -94,7 +94,13 @@
   display: flex;
   flex-direction: column;
   gap: 30px;
+  color: #100A1C;
   text-align: center;
+}
+
+.mobile-nav-links a{
+  color: #100A1C;
+  text-decoration: none;
 }
 
 .mobile-auth-buttons {
