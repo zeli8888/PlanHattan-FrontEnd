@@ -184,7 +184,8 @@ function MyPlans() {
                           className="prediction-bar" 
                           style={{ 
                             '--percentage': plan.predicted,
-                            '--text-color': getPredictionColor(plan.predicted)
+                            '--text-color': getPredictionColor(plan.predicted),
+                            
                           }}
                         >
                           {plan.predicted}

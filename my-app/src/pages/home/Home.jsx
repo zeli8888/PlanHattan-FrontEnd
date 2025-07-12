@@ -98,12 +98,14 @@ function Home() {
             {/* Hero Section */}
             <div className="hero-container">
                 {/* Navigation Bar */}
-                <nav className="n">
-                    <div className="logo" onClick={handleHomeRoute}>PLAN<span className='logoSpan'>HATTAN</span></div>
-                    {/* Hamburger Button */}
+ <nav className="n">
+                    {/* Hamburger Button - Left side */}
                     <button className="hamburger-btn" onClick={toggleMenu}>
                         ☰
                     </button>
+                    
+                    <div className="logo" onClick={handleHomeRoute}>PLAN<span className='logoSpan'>HATTAN</span></div>
+                    
                     <div className="desktop-nav">
                         <div className="nav-links">
                             <a href="#home" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>Home</a>
@@ -113,7 +115,7 @@ function Home() {
                         </div>
                     </div>
                     
-                    {/* Conditional Auth Buttons or User Info */}
+                    {/* Desktop Auth Buttons or User Info */}
                     {user ? (
                         <div className="user-info">
                             <div className="user-greeting">
@@ -149,9 +151,38 @@ function Home() {
                             <button className="hsignin-btn" onClick={handleSignInRoute}>SignIn</button>
                         </div>
                     )}
+
+                    {/* Mobile User Icon - Right side (only shows user avatar with dropdown) */}
+                    {user && (
+                        <div className="mobile-user-container">
+                            <div className="user-menu-container">
+                                <button className="user-profile-btn" onClick={toggleUserMenu}>
+                                    <div className="user-avatar">
+                                        <span className="user-icon">👤</span>
+                                    </div>
+                                </button>
+                                {showUserMenu && (
+                                    <div className="user-dropdown">
+                                        <div className="user-dropdown-item">
+                                            Profile
+                                        </div>
+                                        <div className="user-dropdown-item" onClick={() => navigate('/my-plans')}>
+                                            My Plans
+                                        </div>
+                                        <div 
+                                            className={`user-dropdown-item logout ${isLoggingOut ? 'logging-out' : ''}`} 
+                                            onClick={isLoggingOut ? null : handleLogout}
+                                        >
+                                            {isLoggingOut ? 'Logging out...' : 'Logout'}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
                 </nav>
 
-                <div className={`mobile-nav ${isMenuOpen ? 'open' : ''}`}>
+                 <div className={`mobile-nav ${isMenuOpen ? 'open' : ''}`}>
                     <div className="mobile-nav-links">
                         <a href="#home" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); setIsMenuOpen(false); }}>Home</a>
                         <a href="#services" onClick={(e) => { e.preventDefault(); scrollToSection(trustSectionRef); setIsMenuOpen(false); }}>Services</a>
@@ -159,24 +190,8 @@ function Home() {
                         <a href="/pricing" onClick={() => setIsMenuOpen(false)}>About Us</a>
                     </div>
                     
-                    {/* Mobile Auth Buttons or User Info */}
-                    {user ? (
-                        <div className="mobile-user-info">
-                            <div className="mobile-user-greeting">
-                                <span className="mobile-user-name"><strong>Hi {user.username}</strong></span>
-                            </div>
-                            <div className="mobile-user-actions">
-                                <button onClick={() => { navigate('/profile'); setIsMenuOpen(false); }}>Profile</button>
-                                <button onClick={() => { navigate('/my-plans'); setIsMenuOpen(false); }}>My Plans</button>
-                                <button 
-                                    onClick={isLoggingOut ? null : () => { handleLogout(); setIsMenuOpen(false); }}
-                                    disabled={isLoggingOut}
-                                >
-                                    {isLoggingOut ? 'Logging out...' : 'Logout'}
-                                </button>
-                            </div>
-                        </div>
-                    ) : (
+                    {/* Mobile Auth Buttons - Only show if user is not logged in */}
+                    {!user && (
                         <div className="mobile-auth-buttons">
                             <button className="hsignup-btn" onClick={() => { handleSignUpRoute(); setIsMenuOpen(false); }}>SignUp</button>
                             <button className="hsignin-btn" onClick={() => { handleSignInRoute(); setIsMenuOpen(false); }}>SignIn</button>

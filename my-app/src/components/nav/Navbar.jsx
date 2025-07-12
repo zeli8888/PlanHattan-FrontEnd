@@ -16,26 +16,38 @@ function Navbar() {
 
   const handleHomeNavigate = () => {
     navigate('/');
-    setIsMobileMenuOpen(false);
+    closeMobileMenu();
   };
 
   const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
+    if (!isMobileMenuOpen) {
+      openMobileMenu();
+    }
+  };
+
+  const openMobileMenu = () => {
+    setIsMobileMenuOpen(true);
   };
 
   const closeMobileMenu = () => {
+    if (!isMobileMenuOpen) return;
+    
     setIsMobileMenuOpen(false);
+    
+    // Reset animation state after transition completes
+    setTimeout(() => {
+    }, 400);
   };
 
   const handleLinkClick = () => {
-    setIsMobileMenuOpen(false);
+    closeMobileMenu();
   };
 
   // Close mobile menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (isMobileMenuOpen && !event.target.closest('.mobile-menu-content') && !event.target.closest('.hamburger')) {
-        setIsMobileMenuOpen(false);
+        closeMobileMenu();
       }
     };
 
@@ -56,11 +68,28 @@ function Navbar() {
     };
   }, [isMobileMenuOpen]);
 
+  // Handle escape key to close menu
+  useEffect(() => {
+    const handleEscapeKey = (event) => {
+      if (event.key === 'Escape' && isMobileMenuOpen) {
+        closeMobileMenu();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscapeKey);
+    return () => document.removeEventListener('keydown', handleEscapeKey);
+  }, [isMobileMenuOpen]);
+
   return (
     <>
       <nav className="navbar">
         {/* Hamburger Menu */}
-        <div className={`hamburger ${isMobileMenuOpen ? 'active' : ''}`} onClick={toggleMobileMenu}>
+        <div 
+          className="hamburger" 
+          onClick={toggleMobileMenu}
+          aria-label="Open menu"
+          aria-expanded={isMobileMenuOpen}
+        >
           <span></span>
           <span></span>
           <span></span>
@@ -99,7 +128,11 @@ function Navbar() {
             <div className="mobile-menu-logo" onClick={handleHomeNavigate}>
               PLAN<span>HATTAN</span>
             </div>
-            <button className="mobile-menu-close" onClick={closeMobileMenu}>
+            <button 
+              className="mobile-menu-close" 
+              onClick={closeMobileMenu}
+              aria-label="Close menu"
+            >
               ×
             </button>
           </div>
