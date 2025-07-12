@@ -324,8 +324,8 @@
     padding-bottom: 20px; /* Added bottom padding to cards container */
   }
   
-  .empty-state {
-    padding: 40px 16px;
+.empty-state {
+    padding: 0 16px 40px 16px; /* Removed top padding, kept bottom padding */
   }
   
   .empty-state p {
@@ -346,6 +346,9 @@
 
 /* Extra small mobile optimization */
 @media (max-width: 480px) {
+ .empty-state {
+    padding: 0 16px 30px 16px; /* Removed top padding, adjusted bottom padding */
+  }
   .my-plans-container {
     padding: 12px 8px 40px 8px; /* Added bottom padding */
   }
@@ -389,6 +392,10 @@
 
 /* Very small screens */
 @media (max-width: 360px) {
+    .empty-state {
+    padding: 0 10px 20px 10px; /* Removed top padding, adjusted side and bottom padding */
+  }
+  
   .my-plans-container {
     padding: 10px 6px 40px 6px; /* Added bottom padding */
   }

@@ -192,8 +192,10 @@ function Home() {
             </div>
 
             <section className="trust-section" ref={trustSectionRef}>
-                <h2>Why trust PlanHattan with your Trip?</h2>
-            
+                <div className="trust-header">
+                    <h2>Why trust PlanHattan with your Trip?</h2>
+                </div>
+
                 <div className="features-container">
                     <div className="itinerary-card">
                         <div className="itinerary-icon">
@@ -205,28 +207,29 @@ function Home() {
                         </div>
                     </div>
 
-                    <div className="hmap-card">
-                        <div className="feature-icon">
-                            <img src={homeImages.paperMapIcon} alt="maps" />
+                    <div className="features-right">
+                        <div className="hmap-card">
+                            <div className="feature-icon">
+                                <img src={homeImages.paperMapIcon} alt="maps" />
+                            </div>
+                            <div className="feature-content">
+                                <h3>Local Insights & Less Busyness Gems</h3>
+                                <p>Discover places tourists often miss.</p>
+                            </div>
                         </div>
-                        <div className="feature-content">
-                            <h3>Local Insights & Less Busyness Gems</h3>
-                            <p>Discover places tourists often miss.</p>
-                        </div>
-                    </div>
 
-                    <div className="feature-card">
-                        <div className="feature-icon">
-                            <img src={homeImages.calenderIcon} alt="Perfect Timing" />
-                        </div>
-                        <div className="feature-content">
-                            <h3>Where To Go, When To Go – Perfectly Timed</h3>
-                            <p>Flights, hotels, activities in one place.</p>
+                        <div className="feature-card">
+                            <div className="feature-icon">
+                                <img src={homeImages.calenderIcon} alt="Perfect Timing" />
+                            </div>
+                            <div className="feature-content">
+                                <h3>Where To Go, When To Go – Perfectly Timed</h3>
+                                <p>Flights, hotels, activities in one place.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                
             </section>
             
             <section className="destinations-section" ref={destinationsRef}>

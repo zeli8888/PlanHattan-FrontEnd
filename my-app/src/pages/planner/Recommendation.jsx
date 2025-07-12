@@ -4,6 +4,7 @@ import './Recommendation.css';
 import TimePicker from '../../components/dateTime/TimePicker'
 import RequestRecommendation from '../../api/RecommendationApi'
 import postMultipleUserPlans from '../../api/userplans/AddMultipleUserPlans'; 
+import { useZoneBusyness } from '../../contexts/ZoneBusynessContext';
 
 import {
   Landmark,
@@ -65,7 +66,8 @@ function Recommendation() {
   const [showRecommendations, setShowRecommendations] = useState(false);
   const [recommendations, setRecommendations] = useState([]);
   const [isLoadingRecommendations, setIsLoadingRecommendations] = useState(false);
-  
+  const { zoneBusynessMap, refreshIfStale } = useZoneBusyness();
+
   // Google Places API state
   const [searchPredictions, setSearchPredictions] = useState([]);
   const [showPredictions, setShowPredictions] = useState(false);
@@ -76,6 +78,11 @@ function Recommendation() {
   const autocompleteService = useRef(null);
   const placesService = useRef(null);
   const searchInputRef = useRef(null);
+
+  // Refresh zone data
+  useEffect(() => {
+    refreshIfStale(30); // Refresh if data is older than 30 minutes
+  }, [refreshIfStale]);
 
   // Initialize Google Places services
   useEffect(() => {
@@ -473,7 +480,7 @@ const uniqueId = crypto.randomUUID();
   const isAddButtonDisabled = plans.length >= 5;
 
   return (
-    <PlannerLayout locations={showRecommendations ? convertPlansToLocations(recommendations) : convertPlansToLocations(plans)}>
+    <PlannerLayout locations={showRecommendations ? convertPlansToLocations(recommendations) : convertPlansToLocations(plans)} zoneBusynessMap={zoneBusynessMap}>
       <div className="recommendation-container">
         {notification && (
           <div className={`notification ${notification.type}`}>
@@ -588,8 +595,8 @@ const uniqueId = crypto.randomUUID();
             <div className="planning-section">
               <div className="date-time-section">
                 <div className="date-input-group">
-                  <div className="planning-text">
-                    Planning on 
+                  <div className="rec-planning-text">
+                    <span>Planning on </span>
                     <input 
                       type="date" 
                       className={`date-picker ${dateError ? 'error' : ''}`}
@@ -607,8 +614,7 @@ const uniqueId = crypto.randomUUID();
                 </div>
                 
                 <div className="rec-time-input-group">
-                  <div className="time-picker-section">
-                    <label htmlFor="time-picker">Time:</label>
+                  <div className="rec-time-picker-section">
                     <TimePicker 
                       value={cardDateTime.time}  
                       onChange={handleCardTimeChange}

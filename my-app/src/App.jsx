@@ -16,6 +16,7 @@ import Cafe from './pages/planner/Categories/Cafe.jsx';
 import Museums from './pages/planner/Categories/Museum.jsx';
 import { LocationProvider } from './contexts/LocationContext.jsx';
 import { AuthProvider } from './contexts/AuthContext.jsx';
+import { ZoneBusynessProvider } from './contexts/ZoneBusynessContext.jsx';
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -35,6 +36,7 @@ function App() {
   return (
     <AuthProvider>
       <LocationProvider>
+        <ZoneBusynessProvider>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/signin" element={<AuthContainer initialView="signin" />} />
@@ -49,6 +51,7 @@ function App() {
           <Route path="/my-plans" element={<MyPlans />} />
           <Route path="/recommendation" element={<Recommendation />} />
         </Routes>
+        </ZoneBusynessProvider>
       </LocationProvider>
     </AuthProvider>
   )

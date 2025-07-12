@@ -6,18 +6,17 @@ import InterestSelector from './InterestSelector';
 import DateTimePicker from '../../components/dateTime/DateTimePicker';
 import { useCurrentLocation } from '../../contexts/LocationContext';
 import { useMyPlans } from '../../contexts/MyPlansProvider';
+import { useZoneBusyness } from '../../contexts/ZoneBusynessContext';
 import postUserPlans from '../../api/userplans/AddUserPlansApi';
 import { useAuth } from '../../contexts/AuthContext'; 
 import { useNavigate } from 'react-router-dom';
-import { fetchZoneBusyness } from '../../api/ZoneBusynessMap';
 
 function Discover() {
   const { currentLocation, updateCurrentLocation } = useCurrentLocation();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { addPlan, plans } = useMyPlans();
+  const { zoneBusynessMap, isLoading: isLoadingZoneData, error: zoneError, refreshIfStale } = useZoneBusyness();
   const navigate = useNavigate();
-  const [zoneBusynessMap, setZoneBusynessMap] = useState({});
-  const [isLoadingZoneData, setIsLoadingZoneData] = useState(true);
 
   const [dateTime, setDateTime] = useState({
     date: new Date(),
@@ -32,30 +31,46 @@ function Discover() {
   const [predictions, setPredictions] = useState([]);
   const [showPredictions, setShowPredictions] = useState(false);
   const [title, setTitle] = useState('');
-  const [departureLocation, setDepartureLocation] = useState({});
   
   const searchInputRef = useRef(null);
   const autocompleteService = useRef(null);
   const placesService = useRef(null);
 
-  useEffect(() => {
-    const loadZoneBusynessData = async () => {
-      
-      try {
-        setIsLoadingZoneData(true);
-        const zoneBusynessData = await fetchZoneBusyness();
-        
-        setZoneBusynessMap(zoneBusynessData || {});
-      } catch (error) {
-        console.error('Failed to fetch zone busyness data:', error);
-        setZoneBusynessMap({});
-      } finally {
-        setIsLoadingZoneData(false);
-      }
-    };
+  const [predictionStatus, setPredictionStatus] = useState({
+  isLoading: false,
+  busynessLevel: null,
+  error: null
+});
 
-    loadZoneBusynessData();
-  }, []); 
+  const getBusynessButtonColor = (busynessLevel) => {
+  const colors = {
+    low: '#52c41a',      // Green
+    medium: '#faad14',   // Yellow/Orange
+    high: '#ff4d4f'      // Red
+  };
+  
+  return colors[busynessLevel?.toLowerCase()] || '#4a54e1'; // Default blue
+};
+
+  const getPredictionButtonText = () => {
+  if (predictionStatus.isLoading) {
+    return 'Predicting...';
+  }
+  
+  if (predictionStatus.busynessLevel) {
+    return `${predictionStatus.busynessLevel.toUpperCase()} Busyness`;
+  }
+  
+  if (predictionStatus.error) {
+    return 'Prediction Failed';
+  }
+  
+  return 'Predict Busyness';
+};
+  // Refresh zone data if stale on component mount
+  useEffect(() => {
+    refreshIfStale(30); // Refresh if data is older than 30 minutes
+  }, [refreshIfStale]);
 
   // Initialize Google Places services
   useEffect(() => {
@@ -85,6 +100,11 @@ function Discover() {
     if (value.trim() === '') {
       setSelectedPlace(null);
       setTitle('');
+      setPredictionStatus({
+      isLoading: false,
+      busynessLevel: null,
+      error: null
+    });
     }
 
     if (value.length > 2 && autocompleteService.current) {
@@ -125,47 +145,49 @@ function Discover() {
   };
 
   // Handle place selection
-  const handlePlaceSelect = (prediction) => {
-    setSearchQuery(prediction.description);
-    setShowPredictions(false);
+const handlePlaceSelect = (prediction) => {
+  setSearchQuery(prediction.description);
+  setShowPredictions(false);
 
-    if (placesService.current) {
-      const request = {
-        placeId: prediction.place_id,
-        fields: ['name', 'geometry', 'formatted_address', 'place_id', 'photos', 'rating', 'types']
-      };
+  if (placesService.current) {
+    const request = {
+      placeId: prediction.place_id,
+      fields: ['name', 'geometry', 'formatted_address', 'place_id', 'rating', 'types']
+    };
 
-      placesService.current.getDetails(request, (place, status) => {
-        if (status === window.google.maps.places.PlacesServiceStatus.OK) {
-          // Generate a mock busyness prediction (you can replace this with actual API call)
-          const mockBusyPercentage = Math.floor(Math.random() * 100) + '%';
-          
-          // Get area image (you can replace this with actual logic)
-          const areaImage = place.photos && place.photos[0] 
-            ? place.photos[0].getUrl({ maxWidth: 200, maxHeight: 200 })
-            : 'https://via.placeholder.com/200x200?text=No+Image';
+    placesService.current.getDetails(request, (place, status) => {
+      if (status === window.google.maps.places.PlacesServiceStatus.OK) {
+        
+        // Get coordinates
+        const coordinates = place.geometry && place.geometry.location 
+          ? [place.geometry.location.lng(), place.geometry.location.lat()]
+          : null;
+        
+        // Get area image
+        const areaImage = place.photos && place.photos[0] 
+          ? place.photos[0].getUrl({ maxWidth: 200, maxHeight: 200 })
+          : 'https://via.placeholder.com/200x200?text=No+Image';
 
-          setSelectedPlace({
-            id: place.place_id,
-            name: place.name,
-            address: place.formatted_address,
-            coordinates: [place.geometry.location.lng(), place.geometry.location.lat()], // [lng, lat] for Mapbox
-            rating: place.rating,
-            types: place.types,
-            photos: place.photos,
-            location: place.formatted_address,
-            image: areaImage,
-            busy: mockBusyPercentage
-          });
-          
-          // Auto-fill title if empty
-          if (!title) {
-            setTitle(place.name);
-          }
+        setSelectedPlace({
+          id: place.place_id,
+          name: place.name,
+          address: place.formatted_address,
+          rating: place.rating,
+          types: place.types,
+          photos: place.photos,
+          location: place.formatted_address,
+          image: areaImage,
+          coordinates: coordinates, // Add coordinates here
+        });
+        
+        // Auto-fill title if empty
+        if (!title) {
+          setTitle(place.name);
         }
-      });
-    }
-  };
+      }
+    });
+  }
+};
 
   // Handle direct search (when clicking search icon)
   const handleSearch = () => {
@@ -188,16 +210,13 @@ function Discover() {
             // Check if result is within Manhattan bounds
             const location = result.geometry.location;
             if (bounds.contains(location)) {
-              const mockBusyPercentage = Math.floor(Math.random() * 100) + '%';
               
               setSelectedPlace({
                 id: result.place_id,
                 name: searchQuery,
                 address: result.formatted_address,
-                coordinates: [location.lng(), location.lat()], // [lng, lat] for Mapbox
                 location: result.formatted_address,
                 image: 'https://via.placeholder.com/200x200?text=No+Image',
-                busy: mockBusyPercentage
               });
               
               if (!title) {
@@ -221,14 +240,169 @@ function Discover() {
     }
   };
 
-    const handleSignInClick = () => {
+  /**
+  * Determines if a point is inside a polygon using ray casting algorithm
+ * @param {Array} point - [longitude, latitude]
+ * @param {Array} polygon - Array of [longitude, latitude] coordinates
+ * @returns {boolean} - True if point is inside polygon
+ */
+function isPointInPolygon(point, polygon) {
+  const [x, y] = point;
+  let inside = false;
+  
+  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+    const [xi, yi] = polygon[i];
+    const [xj, yj] = polygon[j];
+    
+    if (((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi)) {
+      inside = !inside;
+    }
+  }
+  
+  return inside;
+}
+  /**
+ * Finds which zone contains the given coordinates
+ * @param {Array} coordinates - [longitude, latitude]
+ * @param {Object} geojsonData - GeoJSON data with zone features
+ * @returns {Object|null} - Zone feature or null if not found
+ */
+function findZoneForCoordinates(coordinates, geojsonData) {
+  if (!coordinates || !geojsonData || !geojsonData.features) {
+    return null;
+  }
+  
+  const [longitude, latitude] = coordinates;
+  
+  for (const feature of geojsonData.features) {
+    const geometry = feature.geometry;
+    
+    if (geometry.type === 'Polygon') {
+      // For Polygon, check the outer ring (first coordinate array)
+      const polygon = geometry.coordinates[0];
+      if (isPointInPolygon([longitude, latitude], polygon)) {
+        return feature;
+      }
+    } else if (geometry.type === 'MultiPolygon') {
+      // For MultiPolygon, check each polygon
+      for (const polygonCoords of geometry.coordinates) {
+        const polygon = polygonCoords[0]; // Outer ring
+        if (isPointInPolygon([longitude, latitude], polygon)) {
+          return feature;
+        }
+      }
+    }
+  }
+  
+  return null;
+}
+
+const handlePredictBusyness = async () => {
+  if (!selectedPlace) {
+    console.log('No place selected');
+    return;
+  }
+
+  try {
+    // Get coordinates from selected place
+    let coordinates = null;
+    
+    if (selectedPlace.coordinates) {
+      coordinates = selectedPlace.coordinates;
+    } else if (placesService.current) {
+      // If coordinates not available, get them from Google Places
+      const request = {
+        placeId: selectedPlace.id,
+        fields: ['geometry']
+      };
+      
+      const placeDetails = await new Promise((resolve, reject) => {
+        placesService.current.getDetails(request, (place, status) => {
+          if (status === window.google.maps.places.PlacesServiceStatus.OK) {
+            resolve(place);
+          } else {
+            reject(new Error('Failed to get place details'));
+          }
+        });
+      });
+      
+      if (placeDetails.geometry && placeDetails.geometry.location) {
+        coordinates = [
+          placeDetails.geometry.location.lng(),
+          placeDetails.geometry.location.lat()
+        ];
+        
+        // Update selected place with coordinates
+        setSelectedPlace(prev => ({
+          ...prev,
+          coordinates: coordinates
+        }));
+      }
+    }
+    
+    if (!coordinates) {
+      console.log('Unable to get coordinates for the selected place');
+      return;
+    }
+        
+    let geojsonData;
+    try {
+      const response = await fetch('/zones_with_busyness.geojson');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      geojsonData = await response.json();
+    } catch (error) {
+      console.error('Error loading GeoJSON:', error);
+      return;
+    }
+    
+    // Find which zone contains the coordinates
+    const containingZone = findZoneForCoordinates(coordinates, geojsonData);
+    
+    if (containingZone) {
+      // Get zone ID from properties
+      const zoneId = containingZone.properties.LocationID || containingZone.properties.locationID;
+      const zoneName = containingZone.properties.zone || containingZone.properties.Zone;
+      
+      
+      // Get busyness level from zoneBusynessMap
+      const busynessLevel = zoneBusynessMap[zoneId];
+      
+      if (busynessLevel) {
+        
+        setSelectedPlace(prev => ({
+          ...prev,
+          busy: busynessLevel,
+          zoneId: zoneId,
+          zoneName: zoneName,
+          coordinates: coordinates
+        }));
+        
+        setPredictionStatus({
+          isLoading: false,
+          busynessLevel: busynessLevel,
+          error: null
+        });
+      } else {
+        console.log('No busyness data available for zone:', zoneId);
+      }
+    } else {
+      console.log('Coordinates not found in any zone:', coordinates);
+    }
+    
+  } catch (error) {
+    console.error('Error predicting busyness:', error);
+  }
+};
+
+  const handleSignInClick = () => {
     // Store current location to redirect back after sign in
     navigate('/signin', { 
       state: { from: '/plan' } 
     });
   };
 
-  // Handle add user plans - Make API call and add to local plans
   const handleAddUserPlans = async () => {
     if(!isAuthenticated){
       handleSignInClick()
@@ -274,7 +448,6 @@ function Discover() {
         time: `${dateTime.time.hours}:${dateTime.time.minutes.toString().padStart(2, '0')} ${dateTime.time.period}`,
         predicted: selectedPlace.busy,
         coordinates: selectedPlace.coordinates,
-        departureLocation: departureLocation[selectedPlace.id] || (plans.length === 0 ? 'Current Location' : 'Home')
       });
       
       // Clear form after successful addition
@@ -305,6 +478,20 @@ function Discover() {
       <div className='search-container'>
         <h1>Search a Place</h1>
         <p>Search places in Manhattan and add to MyPlans</p>
+        
+        {/* Zone data loading indicator */}
+        {isLoadingZoneData && (
+          <div className="zone-data-loading">
+            Loading zone busyness data...
+          </div>
+        )}
+        
+        {/* Zone data error indicator */}
+        {zoneError && (
+          <div className="zone-data-error">
+            Error loading zone data: {zoneError}
+          </div>
+        )}
         
         {/* Current Location Display */}
         {currentLocation && (
@@ -372,12 +559,38 @@ function Discover() {
             />
           </div>
         </div>
-
         <div className="buttons">
-          <button className="btn" disabled={!selectedPlace}>
-            Predict Busyness
+          <button 
+            className="btn" 
+            onClick={handlePredictBusyness} 
+            disabled={!selectedPlace || predictionStatus.isLoading} 
+            style={{
+              backgroundColor: !selectedPlace 
+                ? '#c0c0c0' // Light gray when disabled
+                : predictionStatus.busynessLevel 
+                  ? getBusynessButtonColor(predictionStatus.busynessLevel)
+                  : (predictionStatus.error ? '#ff4d4f' : '#4a54e1'),
+              color: !selectedPlace ? '#888' : 'white',
+              border: 'none',
+              transition: 'all 0.3s ease',
+              opacity: predictionStatus.isLoading ? 0.7 : (!selectedPlace ? 0.6 : 1),
+              cursor: (!selectedPlace || predictionStatus.isLoading) ? 'not-allowed' : 'pointer'
+            }}>
+            {getPredictionButtonText()}
           </button>
-          <button className="btn" onClick={handleAddUserPlans} disabled={!selectedPlace || !title}>
+          
+          <button 
+            className="btn" 
+            onClick={handleAddUserPlans} 
+            disabled={!selectedPlace || !title}
+            style={{
+              backgroundColor: (!selectedPlace || !title) ? '#c0c0c0' : '#4a54e1',
+              color: (!selectedPlace || !title) ? '#888' : 'white',
+              border: 'none',
+              transition: 'all 0.3s ease',
+              opacity: (!selectedPlace || !title) ? 0.6 : 1,
+              cursor: (!selectedPlace || !title) ? 'not-allowed' : 'pointer'
+            }}>
             Add To MyPlans
           </button>
         </div>

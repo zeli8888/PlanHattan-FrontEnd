@@ -136,7 +136,7 @@
 .planning-text {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 1rem;
   font-size: 1.1rem;
   color: #333;
   margin-bottom: 1rem;
