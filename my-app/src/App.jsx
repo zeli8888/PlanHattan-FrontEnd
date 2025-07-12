@@ -17,6 +17,7 @@ import Museums from './pages/planner/Categories/Museum.jsx';
 import { LocationProvider } from './contexts/LocationContext.jsx';
 import { AuthProvider } from './contexts/AuthContext.jsx';
 import { ZoneBusynessProvider } from './contexts/ZoneBusynessContext.jsx';
+import GoogleCallback from './pages/login-signup/GoogleCallback.jsx';
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -37,20 +38,21 @@ function App() {
     <AuthProvider>
       <LocationProvider>
         <ZoneBusynessProvider>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/signin" element={<AuthContainer initialView="signin" />} />
-          <Route path="/signup" element={<AuthContainer initialView="signup" />} />
-          <Route path="/plan" element={<Discover />}/>
-          <Route path="/plan/category/attractions" element={<Attractions />} />
-          <Route path="/plan/category/museum" element={<Museums />} />
-          <Route path="/plan/category/restaurant" element={<Restuarants />} />
-          <Route path="/plan/category/pub" element={<NightlifeBars />} />
-          <Route path="/plan/category/park" element={<Parks />} />
-          <Route path="/plan/category/cafe" element={<Cafe />} />
-          <Route path="/my-plans" element={<MyPlans />} />
-          <Route path="/recommendation" element={<Recommendation />} />
-        </Routes>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/signin" element={<AuthContainer initialView="signin" />} />
+            <Route path="/signup" element={<AuthContainer initialView="signup" />} />
+            <Route path="/plan" element={<Discover />} />
+            <Route path="/plan/category/attractions" element={<Attractions />} />
+            <Route path="/plan/category/museum" element={<Museums />} />
+            <Route path="/plan/category/restaurant" element={<Restuarants />} />
+            <Route path="/plan/category/pub" element={<NightlifeBars />} />
+            <Route path="/plan/category/park" element={<Parks />} />
+            <Route path="/plan/category/cafe" element={<Cafe />} />
+            <Route path="/my-plans" element={<MyPlans />} />
+            <Route path="/recommendation" element={<Recommendation />} />
+            <Route path='/google-callback' element={<GoogleCallback />} />
+          </Routes>
         </ZoneBusynessProvider>
       </LocationProvider>
     </AuthProvider>

@@ -18,8 +18,8 @@ const SignIn = ({ onSwitchToSignUp }) => {
 
   const from = location.state?.from || '/';
 
-    const handleHomeNavigate = () => {
-      navigate('/');
+  const handleHomeNavigate = () => {
+    navigate('/');
   };
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -27,7 +27,7 @@ const SignIn = ({ onSwitchToSignUp }) => {
       ...prev,
       [name]: value
     }));
-    
+
     // Clear error when user starts typing
     if (error) setError('');
   };
@@ -37,38 +37,38 @@ const SignIn = ({ onSwitchToSignUp }) => {
       setError('Username is required');
       return false;
     }
-    
+
     if (!formData.password) {
       setError('Password is required');
       return false;
     }
-    
+
     return true;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
-    
+
     setIsLoading(true);
     setError('');
-    
+
     try {
       const loginResult = await authAPI.login({
         username: formData.username,
         password: formData.password
       });
-      
+
       if (loginResult.success) {
         const csrfResult = await authAPI.getCsrfToken();
-        
+
         if (csrfResult.success) {
           const userData = {
             username: formData.username,
             ...loginResult.data
           };
-          
+
           login(userData, csrfResult.token);
           console.log('Login successful with CSRF token');
 
@@ -97,7 +97,7 @@ const SignIn = ({ onSwitchToSignUp }) => {
           PLAN<span>HATTAN</span>
         </div>
       </div>
-      
+
       <div className="planner-layout">
         <div className="planner-left"></div>
 
@@ -108,8 +108,8 @@ const SignIn = ({ onSwitchToSignUp }) => {
             </h2>
 
             <div className="social-buttons">
-              <button className="google-btn">
-                <span className="icon" style={{background: 'white', color: 'black'}}>G</span> Sign in with Google
+              <button className="google-btn" onClick={() => { window.location.href = 'https://planhattan.ddns.net/api/oauth2/authorization/google' }}>
+                <span className="icon" style={{ background: 'white', color: 'black' }}>G</span> Sign in with Google
               </button>
             </div>
 
@@ -121,10 +121,10 @@ const SignIn = ({ onSwitchToSignUp }) => {
             <form onSubmit={handleSubmit}>
               <div className="input-group email-field">
                 <label>Username</label>
-                <input 
+                <input
                   type="text"
                   name="username"
-                  placeholder="heisenberg" 
+                  placeholder="heisenberg"
                   value={formData.username}
                   onChange={handleChange}
                   required
@@ -134,10 +134,10 @@ const SignIn = ({ onSwitchToSignUp }) => {
               <div className="password-container login">
                 <div className="input-group password-field">
                   <label>Password</label>
-                  <input 
-                    type="password" 
+                  <input
+                    type="password"
                     name="password"
-                    placeholder="********" 
+                    placeholder="********"
                     value={formData.password}
                     onChange={handleChange}
                     required
@@ -150,8 +150,8 @@ const SignIn = ({ onSwitchToSignUp }) => {
                 <a href="#">Forgot password?</a>
               </div>
 
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 className="signin-btn"
                 disabled={isLoading}
               >
