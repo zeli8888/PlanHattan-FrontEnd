@@ -255,7 +255,7 @@
 .itinerary-card {
   flex: 1;
   min-width: 350px;
-  max-width: 500px;
+  /* max-width: 500px; */
   min-height: 400px;
   display: flex;
   flex-direction: column;
