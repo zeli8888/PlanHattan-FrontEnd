@@ -7,6 +7,8 @@ import { useMyPlans } from '../../../contexts/MyPlansProvider';
 import { useAuth } from '../../../contexts/AuthContext';
 import getUserPlans from '../../../api/userplans/GetUserPlansApi';
 import { useZoneBusyness } from '../../../contexts/ZoneBusynessContext';
+import useNotification from '../../../components/features/useNotification';
+import Notification from '../../../components/features/Notification';
 
 function MyPlans() {
   const { plans, deletePlan, setPlans } = useMyPlans();
@@ -16,6 +18,7 @@ function MyPlans() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { zoneBusynessMap, refreshIfStale } = useZoneBusyness();
+  const { notification, showNotification, hideNotification } = useNotification();
 
   // Fixed mapLocations with proper coordinate validation
   const mapLocations = plans
@@ -49,7 +52,7 @@ function MyPlans() {
         setError(null);
         
         const userPlans = await getUserPlans();
-        
+        console.log(userPlans)
         const transformedPlans = userPlans.map(plan => ({
           id: plan.userPlanId,
           placeId: plan.userPlanId,
@@ -89,16 +92,22 @@ function MyPlans() {
     fetchUserPlans();
   }, [isAuthenticated, authLoading, setPlans]);
 
-  useEffect(() => {
-    console.log('Plans updated:', plans);
-    console.log('Map locations:', mapLocations);
-  }, [plans]);
-
   const handleDelete = async (id) => {
     setDeletingId(id);
     
     try {
+      // Get the plan name before deleting for the notification
+      const planToDelete = plans.find(plan => plan.id === id);
+      const planName = planToDelete ? planToDelete.place : 'Plan';
+      
       await deletePlan(id);
+      
+      // Show success notification
+      showNotification(
+        'success',
+        'Plan Deleted',
+        `${planName} has been successfully removed from your plans.`
+      );
       
       setTimeout(() => {
         setDeletingId(null);
@@ -106,6 +115,13 @@ function MyPlans() {
     } catch (error) {
       setDeletingId(null);
       console.error('Failed to delete plan:', error);
+      
+      // Show error notification
+      showNotification(
+        'error',
+        'Delete Failed',
+        'Failed to delete the plan. Please try again.'
+      );
     }
   };
 
@@ -279,6 +295,11 @@ function MyPlans() {
           )}
         </div>
       </div>
+      
+      <Notification 
+        notification={notification} 
+        onClose={hideNotification} 
+      />
     </PlannerLayout>
   );
 }

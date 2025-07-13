@@ -15,8 +15,8 @@ const postUserPlans = async (planData) => {
       poiName: planData.place,
       time: planData.time,
       busyness: planData.predicted,
-      latitude: planData.coordinates?.lat || planData.coordinates[0] || null,
-      longitude: planData.coordinates?.lng || planData.coordinates[1] || null
+      longitude: planData.coordinates?.lat || planData.coordinates[0] || null,
+      latitude: planData.coordinates?.lng || planData.coordinates[1] || null
     };
 
     const requestConfig = {

@@ -13,7 +13,8 @@ import { useMyPlans } from '../../../contexts/MyPlansProvider';
 import postUserPlans from '../../../api/userplans/AddUserPlansApi';
 import { useLocation } from 'react-router-dom';
 import getUpcomingBusynessWithFallback from '../../../api/UpcomingBusynessApi';
-
+import useNotification from '../../../components/features/useNotification';
+import Notification from '../../../components/features/Notification';
 
 const CategoryLayout = ({  
   displayName, 
@@ -26,6 +27,7 @@ const CategoryLayout = ({
   const location = useLocation();
   const zoneBusynessMap = location.state?.zoneBusynessMap || {};
   const now = new Date();
+  const { notification, showNotification, hideNotification } = useNotification();
   const [dateTime, setDateTime] = useState({
     date: new Date(),
     time: {
@@ -297,6 +299,7 @@ const handleAddToMyPlans = async (place) => {
       coordinates: place.coordinates
     };
 
+    console.log(planData)
     // Post to server first
     const response = await postUserPlans(planData);
     // IMPORTANT: Use the server's userPlanId as the main ID
@@ -317,9 +320,19 @@ const handleAddToMyPlans = async (place) => {
       serverPlanId: serverPlanId // Also keep as serverPlanId for consistency
     });
         
+    showNotification(
+        'success',
+        'Plan Added',
+        `${place.name} has been successfully added to your plans.`
+      );
   } catch (error) {
     console.error('Failed to add plan:', error);
-    alert('Failed to add plan. Please try again.');
+    // Show error notification
+      showNotification(
+        'error',
+        'Failed to Add Plan',
+        'Unable to add the plan. Please try again.'
+      );
     return;
   } finally {
     setIsLoading(false);
@@ -819,6 +832,10 @@ const handleRemoveFromMyPlans = async (place) => {
         </>
       )}
       </div>
+      <Notification 
+        notification={notification} 
+        onClose={hideNotification} 
+      />
     </PlannerLayout>
   );
 };
