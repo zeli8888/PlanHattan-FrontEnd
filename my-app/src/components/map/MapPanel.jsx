@@ -65,6 +65,57 @@ const GPSButton = ({ onClick, disabled }) => (
   </div>
 );
 
+const ZoneBusynessToggle = ({ isEnabled, onToggle }) => (
+  <div 
+    className="zone-busyness-toggle"
+    style={{
+      position: 'absolute',
+      bottom: '10px',
+      left: '10px',
+      zIndex: 1000,
+      backgroundColor: '#fff',
+      borderRadius: '8px',
+      padding: '12px 16px',
+      boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
+      border: '2px solid #e0e0e0',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '10px',
+      fontSize: '14px',
+      fontWeight: '500',
+      color: '#333'
+    }}
+  >
+    <span>Zone Busyness Map</span>
+    <div 
+      onClick={onToggle}
+      style={{
+        width: '44px',
+        height: '24px',
+        borderRadius: '12px',
+        backgroundColor: isEnabled ? '#4a54e1' : '#ccc',
+        position: 'relative',
+        cursor: 'pointer',
+        transition: 'background-color 0.2s ease'
+      }}
+    >
+      <div 
+        style={{
+          width: '20px',
+          height: '20px',
+          borderRadius: '10px',
+          backgroundColor: '#fff',
+          position: 'absolute',
+          top: '2px',
+          left: isEnabled ? '22px' : '2px',
+          transition: 'left 0.2s ease',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
+        }}
+      />
+    </div>
+  </div>
+);
+
 // Helper function to calculate centroid of a polygon
 function calculateCentroid(coordinates) {
   let x = 0;
@@ -181,6 +232,8 @@ function MapPanel({
   const [error, setError] = useState(null);
   const { currentLocation } = useCurrentLocation();
   const hoveredZoneId = useRef(null);
+  const [showZoneBusyness, setShowZoneBusyness] = useState(true);
+
 
   // Filter locations with valid coordinates
   const locationsWithCoordinates = locations.filter(location => 
@@ -256,19 +309,19 @@ function MapPanel({
       });
 
       // Add fill layer with dynamic coloring based on busyness
-      map.addLayer({
-        id: 'zones-fill',
-        type: 'fill',
-        source: 'manhattan-zones',
-        paint: {
-          'fill-color': Object.keys(zoneBusynessMap).length > 0 
-            ? createZoneColorExpression(zoneBusynessMap) 
-            : '#088F8F',
-          'fill-opacity': Object.keys(zoneBusynessMap).length > 0 
-            ? createZoneOpacityExpression(zoneBusynessMap) 
-            : 0.3
-        }
-      });
+    map.addLayer({
+      id: 'zones-fill',
+      type: 'fill',
+      source: 'manhattan-zones',
+      paint: {
+        'fill-color': (showZoneBusyness && Object.keys(zoneBusynessMap).length > 0) 
+          ? createZoneColorExpression(zoneBusynessMap) 
+          : '#088F8F',
+        'fill-opacity': (showZoneBusyness && Object.keys(zoneBusynessMap).length > 0) 
+          ? createZoneOpacityExpression(zoneBusynessMap) 
+          : 0.3
+      }
+    });
 
       // Add stroke layer
       map.addLayer({
@@ -301,7 +354,7 @@ function MapPanel({
       });
 // Force refresh with a more aggressive approach
     setTimeout(() => {
-      if (map.getLayer('zones-fill') && Object.keys(zoneBusynessMap).length > 0) {
+      if (map.getLayer('zones-fill') && showZoneBusyness && Object.keys(zoneBusynessMap).length > 0) {
         
         // Remove and re-add the layer
         map.removeLayer('zones-fill');
@@ -423,7 +476,7 @@ function MapPanel({
   };
 
 useEffect(() => {
-  if (mapRef && zonesLoaded && Object.keys(zoneBusynessMap).length > 0) {
+  if (mapRef && zonesLoaded) {
     const map = mapRef.getMap();
     if (map.getLayer('zones-fill')) {
       
@@ -434,13 +487,17 @@ useEffect(() => {
         type: 'fill',
         source: 'manhattan-zones',
         paint: {
-          'fill-color': createZoneColorExpression(zoneBusynessMap),
-          'fill-opacity': createZoneOpacityExpression(zoneBusynessMap)
+          'fill-color': (showZoneBusyness && Object.keys(zoneBusynessMap).length > 0) 
+            ? createZoneColorExpression(zoneBusynessMap) 
+            : '#088F8F',
+          'fill-opacity': (showZoneBusyness && Object.keys(zoneBusynessMap).length > 0) 
+            ? createZoneOpacityExpression(zoneBusynessMap) 
+            : 0.3
         }
       }, 'zones-stroke');
     }
   }
-}, [zoneBusynessMap, mapRef, zonesLoaded]);
+}, [zoneBusynessMap, mapRef, zonesLoaded, showZoneBusyness]);
 
   useEffect(() => {
     if (mapRef && !zonesLoaded) {
@@ -453,6 +510,24 @@ useEffect(() => {
       }
     }
   }, [mapRef, geojsonFile, zonesLoaded]);
+
+  useEffect(() => {
+  if (mapRef && zonesLoaded) {
+    const map = mapRef.getMap();
+    if (map.getLayer('zones-fill')) {
+      map.setPaintProperty('zones-fill', 'fill-color', 
+        (showZoneBusyness && Object.keys(zoneBusynessMap).length > 0) 
+          ? createZoneColorExpression(zoneBusynessMap) 
+          : '#088F8F'
+      );
+      map.setPaintProperty('zones-fill', 'fill-opacity', 
+        (showZoneBusyness && Object.keys(zoneBusynessMap).length > 0) 
+          ? createZoneOpacityExpression(zoneBusynessMap) 
+          : 0.3
+      );
+    }
+  }
+}, [showZoneBusyness]);
 
   useEffect(() => {
   if (mapRef && Object.keys(zoneBusynessMap).length > 0) {
@@ -653,6 +728,10 @@ useEffect(() => {
       <GPSButton 
         onClick={handleGPSClick}
         disabled={!currentLocation || !currentLocation.coordinates}
+      />
+      <ZoneBusynessToggle 
+        isEnabled={showZoneBusyness}
+        onToggle={() => setShowZoneBusyness(!showZoneBusyness)}
       />
     </div>
   );

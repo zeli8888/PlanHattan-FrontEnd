@@ -381,7 +381,8 @@
   }
   
   .plan-card-prediction .prediction-bar {
-    font-size: 10px;
+    width: fit-content;
+    font-size: 0.8rem;
     padding: 2px 5px;
   }
   

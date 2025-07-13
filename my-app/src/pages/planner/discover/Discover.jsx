@@ -1,14 +1,14 @@
-import PlannerLayout from './PlannerLayout';
+import PlannerLayout from '../PlannerLayout';
 import './Discover.css'
 import { Search, MapPin } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import InterestSelector from './InterestSelector';
-import DateTimePicker from '../../components/dateTime/DateTimePicker';
-import { useCurrentLocation } from '../../contexts/LocationContext';
-import { useMyPlans } from '../../contexts/MyPlansProvider';
-import { useZoneBusyness } from '../../contexts/ZoneBusynessContext';
-import postUserPlans from '../../api/userplans/AddUserPlansApi';
-import { useAuth } from '../../contexts/AuthContext'; 
+import DateTimePicker from '../../../components/dateTime/DateTimePicker';
+import { useCurrentLocation } from '../../../contexts/LocationContext';
+import { useMyPlans } from '../../../contexts/MyPlansProvider';
+import { useZoneBusyness } from '../../../contexts/ZoneBusynessContext';
+import postUserPlans from '../../../api/userplans/AddUserPlansApi';
+import { useAuth } from '../../../contexts/AuthContext'; 
 import { useNavigate } from 'react-router-dom';
 
 function Discover() {

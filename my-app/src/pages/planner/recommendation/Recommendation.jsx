@@ -1,10 +1,10 @@
-import PlannerLayout from './PlannerLayout';
+import PlannerLayout from '../PlannerLayout';
 import { useState, useEffect, useRef } from 'react';
 import './Recommendation.css';
-import TimePicker from '../../components/dateTime/TimePicker'
-import RequestRecommendation from '../../api/RecommendationApi'
-import postMultipleUserPlans from '../../api/userplans/AddMultipleUserPlans'; 
-import { useZoneBusyness } from '../../contexts/ZoneBusynessContext';
+import TimePicker from '../../../components/dateTime/TimePicker'
+import RequestRecommendation from '../../../api/RecommendationApi'
+import postMultipleUserPlans from '../../../api/userplans/AddMultipleUserPlans'; 
+import { useZoneBusyness } from '../../../contexts/ZoneBusynessContext';
 
 import {
   Landmark,

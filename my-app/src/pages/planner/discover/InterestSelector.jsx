@@ -2,9 +2,9 @@ import React from "react";
 import './InterestSelector.css'
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { makeApiRequest } from "../../api/PoiApi";
-import { useCurrentLocation } from '../../contexts/LocationContext';
-import TimePicker from '../../components/dateTime/TimePicker'
+import { makeApiRequest } from "../../../api/PoiApi";
+import { useCurrentLocation } from '../../../contexts/LocationContext';
+import TimePicker from '../../../components/dateTime/TimePicker'
 
 import {
   Landmark,

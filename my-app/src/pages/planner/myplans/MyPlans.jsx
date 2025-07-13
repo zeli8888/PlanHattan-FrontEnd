@@ -1,11 +1,12 @@
-import PlannerLayout from './PlannerLayout';
+import PlannerLayout from '../PlannerLayout';
 import './MyPlans.css';
 import { FiTrash2 } from 'react-icons/fi';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useMyPlans } from '../../contexts/MyPlansProvider';
-import { useAuth } from '../../contexts/AuthContext';
-import getUserPlans from '../../api/userplans/GetUserPlansApi';
+import { useMyPlans } from '../../../contexts/MyPlansProvider';
+import { useAuth } from '../../../contexts/AuthContext';
+import getUserPlans from '../../../api/userplans/GetUserPlansApi';
+import { useZoneBusyness } from '../../../contexts/ZoneBusynessContext';
 
 function MyPlans() {
   const { plans, deletePlan, setPlans } = useMyPlans();
@@ -14,15 +15,26 @@ function MyPlans() {
   const [deletingId, setDeletingId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { zoneBusynessMap, refreshIfStale } = useZoneBusyness();
 
-  const mapLocations = plans.map(plan => ({
-    id: plan.placeId || plan.id, 
-    name: plan.place,
-    coordinates: plan.coordinates,
-    image: plan.areaImage,
-    location: plan.area,
-    busy: plan.predicted
-  }));
+  // Fixed mapLocations with proper coordinate validation
+  const mapLocations = plans
+    .filter(plan => plan.coordinates && Array.isArray(plan.coordinates) && plan.coordinates.length === 2)
+    .map(plan => ({
+      id: plan.placeId || plan.id, 
+      name: plan.place,
+      coordinates: plan.coordinates,
+      image: plan.areaImage,
+      location: plan.area,
+      busy: plan.predicted,
+      place: plan.place,
+      area: plan.area
+    }));
+
+    // Refresh zone data
+    useEffect(() => {
+      refreshIfStale(30); // Refresh if data is older than 30 minutes
+    }, [refreshIfStale]);
 
   // Fetch user plans when component mounts (only if authenticated)
   useEffect(() => {
@@ -51,11 +63,21 @@ function MyPlans() {
             hour12: true 
           }),
           predicted: plan.busyness,
-          coordinates: [plan.latitude, plan.longitude],
+          // Fixed: Ensure coordinates are properly formatted as [longitude, latitude]
+          coordinates: plan.longitude && plan.latitude ? [plan.longitude, plan.latitude] : null,
           serverPlanId: plan.userPlanId
         }));
         
-        setPlans(transformedPlans);
+        // Filter out plans without valid coordinates
+        const validPlans = transformedPlans.filter(plan => 
+          plan.coordinates && 
+          Array.isArray(plan.coordinates) && 
+          plan.coordinates.length === 2 &&
+          !isNaN(plan.coordinates[0]) && 
+          !isNaN(plan.coordinates[1])
+        );
+        
+        setPlans(validPlans);
         
       } catch (err) {
         setError(err.message);
@@ -69,6 +91,7 @@ function MyPlans() {
 
   useEffect(() => {
     console.log('Plans updated:', plans);
+    console.log('Map locations:', mapLocations);
   }, [plans]);
 
   const handleDelete = async (id) => {
@@ -137,7 +160,7 @@ function MyPlans() {
   }
 
   return (
-    <PlannerLayout locations={mapLocations}>
+    <PlannerLayout locations={mapLocations} zoneBusynessMap={zoneBusynessMap}>
       <div className="my-plans-container">
         <div className="my-plans-header">
           <h2>My Plans</h2>
@@ -185,7 +208,7 @@ function MyPlans() {
                           style={{ 
                             '--percentage': plan.predicted,
                             '--text-color': getPredictionColor(plan.predicted),
-                            
+                            display: 'inline-flex'
                           }}
                         >
                           {plan.predicted}
