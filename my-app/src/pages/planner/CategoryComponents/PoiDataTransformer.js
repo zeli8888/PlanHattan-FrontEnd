@@ -115,7 +115,7 @@ class PoiDataTransformer {
           zoneId: poi.zone.zoneId,
           name: capitalizeWords(poi.poiName || poi.name || poi.title || `${category} ${index + 1}`),
           coordinates: formatCoordinates(item),
-          image: poi.imageUrl || poi.image || poi.photo || getDefaultImage(category, index),
+          image: poi.pictureUrl || getDefaultImage(category, index),
           location: poi.address || poi.location || poi.vicinity || 'New York, NY',
           busy: mapBusynessValue(item.busyness || item.busy || poi.busyness || poi.busy || poi.crowdedness || 'medium'),
           distance: formatDistance(item.distance || poi.distance || 5),

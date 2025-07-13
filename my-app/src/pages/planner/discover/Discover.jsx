@@ -1,21 +1,25 @@
-import PlannerLayout from './PlannerLayout';
+import PlannerLayout from '../PlannerLayout';
 import './Discover.css'
 import { Search, MapPin } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import InterestSelector from './InterestSelector';
-import DateTimePicker from '../../components/dateTime/DateTimePicker';
-import { useCurrentLocation } from '../../contexts/LocationContext';
-import { useMyPlans } from '../../contexts/MyPlansProvider';
-import { useZoneBusyness } from '../../contexts/ZoneBusynessContext';
-import postUserPlans from '../../api/userplans/AddUserPlansApi';
-import { useAuth } from '../../contexts/AuthContext'; 
+import DateTimePicker from '../../../components/dateTime/DateTimePicker';
+import { useCurrentLocation } from '../../../contexts/LocationContext';
+import { useMyPlans } from '../../../contexts/MyPlansProvider';
+import { useZoneBusyness } from '../../../contexts/ZoneBusynessContext';
+import postUserPlans from '../../../api/userplans/AddUserPlansApi';
+import { useAuth } from '../../../contexts/AuthContext'; 
 import { useNavigate } from 'react-router-dom';
+import useNotification from '../../../components/features/useNotification';
+import Notification from '../../../components/features/Notification';
+
 
 function Discover() {
   const { currentLocation, updateCurrentLocation } = useCurrentLocation();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { addPlan, plans } = useMyPlans();
   const { zoneBusynessMap, isLoading: isLoadingZoneData, error: zoneError, refreshIfStale } = useZoneBusyness();
+  const { notification, showNotification, hideNotification } = useNotification();
   const navigate = useNavigate();
 
   const [dateTime, setDateTime] = useState({
@@ -41,6 +45,7 @@ function Discover() {
   busynessLevel: null,
   error: null
 });
+
 
   const getBusynessButtonColor = (busynessLevel) => {
   const colors = {
@@ -237,6 +242,11 @@ const handlePlaceSelect = (prediction) => {
   const handleSetCurrentLocation = () => {
     if (selectedPlace) {
       updateCurrentLocation(selectedPlace);
+      showNotification(
+        'success',
+        'Current Location Set',
+        `${selectedPlace.name} has been set as your current location.`
+      );
     }
   };
 
@@ -436,6 +446,7 @@ const handlePredictBusyness = async () => {
       
       // Make API call
       const response = await postUserPlans(planData);
+      console.log(planData)
       console.log('Plan added successfully:', response);
       
       // Add to local plans context
@@ -462,13 +473,24 @@ const handlePredictBusyness = async () => {
           period: 'PM'
         }
       });
-      
-      alert('Plan added successfully!');
+
+      // Show success notification
+      showNotification(
+        'success',
+        'Plan Added',
+        `${selectedPlace.name} has been successfully added to your plans.`
+      );
     } catch (error) {
       console.error('Error adding plan:', error);
       
+      // Show error notification
+      showNotification(
+        'error',
+        'Failed to Add Plan',
+        'Unable to add the plan. Please try again.'
+      );
     }
-  };
+  }
 
   // Locations to pass to PlannerLayout (including selected place)
   const locations = selectedPlace ? [selectedPlace] : [];
@@ -596,6 +618,10 @@ const handlePredictBusyness = async () => {
         </div>
       </div>
       <InterestSelector/>
+      <Notification 
+        notification={notification} 
+        onClose={hideNotification} 
+      />
     </PlannerLayout>
   );
 }

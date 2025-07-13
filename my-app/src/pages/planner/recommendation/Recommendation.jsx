@@ -1,10 +1,12 @@
-import PlannerLayout from './PlannerLayout';
+import PlannerLayout from '../PlannerLayout';
 import { useState, useEffect, useRef } from 'react';
 import './Recommendation.css';
-import TimePicker from '../../components/dateTime/TimePicker'
-import RequestRecommendation from '../../api/RecommendationApi'
-import postMultipleUserPlans from '../../api/userplans/AddMultipleUserPlans'; 
-import { useZoneBusyness } from '../../contexts/ZoneBusynessContext';
+import TimePicker from '../../../components/dateTime/TimePicker'
+import RequestRecommendation from '../../../api/RecommendationApi'
+import postMultipleUserPlans from '../../../api/userplans/AddMultipleUserPlans'; 
+import { useZoneBusyness } from '../../../contexts/ZoneBusynessContext';
+import Notification from '../../../components/features/Notification';
+import useNotification from '../../../components/features/useNotification';
 
 import {
   Landmark,
@@ -14,11 +16,8 @@ import {
   Coffee,
   TreeDeciduous,
   X,
-  AlertCircle,
   Clock,
   Calendar,
-  CheckCircle,
-  Info,
   ArrowLeft,
   MapPin
 } from "lucide-react";
@@ -60,13 +59,14 @@ function Recommendation() {
   const [customTitleQuery, setCustomTitleQuery] = useState('');
   const [selectedDate, setSelectedDate] = useState('');
   const [plans, setPlans] = useState([]);
-  const [notification, setNotification] = useState(null);
   const [dateError, setDateError] = useState(false);
   const [timeError, setTimeError] = useState(false);
   const [showRecommendations, setShowRecommendations] = useState(false);
   const [recommendations, setRecommendations] = useState([]);
   const [isLoadingRecommendations, setIsLoadingRecommendations] = useState(false);
   const { zoneBusynessMap, refreshIfStale } = useZoneBusyness();
+  const { notification, showNotification, hideNotification } = useNotification();
+
 
   // Google Places API state
   const [searchPredictions, setSearchPredictions] = useState([]);
@@ -182,20 +182,6 @@ function Recommendation() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
   
-  // Auto-hide notification after 5 seconds
-  useEffect(() => {
-    if (notification) {
-      const timer = setTimeout(() => {
-        setNotification(null);
-      }, 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [notification]);
-
-  const showNotification = (type, title, message) => {
-    setNotification({ type, title, message });
-  };
-
   const handleCustomSearch = () => {
     setSearchType('custom');
     setSelectedCategory('');
@@ -399,7 +385,6 @@ const uniqueId = crypto.randomUUID();
         ? { lat: recommendation.latitude, lng: recommendation.longitude }
         : null
     }));
-
     await postMultipleUserPlans(transformedRecommendations);
     showNotification('success', 'Plans Added', 'All recommendations have been added to your plans!');
   } catch (error) {
@@ -445,20 +430,6 @@ const uniqueId = crypto.randomUUID();
       placeId: plan.placeId
     }));
 };
-  const getNotificationIcon = (type) => {
-    switch (type) {
-      case 'error':
-        return <AlertCircle size={20} />;
-      case 'success':
-        return <CheckCircle size={20} />;
-      case 'warning':
-        return <AlertCircle size={20} />;
-      case 'info':
-        return <Info size={20} />;
-      default:
-        return <Info size={20} />;
-    }
-  };
 
   const getBusynessColor = (busyness) => {
     switch (busyness?.toLowerCase()) {
@@ -482,24 +453,10 @@ const uniqueId = crypto.randomUUID();
   return (
     <PlannerLayout locations={showRecommendations ? convertPlansToLocations(recommendations) : convertPlansToLocations(plans)} zoneBusynessMap={zoneBusynessMap}>
       <div className="recommendation-container">
-        {notification && (
-          <div className={`notification ${notification.type}`}>
-            <div className="notification-icon">
-              {getNotificationIcon(notification.type)}
-            </div>
-            <div className="notification-content">
-              <div className="notification-title">{notification.title}</div>
-              <div className="notification-message">{notification.message}</div>
-            </div>
-            <button 
-              className="notification-close"
-              onClick={() => setNotification(null)}
-            >
-              <X size={16} />
-            </button>
-          </div>
-        )}
-        
+        <Notification 
+          notification={notification} 
+          onClose={hideNotification} 
+        />
         {showRecommendations ? (
           <div className="recommendations-view">
             <div className="recommendations-header">

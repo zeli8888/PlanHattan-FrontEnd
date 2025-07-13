@@ -1,8 +1,8 @@
 import './App.css'
 import Home from './pages/home/Home.jsx'
-import Discover from './pages/planner/Discover.jsx';
-import MyPlans from './pages/planner/MyPlans.jsx';
-import Recommendation from './pages/planner/Recommendation.jsx';
+import Discover from './pages/planner/discover/Discover.jsx';
+import MyPlans from './pages/planner/myplans/MyPlans.jsx';
+import Recommendation from './pages/planner/recommendation/Recommendation.jsx';
 import Loading from './components/features/LoadingPage.jsx';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
