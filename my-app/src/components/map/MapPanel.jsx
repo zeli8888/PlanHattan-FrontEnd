@@ -60,22 +60,22 @@ const BusynessHeader = ({ isVisible }) => {
         transform: 'translateX(-50%)',
         zIndex: 1000,
         backgroundColor: 'rgba(255, 255, 255, 0.95)',
-        borderRadius: '8px',
-        padding: '12px 24px',
+        borderRadius: '6px',
+        padding: window.innerWidth <= 768 ? '8px 12px' : '12px 24px',
         boxShadow: '0 2px 10px rgba(0,0,0,0.15)',
         border: '1px solid #e0e0e0',
-        fontSize: '16px',
-        fontWeight: '700',
+        fontSize: window.innerWidth <= 768 ? '12px' : '16px',
+        fontWeight: '600',
         color: '#333',
         textAlign: 'center',
         backdropFilter: 'blur(10px)',
-        maxWidth: '90%',
+        maxWidth: window.innerWidth <= 768 ? '85%' : '90%',
         whiteSpace: 'nowrap',
         overflow: 'hidden',
         textOverflow: 'ellipsis'
       }}
     >
-      Predicted Zone Busyness on {formattedDate}
+      {window.innerWidth <= 768 ? `Predicted Busyness - ${formattedDate}` : `Predicted Busyness on ${formattedDate}`}
     </div>
   );
 };
@@ -86,12 +86,12 @@ const GPSButton = ({ onClick, disabled }) => (
     onClick={onClick}
     style={{
       position: 'absolute',
-      bottom: '20px',
-      right: '20px',
+      bottom: window.innerWidth <= 768 ? '10px' : '20px',
+      right: window.innerWidth <= 768 ? '10px' : '20px',
       zIndex: 1000,
       backgroundColor: disabled ? '#ccc' : '#fff',
       borderRadius: '50%',
-      padding: '12px',
+      padding: window.innerWidth <= 768 ? '8px' : '12px',
       boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
       cursor: disabled ? 'not-allowed' : 'pointer',
       transition: 'all 0.2s ease',
@@ -99,7 +99,7 @@ const GPSButton = ({ onClick, disabled }) => (
     }}
   >
     <Navigation 
-      size={24} 
+      size={window.innerWidth <= 768 ? 20 : 24} 
       color={disabled ? '#999' : '#4a54e1'}
       fill={disabled ? '#999' : '#4a54e1'}
     />
@@ -111,44 +111,52 @@ const ZoneBusynessToggle = ({ isEnabled, onToggle }) => (
     className="zone-busyness-toggle"
     style={{
       position: 'absolute',
-      bottom: '10px',
-      left: '10px',
+      bottom: window.innerWidth <= 768 ? '10px' : '20px',
+      left: window.innerWidth <= 768 ? '10px' : '20px',
       zIndex: 1000,
       backgroundColor: '#fff',
-      borderRadius: '8px',
-      padding: '12px 16px',
+      borderRadius: window.innerWidth <= 768 ? '6px' : '8px',
+      padding: window.innerWidth <= 768 ? '8px 12px' : '12px 16px',
       boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
       border: '2px solid #e0e0e0',
       display: 'flex',
       alignItems: 'center',
-      gap: '10px',
-      fontSize: '14px',
-      fontWeight: '600',
-      color: '#333'
+      gap: window.innerWidth <= 768 ? '8px' : '10px',
+      fontSize: window.innerWidth <= 768 ? '12px' : '14px',
+      fontWeight: '500',
+      color: '#333',
+      maxWidth: window.innerWidth <= 768 ? '200px' : 'auto'
     }}
   >
-    <span>Zone Busyness Map</span>
+    <span style={{
+      whiteSpace: 'nowrap',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis'
+    }}>
+      {window.innerWidth <= 768 ? 'Zone Busyness' : 'Zone Busyness Map'}
+    </span>
     <div 
       onClick={onToggle}
       style={{
-        width: '44px',
-        height: '24px',
-        borderRadius: '12px',
+        width: window.innerWidth <= 768 ? '36px' : '44px',
+        height: window.innerWidth <= 768 ? '20px' : '24px',
+        borderRadius: window.innerWidth <= 768 ? '10px' : '12px',
         backgroundColor: isEnabled ? '#4a54e1' : '#ccc',
         position: 'relative',
         cursor: 'pointer',
-        transition: 'background-color 0.2s ease'
+        transition: 'background-color 0.2s ease',
+        flexShrink: 0
       }}
     >
       <div 
         style={{
-          width: '20px',
-          height: '20px',
-          borderRadius: '10px',
+          width: window.innerWidth <= 768 ? '16px' : '20px',
+          height: window.innerWidth <= 768 ? '16px' : '20px',
+          borderRadius: window.innerWidth <= 768 ? '8px' : '10px',
           backgroundColor: '#fff',
           position: 'absolute',
           top: '2px',
-          left: isEnabled ? '22px' : '2px',
+          left: isEnabled ? (window.innerWidth <= 768 ? '18px' : '22px') : '2px',
           transition: 'left 0.2s ease',
           boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
         }}
@@ -246,6 +254,7 @@ function createZoneOpacityExpression(zoneBusynessMap) {
   expression.push(0.3); // Default opacity
   return expression;
 }
+
 
 function MapPanel({ 
   locations = [],
@@ -516,6 +525,16 @@ function MapPanel({
     }
   };
 
+  useEffect(() => {
+  const handleResize = () => {
+    // Force re-render on window resize to update responsive styles
+    setViewport(prev => ({ ...prev }));
+  };
+
+  window.addEventListener('resize', handleResize);
+  return () => window.removeEventListener('resize', handleResize);
+}, []);
+
 useEffect(() => {
   if (mapRef && zonesLoaded) {
     const map = mapRef.getMap();
@@ -637,18 +656,18 @@ useEffect(() => {
 
   return (
     <div className="map-panel" style={{ position: 'relative' }}>
-      {error && (
+    {error && (
         <div className="error-message" style={{
           position: 'absolute',
           top: '10px',
-          left: '10px',
-          right: '10px',
+          left: window.innerWidth <= 768 ? '5px' : '10px',
+          right: window.innerWidth <= 768 ? '5px' : '10px',
           zIndex: 1000,
           backgroundColor: '#ff4d4f',
           color: 'white',
-          padding: '10px',
+          padding: window.innerWidth <= 768 ? '8px' : '10px',
           borderRadius: '4px',
-          fontSize: '14px'
+          fontSize: window.innerWidth <= 768 ? '12px' : '14px'
         }}>
           {error}
         </div>
