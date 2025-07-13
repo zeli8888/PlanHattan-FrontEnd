@@ -75,7 +75,7 @@ const BusynessHeader = ({ isVisible }) => {
         textOverflow: 'ellipsis'
       }}
     >
-      Predicted Busyness on {formattedDate}
+      Predicted Zone Busyness on {formattedDate}
     </div>
   );
 };
