@@ -39,6 +39,47 @@ const CurrentLocationMarker = () => (
   </svg>
 );
 
+const BusynessHeader = ({ isVisible }) => {
+  const today = new Date();
+  const formattedDate = today.toLocaleDateString('en-US', { 
+    weekday: 'long', 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+  });
+
+  if (!isVisible) return null;
+
+  return (
+    <div 
+      className="busyness-header"
+      style={{
+        position: 'absolute',
+        top: '10px',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        zIndex: 1000,
+        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+        borderRadius: '8px',
+        padding: '12px 24px',
+        boxShadow: '0 2px 10px rgba(0,0,0,0.15)',
+        border: '1px solid #e0e0e0',
+        fontSize: '16px',
+        fontWeight: '700',
+        color: '#333',
+        textAlign: 'center',
+        backdropFilter: 'blur(10px)',
+        maxWidth: '90%',
+        whiteSpace: 'nowrap',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis'
+      }}
+    >
+      Predicted Busyness on {formattedDate}
+    </div>
+  );
+};
+
 const GPSButton = ({ onClick, disabled }) => (
   <div 
     className="gps-button"
@@ -82,7 +123,7 @@ const ZoneBusynessToggle = ({ isEnabled, onToggle }) => (
       alignItems: 'center',
       gap: '10px',
       fontSize: '14px',
-      fontWeight: '500',
+      fontWeight: '600',
       color: '#333'
     }}
   >
@@ -612,7 +653,7 @@ useEffect(() => {
           {error}
         </div>
       )}
-      
+      <BusynessHeader isVisible={showZoneBusyness} />
       <Map
         ref={setMapRef}
         mapboxAccessToken={TOKEN}
