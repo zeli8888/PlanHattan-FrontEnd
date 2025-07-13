@@ -385,7 +385,6 @@ const uniqueId = crypto.randomUUID();
         ? { lat: recommendation.latitude, lng: recommendation.longitude }
         : null
     }));
-    console.log(transformedRecommendations)
     await postMultipleUserPlans(transformedRecommendations);
     showNotification('success', 'Plans Added', 'All recommendations have been added to your plans!');
   } catch (error) {

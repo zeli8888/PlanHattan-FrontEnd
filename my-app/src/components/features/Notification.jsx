@@ -5,6 +5,7 @@ import {
   CheckCircle,
   Info
 } from "lucide-react";
+import './Notification.css';
 
 const Notification = ({ notification, onClose }) => {
   // Auto-hide notification after 5 seconds
