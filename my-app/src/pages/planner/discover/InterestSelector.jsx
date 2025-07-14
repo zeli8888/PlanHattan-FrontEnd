@@ -127,83 +127,78 @@ const InterestSelector = () => {
     return `${hours}:${formattedMinutes} ${period}`;
   };
 
-  const handleGo = async () => {
-    if (selectedCategory) {
-      setIsLoading(true);
+// In InterestSelector.jsx, update the handleGo function to pass the selected date/time
+
+const handleGo = async () => {
+  if (selectedCategory) {
+    setIsLoading(true);
+    
+    try {
+      const categoryInfo = categoryMapping[selectedCategory];
       
-      try {
-        const categoryInfo = categoryMapping[selectedCategory];
-        
-        // Combine date and time into a single datetime object
-        // Get date value - use selectedDate if available, otherwise current date
-        const dateValue = selectedDate || new Date().toISOString().split('T')[0];
+      // Combine date and time into a single datetime object
+      const dateValue = selectedDate || new Date().toISOString().split('T')[0];
+      const hours = parseInt(cardDateTime.time.hours);
+      const minutes = parseInt(cardDateTime.time.minutes);
 
-        // Extract hour and minute values
-        const hours = parseInt(cardDateTime.time.hours); // Fixed: was using selectedDate instead of cardDateTime.time.hours
-        const minutes = parseInt(cardDateTime.time.minutes);
-
-        // Convert to 24-hour format
-        let hours24 = hours;
-        if (cardDateTime.time.period === 'PM' && hours !== 12) {
-            hours24 += 12;
-        } else if (cardDateTime.time.period === 'AM' && hours === 12) {
-            hours24 = 0;
-        }
-
-        // Parse the date string to get year, month, day
-        const dateObj = new Date(dateValue);
-        const year = dateObj.getFullYear();
-        const month = dateObj.getMonth();
-        const day = dateObj.getDate();
-
-        // Create local datetime
-        const localDateTime = new Date(year, month, day, hours24, minutes, 0, 0);
-
-        // Convert to UTC ISO 8601 timestamp (ends with 'Z')
-        const utcTimestamp = localDateTime.toISOString();
-         
-        // Prepare location options for the API request
-        const locationOptions = {};
-        if (currentLocation?.latitude && currentLocation?.longitude) {
-          locationOptions.latitude = currentLocation.latitude.toString();
-          locationOptions.longitude = currentLocation.longitude.toString();
-        }
-        
-        // Make API request with the correct POI type and current location
-        const apiResponse = await makeApiRequest(categoryInfo.poiType, locationOptions, utcTimestamp, currentLocation);
-        
-        console.log('API Response in InterestSelector:', apiResponse);        
-        // Navigate with state containing the API response INCLUDING zoneBusynessMap
-        navigate(`/plan/category/${categoryInfo.url}`, {
-          state: {
-            apiData: apiResponse, // Pass the entire API response
-            poiType: categoryInfo.poiType,
-            categoryName: selectedCategory,
-            zoneBusynessMap: apiResponse.zoneBusynessMap, // Explicitly pass zone busyness data
-            selectedDateTime: utcTimestamp // Pass the selected date/time
-          }
-        });
-      } catch (error) {
-        console.error('Failed to fetch POIs:', error);
-        // Still navigate but without API data (will use fallback data)
-        const categoryInfo = categoryMapping[selectedCategory];
-        const dateTime = {
-          date: selectedDate || new Date().toISOString().split('T')[0],
-          time: cardDateTime.time
-        };
-        navigate(`/plan/category/${categoryInfo.url}`, {
-          state: {
-            poiType: categoryInfo.poiType,
-            categoryName: selectedCategory,
-            selectedDateTime: dateTime,
-            error: error.message
-          }
-        });
-      } finally {
-        setIsLoading(false);
+      // Convert to 24-hour format
+      let hours24 = hours;
+      if (cardDateTime.time.period === 'PM' && hours !== 12) {
+          hours24 += 12;
+      } else if (cardDateTime.time.period === 'AM' && hours === 12) {
+          hours24 = 0;
       }
+
+      const dateObj = new Date(dateValue);
+      const year = dateObj.getFullYear();
+      const month = dateObj.getMonth();
+      const day = dateObj.getDate();
+
+      const localDateTime = new Date(year, month, day, hours24, minutes, 0, 0);
+      const utcTimestamp = localDateTime.toISOString();
+       
+      const locationOptions = {};
+      if (currentLocation?.latitude && currentLocation?.longitude) {
+        locationOptions.latitude = currentLocation.latitude.toString();
+        locationOptions.longitude = currentLocation.longitude.toString();
+      }
+      
+      const apiResponse = await makeApiRequest(categoryInfo.poiType, locationOptions, utcTimestamp, currentLocation);
+      
+      console.log('API Response in InterestSelector:', apiResponse);        
+      
+      // Navigate with state containing the API response AND the selected date/time
+      navigate(`/plan/category/${categoryInfo.url}`, {
+        state: {
+          apiData: apiResponse,
+          poiType: categoryInfo.poiType,
+          categoryName: selectedCategory,
+          zoneBusynessMap: apiResponse.zoneBusynessMap,
+          selectedDateTime: utcTimestamp,
+          // ADD THESE NEW FIELDS:
+          selectedDate: dateValue, // Pass the selected date
+          selectedTime: cardDateTime.time // Pass the selected time object
+        }
+      });
+    } catch (error) {
+      console.error('Failed to fetch POIs:', error);
+      const categoryInfo = categoryMapping[selectedCategory];
+      navigate(`/plan/category/${categoryInfo.url}`, {
+        state: {
+          poiType: categoryInfo.poiType,
+          categoryName: selectedCategory,
+          selectedDateTime: utcTimestamp,
+          // ADD THESE NEW FIELDS EVEN IN ERROR CASE:
+          selectedDate: selectedDate || new Date().toISOString().split('T')[0],
+          selectedTime: cardDateTime.time,
+          error: error.message
+        }
+      });
+    } finally {
+      setIsLoading(false);
     }
-  };
+  }
+};
 
   return (
     <div className="interest-container">
@@ -237,7 +232,7 @@ const InterestSelector = () => {
                 </button>
                 <h3>Select Date & Time</h3>
               </div>
-  <div className="datetime-content">
+  <div className="datetime-content"> 
   <div className="datetime-input-wrapper">
     <div className="planning-text">
       <span>Planning on</span>
