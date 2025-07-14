@@ -28,12 +28,28 @@ const CategoryLayout = ({
   const zoneBusynessMap = location.state?.zoneBusynessMap || {};
   const now = new Date();
   const { notification, showNotification, hideNotification } = useNotification();
-  const [dateTime, setDateTime] = useState({
-    date: new Date(),
-    time: {
-      hours: now.getHours() % 12 || 12,
-      minutes: now.getMinutes(),
-      period: now.getHours() >= 12 ? 'PM' : 'AM'
+const [dateTime, setDateTime] = useState(() => {
+    // Get the selected date and time from navigation state
+    const selectedDate = location.state?.selectedDate;
+    const selectedTime = location.state?.selectedTime;
+    
+    if (selectedDate && selectedTime) {
+      // Convert the selected date string to a Date object
+      const dateObj = new Date(selectedDate);
+      return {
+        date: dateObj,
+        time: selectedTime
+      };
+    } else {
+      // Fallback to current date/time if not provided
+      return {
+        date: new Date(),
+        time: {
+          hours: now.getHours() % 12 || 12,
+          minutes: now.getMinutes(),
+          period: now.getHours() >= 12 ? 'PM' : 'AM'
+        }
+      };
     }
   });
   
@@ -48,6 +64,20 @@ const CategoryLayout = ({
       }));
     }
   }, [selectedMapLocation]);
+
+  useEffect(() => {
+  setUpcomingBusyness({});
+}, [dateTime]);
+
+useEffect(() => {
+  if (selectedMapLocation) {
+    setFlippedCards(prev => ({
+      ...prev,
+      [selectedMapLocation.id]: true
+    }));
+    handleGetUpcomingBusyness(selectedMapLocation);
+  }
+}, [selectedMapLocation, dateTime]);
 
   const [cardDateTime, setCardDateTime] = useState({
     date: new Date(),
@@ -153,16 +183,40 @@ const handleGetUpcomingBusyness = async (place) => {
   }
 
   console.log('Fetching busyness data for place:', place.name);
-  console.log('Using date:', dateTime.date.toISOString());
+  
+  // UPDATED: Create a proper datetime from the selected date and time
+  const selectedDate = dateTime.date;
+  const selectedTime = dateTime.time;
+  
+  // Convert 12-hour time to 24-hour format
+  let hours24 = parseInt(selectedTime.hours);
+  if (selectedTime.period === 'PM' && hours24 !== 12) {
+    hours24 += 12;
+  } else if (selectedTime.period === 'AM' && hours24 === 12) {
+    hours24 = 0;
+  }
+  
+  // Create a proper datetime object combining selected date and time
+  const combinedDateTime = new Date(
+    selectedDate.getFullYear(),
+    selectedDate.getMonth(),
+    selectedDate.getDate(),
+    hours24,
+    parseInt(selectedTime.minutes),
+    0,
+    0
+  );
+  
+  console.log('Using combined date/time:', combinedDateTime.toISOString());
   
   setBusynessLoading(prev => ({ ...prev, [place.id]: true }));
 
   try {
-    // Fetch busyness data using the API service
+    // Fetch busyness data using the combined datetime
     const busynessData = await getUpcomingBusynessWithFallback(
       1, // zoneId - adjust based on your zone system
       3, // predictedHours
-      dateTime.date.toISOString() // Use the selected date/time from the component
+      combinedDateTime.toISOString() // Use the combined datetime
     );
     
     setUpcomingBusyness(prev => ({
