@@ -57,7 +57,7 @@ function Recommendation() {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [customSearchQuery, setCustomSearchQuery] = useState('');
   const [customTitleQuery, setCustomTitleQuery] = useState('');
-  const [selectedDate, setSelectedDate] = useState('');
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [plans, setPlans] = useState([]);
   const [dateError, setDateError] = useState(false);
   const [timeError, setTimeError] = useState(false);
@@ -66,6 +66,7 @@ function Recommendation() {
   const [isLoadingRecommendations, setIsLoadingRecommendations] = useState(false);
   const { zoneBusynessMap, refreshIfStale } = useZoneBusyness();
   const { notification, showNotification, hideNotification } = useNotification();
+  const [isCategoryEnabled, setIsCategoryEnabled] = useState(false);
 
 
   // Google Places API state
@@ -304,6 +305,8 @@ const uniqueId = crypto.randomUUID();
         return a.date.localeCompare(b.date);
       }));
       
+      setIsCategoryEnabled(true);
+
       // Reset form
       setCustomSearchQuery('');
       setCustomTitleQuery('');
@@ -544,9 +547,9 @@ const uniqueId = crypto.randomUUID();
           </div>
         ) : (
           <>
-            <h2>Discover Amazing Places</h2>
+            <h2>Recommendation Day Planner</h2>
             <p className="recommendation-description">
-              Find the perfect spots for your next adventure. Search by your preferences or browse by category.
+              Plan your whole day in one click. Find the perfect spots for your next adventure. Search by your preferences or browse by category.
             </p>
             
             <div className="planning-section">
@@ -597,12 +600,18 @@ const uniqueId = crypto.randomUUID();
                   Custom search
                 </button>
                 <button 
-                  className={`search-btn ${searchType === 'category' ? 'active' : ''}`}
+                  className={`search-btn ${searchType === 'category' ? 'active' : ''} ${!isCategoryEnabled ? 'disabled' : ''}`}
                   onClick={handleCategorySearch}
+                  disabled={!isCategoryEnabled}
                 >
                   Search by category
                 </button>
               </div>
+              {!isCategoryEnabled && (
+              <p className="search-note">
+                Add a custom search plan first to unlock category search
+              </p>
+            )}
             </div>
             
             <div className="pick-section">

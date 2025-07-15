@@ -296,7 +296,8 @@
   border-radius: 15px;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
   overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transform: scale(1);
+  transition: transform 0.4s ease-in-out;
 }
 
 .features-right {
@@ -403,8 +404,9 @@
 .itinerary-card:hover,
 .hmap-card:hover,
 .feature-card:hover {
-  transform: translateY(-8px);
+  transform: scale(1.03);
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+  transition: 1s;
 }
 
 .itinerary-card:hover .itinerary-icon img,

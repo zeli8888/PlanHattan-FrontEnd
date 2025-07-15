@@ -107,6 +107,19 @@
   flex-wrap: wrap;
 }
 
+.search-btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.search-note {
+  font-size: 14px;
+  color: red;
+  margin-top: 4px;
+  text-align: center;
+  font-style: italic;
+}
+
 .search-buttons {
   display: flex;
   gap: 1rem;
