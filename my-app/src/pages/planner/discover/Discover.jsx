@@ -12,7 +12,7 @@ import { useAuth } from '../../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import useNotification from '../../../components/features/useNotification';
 import Notification from '../../../components/features/Notification';
-
+import { fetchZoneBusyness } from '../../../api/ZoneBusynessMap';
 
 function Discover() {
   const { currentLocation, updateCurrentLocation } = useCurrentLocation();
@@ -20,6 +20,7 @@ function Discover() {
   const { addPlan, plans } = useMyPlans();
   const { zoneBusynessMap, isLoading: isLoadingZoneData, error: zoneError, refreshIfStale } = useZoneBusyness();
   const { notification, showNotification, hideNotification } = useNotification();
+  const [selectedDateZoneBusyness, setSelectedDateZoneBusyness] = useState({});
   const navigate = useNavigate();
 
   const [dateTime, setDateTime] = useState({
@@ -45,7 +46,6 @@ function Discover() {
   busynessLevel: null,
   error: null
 });
-
 
   const getBusynessButtonColor = (busynessLevel) => {
   const colors = {
@@ -377,7 +377,7 @@ const handlePredictBusyness = async () => {
       
       
       // Get busyness level from zoneBusynessMap
-      const busynessLevel = zoneBusynessMap[zoneId];
+      const busynessLevel = selectedDateZoneBusyness[zoneId];
       
       if (busynessLevel) {
         
