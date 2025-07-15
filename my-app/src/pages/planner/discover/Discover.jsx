@@ -314,6 +314,7 @@ const handlePredictBusyness = async () => {
   }
 
   try {
+    console.log(zoneBusynessMap)
     // Get coordinates from selected place
     let coordinates = null;
     
@@ -377,7 +378,7 @@ const handlePredictBusyness = async () => {
       
       
       // Get busyness level from zoneBusynessMap
-      const busynessLevel = selectedDateZoneBusyness[zoneId];
+      const busynessLevel = zoneBusynessMap[zoneId];
       
       if (busynessLevel) {
         
