@@ -206,13 +206,6 @@ function MyPlans() {
                     <tr key={plan.id} className={`plan-row ${deletingId === plan.id ? 'deleting' : ''}`}>
                       <td>
                         <div className="place-cell">
-                          <div className="area-image-container">
-                            <img 
-                              src={plan.areaImage || '/default-image.jpg'} 
-                              alt={plan.area} 
-                              className="area-image"
-                            />
-                          </div>
                           {plan.place}
                         </div>
                       </td>
@@ -249,13 +242,7 @@ function MyPlans() {
                   <div key={plan.id} className={`plan-card ${deletingId === plan.id ? 'deleting' : ''}`}>
                     <div className="plan-card-header">
                       <div className="plan-card-place">
-                        <div className="area-image-container">
-                          <img 
-                            src={plan.areaImage || '/default-image.jpg'} 
-                            alt={plan.area} 
-                            className="area-image"
-                          />
-                        </div>
+                        
                         <div className="plan-card-place-name">{plan.place}</div>
                       </div>
                       <button 

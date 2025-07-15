@@ -2,13 +2,6 @@ import axios from 'axios';
 
 const RequestRecommendations = async (plansArray) => {
   try {
-    // Get CSRF token from localStorage
-    const csrfToken = localStorage.getItem('csrfToken');
-    
-    if (!csrfToken) {
-      throw new Error('CSRF token not found in localStorage');
-    }
-
     // Transform the plans array to match your API expected format
     const payload = plansArray.map(plan => ({
       poiName: plan.poiName || null,
@@ -23,10 +16,8 @@ const RequestRecommendations = async (plansArray) => {
     const requestConfig = {
       headers: {
         'Content-Type': 'application/json',
-        'X-CSRF-TOKEN': csrfToken,
         'Accept': 'application/json',
       },
-      withCredentials: true // Include cookies for session-based auth
     };
 
     // // Log the final request details
