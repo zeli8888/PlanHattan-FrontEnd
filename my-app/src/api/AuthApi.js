@@ -220,7 +220,7 @@ export const userStorage = {
   setUser: (userData) => {
     try {
       window.currentUser = userData;
-      localStorage.setItem('currentUser', JSON.stringify(userData));
+      sessionStorage.setItem('currentUser', JSON.stringify(userData)); // Store in sessionStorage
       
       if (userData.token) {
         apiClient.defaults.headers.common['Authorization'] = `Bearer ${userData.token}`;
@@ -234,7 +234,7 @@ export const userStorage = {
     try {
       if (window.currentUser) return window.currentUser;
       
-      const storedUser = localStorage.getItem('currentUser');
+      const storedUser = sessionStorage.getItem('currentUser'); // Get from sessionStorage
       if (storedUser) {
         const user = JSON.parse(storedUser);
         window.currentUser = user;
@@ -255,8 +255,8 @@ export const userStorage = {
   clearUser: () => {
     try {
       window.currentUser = null;
-      localStorage.removeItem('currentUser');
-      localStorage.removeItem('csrfToken');
+      sessionStorage.removeItem('currentUser'); // Clear from sessionStorage
+      sessionStorage.removeItem('csrfToken'); // Clear CSRF token from sessionStorage
       delete apiClient.defaults.headers.common['Authorization'];
       delete apiClient.defaults.headers.common['X-CSRF-Token'];
     } catch (error) {
@@ -270,7 +270,7 @@ export const userStorage = {
 
   setCsrfToken: (token) => {
     try {
-      localStorage.setItem('csrfToken', token);
+      sessionStorage.setItem('csrfToken', token); // Store in sessionStorage
       apiClient.defaults.headers.common['X-CSRF-Token'] = token;
     } catch (error) {
       console.error('Error saving CSRF token:', error);
@@ -279,7 +279,7 @@ export const userStorage = {
 
   getCsrfToken: () => {
     try {
-      return localStorage.getItem('csrfToken');
+      return sessionStorage.getItem('csrfToken'); // Get from sessionStorage
     } catch (error) {
       console.error('Error retrieving CSRF token:', error);
       return null;
@@ -288,7 +288,7 @@ export const userStorage = {
 
   clearCsrfToken: () => {
     try {
-      localStorage.removeItem('csrfToken');
+      sessionStorage.removeItem('csrfToken'); // Clear from sessionStorage
       delete apiClient.defaults.headers.common['X-CSRF-Token'];
     } catch (error) {
       console.error('Error clearing CSRF token:', error);
