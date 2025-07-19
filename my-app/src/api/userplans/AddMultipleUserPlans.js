@@ -6,7 +6,7 @@ const postMultipleUserPlans = async (planDataArray) => {
     const csrfToken = sessionStorage.getItem('csrfToken');
     
     if (!csrfToken) {
-      throw new Error('CSRF token not found in localStorage');
+      throw new Error('CSRF token not found in session');
     }
 
     // Prepare the request payload with multiple POIs

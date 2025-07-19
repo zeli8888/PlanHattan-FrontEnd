@@ -1,5 +1,6 @@
 import React from 'react';
 import './Home.css';
+import UserProfile from './UserProfile';
 import homeImages from './HomeImages';
 import { useNavigate } from 'react-router-dom';
 import { useRef, useState, useEffect } from 'react';
@@ -13,6 +14,7 @@ function Home() {
     const [isLoggingOut, setIsLoggingOut] = useState(false); // Added loading state
     const trustSectionRef = useRef(null);
     const destinationsRef = useRef(null);
+    const [showProfileModal, setShowProfileModal] = useState(false);
 
     // Check for user authentication on component mount
     useEffect(() => {
@@ -35,6 +37,15 @@ function Home() {
     const handleHomeRoute = () => {
         navigate('/');
     }
+
+    const handleProfileClick = () => {
+    setShowProfileModal(true);
+    setShowUserMenu(false); // Close the dropdown menu
+    };
+
+    const handleCloseProfile = () => {
+        setShowProfileModal(false);
+    };
 
     // Enhanced logout function with debugging
     const handleLogout = async () => {
@@ -128,7 +139,7 @@ function Home() {
                                     </button>
                                     {showUserMenu && (
                                         <div className="user-dropdown">
-                                            <div className="user-dropdown-item">
+                                            <div className="user-dropdown-item" onClick={handleProfileClick}>
                                                 Profile
                                             </div>
                                             <div className="user-dropdown-item" onClick={() => navigate('/my-plans')}>
@@ -290,6 +301,11 @@ function Home() {
                     </div>
                 </div>
             </section>
+            <UserProfile 
+            user={user}
+            isOpen={showProfileModal}
+            onClose={handleCloseProfile}
+        />
         </div>
     );
 }
