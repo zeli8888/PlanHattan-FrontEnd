@@ -278,6 +278,14 @@
   color: #666;
 }
 
+/* User avatar image styles */
+.user-avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
 /* User dropdown menu */
 .user-dropdown {
   position: absolute;
@@ -336,6 +344,102 @@
   cursor: not-allowed;
 }
 
+/* Mobile user info section */
+.mobile-user-info {
+  padding: 1.5rem 0 1rem 0;
+  border-top: 1px solid #eee;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.mobile-user-avatar {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid #e0e0e0;
+  background-color: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-user-avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.mobile-user-icon {
+  font-size: 1.5rem;
+  color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.mobile-user-name {
+  font-weight: 600;
+  color: #333;
+  font-size: 1rem;
+  text-align: center;
+}
+
+.mobile-user-actions {
+  display: flex;
+  gap: 0.75rem;
+  width: 100%;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.mobile-user-action {
+  padding: 0.5rem 1rem;
+  border: 1px solid #ddd;
+  background: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  flex: 1;
+  min-width: 80px;
+  text-align: center;
+}
+
+.mobile-user-action:hover {
+  background: #f8f9fa;
+  border-color: #5c5cff;
+  color: #5c5cff;
+}
+
+.mobile-user-action.logout {
+  color: #e74c3c;
+  border-color: #e74c3c;
+}
+
+.mobile-user-action.logout:hover {
+  background: #e74c3c;
+  color: white;
+}
+
+.mobile-user-action.logging-out {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.mobile-user-action.logging-out:hover {
+  background: white;
+  color: #e74c3c;
+  border-color: #e74c3c;
+}
 
 @keyframes slideInBounce {
   0% {
@@ -414,5 +518,16 @@
   .mobile-menu-content {
     width: 260px;
     padding: 1.5rem;
+  }
+
+  /* Mobile user actions stack vertically on small screens */
+  .mobile-user-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .mobile-user-action {
+    flex: none;
+    width: 100%;
   }
 }

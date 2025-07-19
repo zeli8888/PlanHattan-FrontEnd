@@ -1,7 +1,9 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { useAuth } from '../../contexts/AuthContext'; // Import the auth context
+import { useAuth } from '../../contexts/AuthContext'; // Keep for logout functionality
+import { useUserProfile } from '../../contexts/UserProfileContext'; // Import user profile context
 import { authAPI } from '../../api/AuthApi'; // Import authAPI for logout
+import UserProfile from '../../pages/home/UserProfile'
 import './Navbar.css';
 
 const navItems = [
@@ -13,10 +15,12 @@ const navItems = [
 function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, logout: contextLogout } = useAuth(); // Get user and logout from context
+  const { logout: contextLogout } = useAuth(); // Keep auth context for logout
+  const { user, username, userPicture, isLoggedIn, logoutUser } = useUserProfile(); // Use profile context
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
 
   const handleHomeNavigate = () => {
     navigate('/');
@@ -27,6 +31,16 @@ function Navbar() {
     if (!isMobileMenuOpen) {
       openMobileMenu();
     }
+  };
+
+   const handleCloseProfile = () => {
+        setShowProfileModal(false);
+    };
+
+  // Add handler to open profile modal
+  const handleOpenProfile = () => {
+    setShowProfileModal(true);
+    setShowUserMenu(false); // Close the dropdown menu
   };
 
   const openMobileMenu = () => {
@@ -51,7 +65,7 @@ function Navbar() {
     setShowUserMenu(!showUserMenu);
   };
 
-  // Enhanced logout function (same as Home page)
+  // Enhanced logout function using both contexts
   const handleLogout = async () => {
     setIsLoggingOut(true);
     
@@ -66,8 +80,9 @@ function Navbar() {
         console.log('Navbar - Server response status:', result.status);
         console.log('Navbar - Server response data:', result.data);
         
-        // Use context logout to update global state
-        contextLogout();
+        // Use both context logout methods to update global state
+        contextLogout(); // Auth context logout
+        logoutUser(); // Profile context logout
         setShowUserMenu(false);
         
         navigate('/');
@@ -76,6 +91,7 @@ function Navbar() {
         
         // Still update local state and navigate
         contextLogout();
+        logoutUser();
         setShowUserMenu(false);
         navigate('/');
       }
@@ -84,6 +100,7 @@ function Navbar() {
       
       // Clear local state even on error
       contextLogout();
+      logoutUser();
       setShowUserMenu(false);
       navigate('/');
     } finally {
@@ -172,20 +189,38 @@ function Navbar() {
           ))}
         </div>
 
-        {/* User Profile - Only show if authenticated */}
-        {user && (
+        {/* User Profile - Only show if authenticated using profile context */}
+        {isLoggedIn() && (
           <div className="navbar-user-container">
             <div className="navbar-user" onClick={toggleUserMenu}>
               <div className="user-avatar">
-                <span className="user-icon">👤</span>
+                {(userPicture || user?.userPicture || user?.profileImage) ? (
+                  <img 
+                    src={userPicture || user?.userPicture || user?.profileImage} 
+                    alt="User Avatar" 
+                    className="user-avatar-img"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.style.display = 'flex';
+                    }}
+                  />
+                ) : null}
+                <span 
+                  className="user-icon" 
+                  style={{ display: (userPicture || user?.userPicture || user?.profileImage) ? 'none' : 'flex' }}
+                >
+                  👤
+                </span>
               </div>
             </div>
             {showUserMenu && (
               <div className="user-dropdown">
                 <div className="user-dropdown-header">
-                  <span className="user-name">Hi {user.username}</span>
+                  <span className="user-name">
+                    Hi {username || 'User'}
+                  </span>
                 </div>
-                <div className="user-dropdown-item" onClick={() => { setShowUserMenu(false); }}>
+                <div className="user-dropdown-item" onClick={handleOpenProfile}>
                   Profile
                 </div>
                 <div className="user-dropdown-item" onClick={() => { navigate('/my-plans'); setShowUserMenu(false); }}>
@@ -234,8 +269,58 @@ function Navbar() {
             ))}
           </div>
 
+          {/* Mobile User Info - Show if logged in */}
+          {isLoggedIn() && (
+            <div className="mobile-user-info">
+              <div className="mobile-user-avatar">
+                {(userPicture || user?.userPicture || user?.profileImage) ? (
+                  <img 
+                    src={userPicture || user?.userPicture || user?.profileImage} 
+                    alt="User Avatar" 
+                    className="mobile-user-avatar-img"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.style.display = 'flex';
+                    }}
+                  />
+                ) : null}
+                <span 
+                  className="mobile-user-icon" 
+                  style={{ display: (userPicture || user?.userPicture || user?.profileImage) ? 'none' : 'flex' }}
+                >
+                  👤
+                </span>
+              </div>
+              <span className="mobile-user-name">Hi {username || 'User'}</span>
+              <div className="mobile-user-actions">
+                <button 
+                  className="mobile-user-action"
+                  onClick={() => { handleOpenProfile(); closeMobileMenu(); }}
+                >
+                  Profile
+                </button>
+                <button 
+                  className="mobile-user-action"
+                  onClick={() => { navigate('/my-plans'); closeMobileMenu(); }}
+                >
+                  My Plans
+                </button>
+                <button 
+                  className={`mobile-user-action logout ${isLoggingOut ? 'logging-out' : ''}`}
+                  onClick={isLoggingOut ? null : handleLogout}
+                >
+                  {isLoggingOut ? 'Logging out...' : 'Logout'}
+                </button>
+              </div>
+            </div>
+          )}
+
         </div>
       </div>
+      <UserProfile 
+            isOpen={showProfileModal}
+            onClose={handleCloseProfile}
+        />
     </>
   );
 }

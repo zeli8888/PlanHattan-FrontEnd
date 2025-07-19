@@ -15,6 +15,9 @@
   align-items: center;
   padding: 10px 50px;
   background-color: #ffffff;
+  height: 70px; /* Fixed height */
+  min-height: 70px; /* Prevent shrinking */
+  max-height: 70px; /* Prevent growing */
 }
 
 /* Navbar Styles */
@@ -493,7 +496,10 @@
   display: flex;
   align-items: center;
   gap: 15px;
+  height: 50px; /* Fixed height */
+  flex-shrink: 0;
 }
+
 
 .user-greeting {
   display: flex;
@@ -503,7 +509,7 @@
 
 .user-name {
   color: #333;
-  font-size: 16px;
+  font-size: 30px;
   font-weight: bold;
 }
 
@@ -515,30 +521,53 @@
   background: none;
   border: none;
   cursor: pointer;
-  padding: 5px;
+  padding: 0;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: background-color 0.3s ease;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
 }
 
 .user-profile-btn:hover {
   background-color: #f0f0f0;
 }
 
+/* Replace the existing .user-avatar CSS with this: */
 .user-avatar {
   width: 40px;
   height: 40px;
+  min-width: 40px;
+  min-height: 40px;
+  max-width: 40px;
+  max-height: 40px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: 2px solid #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  overflow: hidden;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid #fff;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  position: relative;
 }
 
+/* Ensure the image inside avatar is properly circular and contained */
+.user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
 .user-icon {
   font-size: 18px;
   color: white;
@@ -587,8 +616,24 @@
   right: 20px;
   top: 50%;
   transform: translateY(-50%);
-  display: none;
+  display: none; 
   z-index: 1002; 
+}
+
+.mobile-user-container .user-avatar {
+  width: 35px;
+  height: 35px;
+  min-width: 35px;
+  min-height: 35px;
+  max-width: 35px;
+  max-height: 35px;
+}
+
+.mobile-user-container .user-profile-btn {
+  width: 39px;
+  height: 39px;
+  min-width: 39px;
+  min-height: 39px;
 }
 
 /* Mobile User Info */
@@ -757,12 +802,12 @@
   
   /* Show mobile user container on mobile */
   .mobile-user-container {
-    display: block;
+    display: block !important;
   }
   
   /* Hide desktop user info on mobile */
   .user-info {
-    display: none;
+    display: none !important;
   }
 }
 
