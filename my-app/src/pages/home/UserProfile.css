@@ -32,8 +32,8 @@
 
 .profile-close-btn {
     position: absolute;
-    top: 15px;
-    right: 15px;
+    top: 2px;
+    right: 2px;
     background: none;
     border: none;
     font-size: 24px;
@@ -47,11 +47,6 @@
     border-radius: 50%;
     transition: all 0.2s;
     z-index: 10;
-}
-
-.profile-close-btn:hover {
-    background-color: rgba(0, 0, 0, 0.1);
-    color: #333;
 }
 
 .profile-content {

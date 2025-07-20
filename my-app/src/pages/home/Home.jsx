@@ -104,7 +104,6 @@ function Home() {
                             <a href="#home" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>Home</a>
                             <a href="#services" onClick={(e) => { e.preventDefault(); scrollToSection(trustSectionRef); }}>Services</a>
                             <a href="#places" onClick={(e) => { e.preventDefault(); scrollToSection(destinationsRef); }}>Places</a>
-                            <a href="/pricing">About Us</a>
                         </div>
                     </div>
                     
@@ -188,7 +187,6 @@ function Home() {
                         <a href="#home" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); setIsMenuOpen(false); }}>Home</a>
                         <a href="#services" onClick={(e) => { e.preventDefault(); scrollToSection(trustSectionRef); setIsMenuOpen(false); }}>Services</a>
                         <a href="#places" onClick={(e) => { e.preventDefault(); scrollToSection(destinationsRef); setIsMenuOpen(false); }}>Places</a>
-                        <a href="/pricing" onClick={() => setIsMenuOpen(false)}>About Us</a>
                     </div>
                     
                     {/* Mobile Auth Buttons - Only show if user is not logged in */}

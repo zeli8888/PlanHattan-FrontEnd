@@ -70,15 +70,11 @@ function Navbar() {
     setIsLoggingOut(true);
     
     try {
-      console.log('Navbar - Current user:', user);
       
       const result = await authAPI.logout();
       
-      console.log('Navbar - Logout result:', result);
       
       if (result.success) {
-        console.log('Navbar - Server response status:', result.status);
-        console.log('Navbar - Server response data:', result.data);
         
         // Use both context logout methods to update global state
         contextLogout(); // Auth context logout
@@ -86,9 +82,7 @@ function Navbar() {
         setShowUserMenu(false);
         
         navigate('/');
-      } else {
-        console.log('Navbar - Error status:', result.status);
-        
+      } else {        
         // Still update local state and navigate
         contextLogout();
         logoutUser();
@@ -215,11 +209,6 @@ function Navbar() {
             </div>
             {showUserMenu && (
               <div className="user-dropdown">
-                <div className="user-dropdown-header">
-                  <span className="user-name">
-                    Hi {username || 'User'}
-                  </span>
-                </div>
                 <div className="user-dropdown-item" onClick={handleOpenProfile}>
                   Profile
                 </div>
@@ -268,52 +257,6 @@ function Navbar() {
               </Link>
             ))}
           </div>
-
-          {/* Mobile User Info - Show if logged in */}
-          {isLoggedIn() && (
-            <div className="mobile-user-info">
-              <div className="mobile-user-avatar">
-                {(userPicture || user?.userPicture || user?.profileImage) ? (
-                  <img 
-                    src={userPicture || user?.userPicture || user?.profileImage} 
-                    alt="User Avatar" 
-                    className="mobile-user-avatar-img"
-                    onError={(e) => {
-                      e.target.style.display = 'none';
-                      e.target.nextSibling.style.display = 'flex';
-                    }}
-                  />
-                ) : null}
-                <span 
-                  className="mobile-user-icon" 
-                  style={{ display: (userPicture || user?.userPicture || user?.profileImage) ? 'none' : 'flex' }}
-                >
-                  👤
-                </span>
-              </div>
-              <span className="mobile-user-name">Hi {username || 'User'}</span>
-              <div className="mobile-user-actions">
-                <button 
-                  className="mobile-user-action"
-                  onClick={() => { handleOpenProfile(); closeMobileMenu(); }}
-                >
-                  Profile
-                </button>
-                <button 
-                  className="mobile-user-action"
-                  onClick={() => { navigate('/my-plans'); closeMobileMenu(); }}
-                >
-                  My Plans
-                </button>
-                <button 
-                  className={`mobile-user-action logout ${isLoggingOut ? 'logging-out' : ''}`}
-                  onClick={isLoggingOut ? null : handleLogout}
-                >
-                  {isLoggingOut ? 'Logging out...' : 'Logout'}
-                </button>
-              </div>
-            </div>
-          )}
 
         </div>
       </div>
