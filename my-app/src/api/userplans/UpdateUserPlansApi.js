@@ -2,8 +2,8 @@ import axios from 'axios';
 
 const updateUserPlans = async (userPlanId, planData) => {
   try {
-    // Get the CSRF token from localStorage or wherever you store it
-    const token = localStorage.getItem('csrfToken') || sessionStorage.getItem('csrfToken');
+    // Get the CSRF token from sessionStorage or wherever you store it
+    const token = sessionStorage.getItem('csrfToken') || sessionStorage.getItem('csrfToken');
     
     if (!token) {
       throw new Error('CSRF token not found. Please login first.');

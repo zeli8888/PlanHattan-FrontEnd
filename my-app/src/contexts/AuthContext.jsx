@@ -66,19 +66,17 @@ export const AuthProvider = ({ children }) => {
     return checkAuthStatus();
   };
 
-  // Listen for localStorage changes (useful for cross-tab synchronization)
+  // Listen for sessionStorage changes (for same-tab updates)
+  // Note: sessionStorage events don't work across tabs like localStorage does
   useEffect(() => {
-    const handleStorageChange = (e) => {
-      if (e.key === 'currentUser' || e.key === 'csrfToken') {
-        checkAuthStatus();
-      }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
+    // Since sessionStorage doesn't trigger storage events across tabs,
+    // we only need to handle programmatic changes within the same tab
+    // The storage event listener is removed since we're using sessionStorage
     
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
+    // Optional: You could add a custom event listener for manual storage updates
+    // or use other state management solutions for complex scenarios
+    
+    // For now, we rely on the context methods (login, logout, etc.) to update state
   }, []);
 
   const value = {

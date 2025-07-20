@@ -511,7 +511,7 @@ const handleRemoveFromMyPlans = async (place) => {
             </div>
             {showBusyness && (
               <div className="time-picker-wrapper">
-                <span>Predict Busyness At</span>
+                <span>Predicted Busyness At</span>
                 <DateTimePicker 
                   value={dateTime}
                   onChange={setDateTime}

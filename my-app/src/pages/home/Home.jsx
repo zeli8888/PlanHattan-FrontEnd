@@ -1,25 +1,27 @@
 import React from 'react';
 import './Home.css';
+import UserProfile from './UserProfile';
 import homeImages from './HomeImages';
 import { useNavigate } from 'react-router-dom';
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState } from 'react';
 import { userStorage, authAPI } from '../../api/AuthApi'; // Added authAPI import
+import { useUserProfile } from '../../contexts/UserProfileContext';
 
 function Home() {
     const navigate = useNavigate();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [user, setUser] = useState(null);
     const [showUserMenu, setShowUserMenu] = useState(false);
     const [isLoggingOut, setIsLoggingOut] = useState(false); // Added loading state
     const trustSectionRef = useRef(null);
     const destinationsRef = useRef(null);
+    const [showProfileModal, setShowProfileModal] = useState(false);
 
-    // Check for user authentication on component mount
-    useEffect(() => {
-        const currentUser = userStorage.getUser();
-        setUser(currentUser);
-    }, []);
-
+     const { 
+        user, 
+        username, 
+        logoutUser 
+    } = useUserProfile();
+    
     const handleSignUpRoute = () => {
         navigate('/signup');
     };
@@ -36,44 +38,35 @@ function Home() {
         navigate('/');
     }
 
+    const handleProfileClick = () => {
+    setShowProfileModal(true);
+    setShowUserMenu(false); // Close the dropdown menu
+    };
+
+    const handleCloseProfile = () => {
+        setShowProfileModal(false);
+    };
+
     // Enhanced logout function with debugging
     const handleLogout = async () => {
         setIsLoggingOut(true);
         
         try {
-            console.log('Current user:', userStorage.getUser());
-            console.log('Current CSRF token:', userStorage.getCsrfToken());
             
             const result = await authAPI.logout();
-            
-            console.log('Logout result:', result);
-            
+                        
             if (result.success) {
-                console.log('Server response status:', result.status);
-                console.log('Server response data:', result.data);
-                
-                console.log('User after logout:', userStorage.getUser());
-                console.log('CSRF token after logout:', userStorage.getCsrfToken());
-                
-                setUser(null);
+                logoutUser(); 
                 setShowUserMenu(false);
-                
                 navigate('/');
             } else {
-                console.log('Error status:', result.status);
-                
-                console.log('User data cleared despite error:', !userStorage.getUser());
-                
-                // Still update local state and navigate
-                setUser(null);
                 setShowUserMenu(false);
                 navigate('/');
             }
         } catch (error) {
             console.error('❌ Logout process error from Home component:', error);
-            
             // Clear local state even on error
-            setUser(null);
+            logoutUser(); 
             setShowUserMenu(false);
             navigate('/');
         } finally {
@@ -111,7 +104,6 @@ function Home() {
                             <a href="#home" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>Home</a>
                             <a href="#services" onClick={(e) => { e.preventDefault(); scrollToSection(trustSectionRef); }}>Services</a>
                             <a href="#places" onClick={(e) => { e.preventDefault(); scrollToSection(destinationsRef); }}>Places</a>
-                            <a href="/pricing">About Us</a>
                         </div>
                     </div>
                     
@@ -119,16 +111,20 @@ function Home() {
                     {user ? (
                         <div className="user-info">
                             <div className="user-greeting">
-                                <span className="user-name"><strong>Hi {user.username}</strong></span>
+                                <span className="user-name"><strong>Hi {username} !</strong></span>
                                 <div className="user-menu-container">
                                     <button className="user-profile-btn" onClick={toggleUserMenu}>
                                         <div className="user-avatar">
-                                            <span className="user-icon">👤</span>
+                                            {user.userPicture ? (
+                                                <img src={user.userPicture} alt="Profile" />
+                                            ) : (
+                                                <span className="user-icon">👤</span>
+                                            )}
                                         </div>
                                     </button>
                                     {showUserMenu && (
                                         <div className="user-dropdown">
-                                            <div className="user-dropdown-item">
+                                            <div className="user-dropdown-item" onClick={handleProfileClick}>
                                                 Profile
                                             </div>
                                             <div className="user-dropdown-item" onClick={() => navigate('/my-plans')}>
@@ -158,12 +154,16 @@ function Home() {
                             <div className="user-menu-container">
                                 <button className="user-profile-btn" onClick={toggleUserMenu}>
                                     <div className="user-avatar">
-                                        <span className="user-icon">👤</span>
+                                        {user.userPicture ? (
+                                            <img src={user.userPicture} alt="Profile" />
+                                        ) : (
+                                            <span className="user-icon">👤</span>
+                                        )}
                                     </div>
                                 </button>
                                 {showUserMenu && (
                                     <div className="user-dropdown">
-                                        <div className="user-dropdown-item">
+                                        <div className="user-dropdown-item" onClick={handleProfileClick}>
                                             Profile
                                         </div>
                                         <div className="user-dropdown-item" onClick={() => navigate('/my-plans')}>
@@ -187,7 +187,6 @@ function Home() {
                         <a href="#home" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); setIsMenuOpen(false); }}>Home</a>
                         <a href="#services" onClick={(e) => { e.preventDefault(); scrollToSection(trustSectionRef); setIsMenuOpen(false); }}>Services</a>
                         <a href="#places" onClick={(e) => { e.preventDefault(); scrollToSection(destinationsRef); setIsMenuOpen(false); }}>Places</a>
-                        <a href="/pricing" onClick={() => setIsMenuOpen(false)}>About Us</a>
                     </div>
                     
                     {/* Mobile Auth Buttons - Only show if user is not logged in */}
@@ -290,6 +289,10 @@ function Home() {
                     </div>
                 </div>
             </section>
+            <UserProfile 
+            isOpen={showProfileModal}
+            onClose={handleCloseProfile}
+        />
         </div>
     );
 }

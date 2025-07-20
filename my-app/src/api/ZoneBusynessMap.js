@@ -4,7 +4,6 @@ export const fetchZoneBusyness = async () => {
     try {
         // Get current datetime in UTC format
         const currentDateTime = new Date().toISOString();
-        console.log(currentDateTime, 'in api');
         const response = await axios.get('https://planhattan.ddns.net/api/zones', {
             headers: {
                 'Content-Type': 'application/json',

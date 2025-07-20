@@ -1,7 +1,7 @@
 // DeleteUserPlansApi.js
 const deleteUserPlans = async (userPlanId) => {
   try {
-    const csrfToken = localStorage.getItem('csrfToken');
+    const csrfToken = sessionStorage.getItem('csrfToken');
     
     if (!csrfToken) {
       throw new Error('CSRF token not found in localStorage');

@@ -3,10 +3,10 @@ import axios from 'axios';
 const postMultipleUserPlans = async (planDataArray) => {
   try {
     // Get CSRF token from localStorage
-    const csrfToken = localStorage.getItem('csrfToken');
+    const csrfToken = sessionStorage.getItem('csrfToken');
     
     if (!csrfToken) {
-      throw new Error('CSRF token not found in localStorage');
+      throw new Error('CSRF token not found in session');
     }
 
     // Prepare the request payload with multiple POIs

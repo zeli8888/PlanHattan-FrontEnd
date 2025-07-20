@@ -3,13 +3,15 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import './Auth.css';
 import { authAPI } from '../../api/AuthApi';
 import { useAuth } from '../../contexts/AuthContext';
+import { useUserProfile } from '../../contexts/UserProfileContext';
+import { getUserProfile } from '../../api/AuthApi';
 
 const SignIn = ({ onSwitchToSignUp }) => {
   const [formData, setFormData] = useState({
     username: '',
     password: ''
   });
-
+  const { loginUser, setUserProfileFromAPI } = useUserProfile();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -21,6 +23,7 @@ const SignIn = ({ onSwitchToSignUp }) => {
   const handleHomeNavigate = () => {
     navigate('/');
   };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -64,15 +67,42 @@ const SignIn = ({ onSwitchToSignUp }) => {
         const csrfResult = await authAPI.getCsrfToken();
 
         if (csrfResult.success) {
-          const userData = {
+          // First, set the basic login data
+          const basicUserData = {
             username: formData.username,
             ...loginResult.data
           };
 
-          login(userData, csrfResult.token);
-          console.log('Login successful with CSRF token');
+          // Login to both contexts with basic data
+          loginUser(basicUserData);
+          login(basicUserData, csrfResult.token);
 
-          // Navigate to the intended destination (from MyPlans or default to home)
+          try {
+            // Fetch detailed profile data
+            const profileData = await getUserProfile();
+
+            if (profileData) {
+              // Merge the profile data with existing login data
+              const completeUserData = {
+                ...basicUserData,
+                ...profileData,
+                // Ensure we preserve the original username if not in profile
+                username: profileData.username || profileData.userName || formData.username
+              };
+
+              // Update the profile context with complete data
+              setUserProfileFromAPI(completeUserData);
+
+            } else {
+              console.warn('No profile data received from API');
+            }
+          } catch (profileError) {
+            console.error('Failed to fetch user profile:', profileError);
+            // Don't fail the login process if profile fetch fails
+            // The basic login data is already set
+          }
+
+          // Navigate to the intended destination
           navigate(from, { replace: true });
         } else {
           // Login was successful but CSRF token fetch failed
