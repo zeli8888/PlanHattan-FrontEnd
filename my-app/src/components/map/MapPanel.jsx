@@ -198,7 +198,7 @@ function getBusynessColor(busynessLevel) {
     high: '#ff4d4f'      // Red
   };
   
-  return colors[busynessLevel?.toLowerCase()] || '#088F8F'; // Fixed: added default fallback
+  return colors[busynessLevel?.toLowerCase()] || '#088F8F';
 }
 
 // Helper function to get opacity based on busyness level
@@ -215,22 +215,22 @@ function getBusynessOpacity(busynessLevel) {
 // Create a Mapbox GL expression for zone coloring
 function createZoneColorExpression(zoneBusynessMap) {  
   if (!zoneBusynessMap || Object.keys(zoneBusynessMap).length === 0) {
-    return '#088F8F'; // Default color
+    return 'transparent'; // Changed from '#088F8F' to transparent
   }
 
   const expression = ['case'];
   
   // Add conditions for each zone
   Object.keys(zoneBusynessMap).forEach((zoneId) => {
-  const busynessLevel = zoneBusynessMap[zoneId];
-  const color = getBusynessColor(busynessLevel);
+    const busynessLevel = zoneBusynessMap[zoneId];
+    const color = getBusynessColor(busynessLevel);
     
-  // Convert locationID to string for comparison
-  expression.push(['==', ['to-string', ['get', 'LocationID']], zoneId]);
-  expression.push(color);
-});
+    // Convert locationID to string for comparison
+    expression.push(['==', ['to-string', ['get', 'LocationID']], zoneId]);
+    expression.push(color);
+  });
   
-  expression.push('#088F8F'); // Default color
+  expression.push('transparent'); // Changed default from '#088F8F' to transparent
   
   return expression;
 }
@@ -238,7 +238,7 @@ function createZoneColorExpression(zoneBusynessMap) {
 // Create a Mapbox GL expression for zone opacity
 function createZoneOpacityExpression(zoneBusynessMap) {
   if (!zoneBusynessMap || Object.keys(zoneBusynessMap).length === 0) {
-    return 0.3; // Default opacity
+    return 0; // Changed from 0.3 to 0 (completely transparent)
   }
 
   const expression = ['case'];
@@ -251,7 +251,7 @@ function createZoneOpacityExpression(zoneBusynessMap) {
     expression.push(opacity);
   });
   
-  expression.push(0.3); // Default opacity
+  expression.push(0); // Changed default from 0.3 to 0
   return expression;
 }
 
@@ -358,20 +358,16 @@ function MapPanel({
         data: geojsonData
       });
 
-      // Add fill layer with dynamic coloring based on busyness
-    map.addLayer({
-      id: 'zones-fill',
-      type: 'fill',
-      source: 'manhattan-zones',
-      paint: {
-        'fill-color': (showZoneBusyness && Object.keys(zoneBusynessMap).length > 0) 
-          ? createZoneColorExpression(zoneBusynessMap) 
-          : '#088F8F',
-        'fill-opacity': (showZoneBusyness && Object.keys(zoneBusynessMap).length > 0) 
-          ? createZoneOpacityExpression(zoneBusynessMap) 
-          : 0.3
-      }
-    });
+      // Add fill layer - initially transparent (no colors)
+      map.addLayer({
+        id: 'zones-fill',
+        type: 'fill',
+        source: 'manhattan-zones',
+        paint: {
+          'fill-color': 'transparent', // Start with transparent
+          'fill-opacity': 0 // Start with no opacity
+        }
+      });
 
       // Add stroke layer
       map.addLayer({
@@ -379,8 +375,8 @@ function MapPanel({
         type: 'line',
         source: 'manhattan-zones',
         paint: {
-          'line-color': '#fff',
-          'line-width': 2,
+          'line-color': '#4C585B',
+          'line-width': 1.1,
           'line-opacity': 0.8
         }
       });
@@ -393,7 +389,7 @@ function MapPanel({
         layout: {
           'text-field': ['get', 'zone'],
           'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-          'text-size': 12,
+          'text-size': 11,
           'text-anchor': 'center'
         },
         paint: {
@@ -402,25 +398,7 @@ function MapPanel({
           'text-halo-width': 1
         }
       });
-// Force refresh with a more aggressive approach
-    setTimeout(() => {
-      if (map.getLayer('zones-fill') && showZoneBusyness && Object.keys(zoneBusynessMap).length > 0) {
-        
-        // Remove and re-add the layer
-        map.removeLayer('zones-fill');
-        
-        map.addLayer({
-          id: 'zones-fill',
-          type: 'fill',
-          source: 'manhattan-zones',
-          paint: {
-            'fill-color': createZoneColorExpression(zoneBusynessMap),
-            'fill-opacity': createZoneOpacityExpression(zoneBusynessMap)
-          }
-        }, 'zones-stroke'); // Insert before stroke layer
-        
-      }
-    }, 100);
+
       // Add hover effects
       map.on('mouseenter', 'zones-fill', (e) => {
         map.getCanvas().style.cursor = 'pointer';
@@ -526,38 +504,32 @@ function MapPanel({
   };
 
   useEffect(() => {
-  const handleResize = () => {
-    // Force re-render on window resize to update responsive styles
-    setViewport(prev => ({ ...prev }));
-  };
+    const handleResize = () => {
+      // Force re-render on window resize to update responsive styles
+      setViewport(prev => ({ ...prev }));
+    };
 
-  window.addEventListener('resize', handleResize);
-  return () => window.removeEventListener('resize', handleResize);
-}, []);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
-useEffect(() => {
-  if (mapRef && zonesLoaded) {
-    const map = mapRef.getMap();
-    if (map.getLayer('zones-fill')) {
-      
-      // Remove and recreate the layer
-      map.removeLayer('zones-fill');
-      map.addLayer({
-        id: 'zones-fill',
-        type: 'fill',
-        source: 'manhattan-zones',
-        paint: {
-          'fill-color': (showZoneBusyness && Object.keys(zoneBusynessMap).length > 0) 
-            ? createZoneColorExpression(zoneBusynessMap) 
-            : '#088F8F',
-          'fill-opacity': (showZoneBusyness && Object.keys(zoneBusynessMap).length > 0) 
-            ? createZoneOpacityExpression(zoneBusynessMap) 
-            : 0.3
+  // Updated useEffect to handle zone coloring based on toggle state
+  useEffect(() => {
+    if (mapRef && zonesLoaded) {
+      const map = mapRef.getMap();
+      if (map.getLayer('zones-fill')) {
+        // Update colors based on toggle state
+        if (showZoneBusyness && Object.keys(zoneBusynessMap).length > 0) {
+          map.setPaintProperty('zones-fill', 'fill-color', createZoneColorExpression(zoneBusynessMap));
+          map.setPaintProperty('zones-fill', 'fill-opacity', createZoneOpacityExpression(zoneBusynessMap));
+        } else {
+          // When toggle is off or no busyness data, make zones transparent
+          map.setPaintProperty('zones-fill', 'fill-color', 'transparent');
+          map.setPaintProperty('zones-fill', 'fill-opacity', 0);
         }
-      }, 'zones-stroke');
+      }
     }
-  }
-}, [zoneBusynessMap, mapRef, zonesLoaded, showZoneBusyness]);
+  }, [zoneBusynessMap, mapRef, zonesLoaded, showZoneBusyness]);
 
   useEffect(() => {
     if (mapRef && !zonesLoaded) {
@@ -570,32 +542,6 @@ useEffect(() => {
       }
     }
   }, [mapRef, geojsonFile, zonesLoaded]);
-
-  useEffect(() => {
-  if (mapRef && zonesLoaded) {
-    const map = mapRef.getMap();
-    if (map.getLayer('zones-fill')) {
-      map.setPaintProperty('zones-fill', 'fill-color', 
-        (showZoneBusyness && Object.keys(zoneBusynessMap).length > 0) 
-          ? createZoneColorExpression(zoneBusynessMap) 
-          : '#088F8F'
-      );
-      map.setPaintProperty('zones-fill', 'fill-opacity', 
-        (showZoneBusyness && Object.keys(zoneBusynessMap).length > 0) 
-          ? createZoneOpacityExpression(zoneBusynessMap) 
-          : 0.3
-      );
-    }
-  }
-}, [showZoneBusyness]);
-
-  useEffect(() => {
-  if (mapRef && Object.keys(zoneBusynessMap).length > 0) {
-    // Force reload zones with new busyness data
-    setZonesLoaded(false);
-    loadManhattanZones();
-  }
-}, [zoneBusynessMap]);
 
   useEffect(() => {
     if (selectedLocation && currentLocation && currentLocation.coordinates) {
@@ -656,7 +602,7 @@ useEffect(() => {
 
   return (
     <div className="map-panel" style={{ position: 'relative' }}>
-    {error && (
+      {error && (
         <div className="error-message" style={{
           position: 'absolute',
           top: '10px',
@@ -796,7 +742,5 @@ useEffect(() => {
     </div>
   );
 }
-
-
 
 export default MapPanel;

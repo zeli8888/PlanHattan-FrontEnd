@@ -1,10 +1,9 @@
 import React, { useState, useRef } from 'react';
 import { updateUserProfile, deleteUserProfile, uploadUserPicture } from '../../api/UserProfileApi';
 import './UserProfile.css';
-import { userStorage } from '../../api/AuthApi'; // Added authAPI import
+import { userStorage } from '../../api/AuthApi'; 
 import { useUserProfile } from '../../contexts/UserProfileContext';
-import Notification from '../../components/features/Notification'; // Import Notification component
-
+import Notification from '../../components/features/Notification'; 
 function UserProfile({isOpen, onClose }) {
     const { 
         user, 
@@ -23,7 +22,7 @@ function UserProfile({isOpen, onClose }) {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [profileImage, setProfileImage] = useState(user?.profileImage || null);
     const [isLoading, setIsLoading] = useState(false);
-    const [notification, setNotification] = useState(null); // Add notification state
+    const [notification, setNotification] = useState(null); 
     const fileInputRef = useRef(null);
 
     if (!isOpen) return null;

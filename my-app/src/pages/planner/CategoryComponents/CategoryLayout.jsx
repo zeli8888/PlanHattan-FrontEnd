@@ -15,7 +15,8 @@ import { useLocation } from 'react-router-dom';
 import getUpcomingBusynessWithFallback from '../../../api/UpcomingBusynessApi';
 import useNotification from '../../../components/features/useNotification';
 import Notification from '../../../components/features/Notification';
-
+import { useAuth } from '../../../contexts/AuthContext'; 
+ 
 const CategoryLayout = ({  
   displayName, 
   locations,
@@ -27,6 +28,7 @@ const CategoryLayout = ({
   const location = useLocation();
   const zoneBusynessMap = location.state?.zoneBusynessMap || {};
   const now = new Date();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { notification, showNotification, hideNotification } = useNotification();
 const [dateTime, setDateTime] = useState(() => {
     // Get the selected date and time from navigation state
@@ -311,6 +313,15 @@ const currentCards = [...finalFilteredLocations].sort((a, b) => {
   const [isLoading, setIsLoading] = useState(false);
   // Step 2: Add to MyPlans (final step)
 const handleAddToMyPlans = async (place) => {
+  if(!isAuthenticated){
+    showNotification(
+        'warning',
+        'Login Required',
+        'Login/SignUp before adding to my Plans'
+      );
+      setIsLoading(false);
+      return; // Exit the function without adding the plan 
+  }
   if (!place) {
     console.error('No place provided to add to My Plans');
     return;
@@ -321,6 +332,22 @@ const handleAddToMyPlans = async (place) => {
     
     // Convert local time to UTC ISO 8601 timestamp
     const localTime = `${cardDateTime.time.hours}:${cardDateTime.time.minutes.toString().padStart(2, '0')} ${cardDateTime.time.period}`;
+    
+     const hasTimeConflict = plans.some(existingPlan => {
+      // Check if there's already a plan at the same time on the same date
+      return existingPlan.time === localTime && 
+             existingPlan.date === cardDateTime.date.toLocaleDateString();
+    });
+    
+    if (hasTimeConflict) {
+      showNotification(
+        'warning',
+        'Time Conflict',
+        `You already have a plan scheduled at ${localTime} on ${cardDateTime.date.toLocaleDateString()}. Please select a different time.`
+      );
+      setIsLoading(false);
+      return; // Exit the function without adding the plan
+    }
     
     // Parse the 12-hour time format
     let hours = parseInt(cardDateTime.time.hours);
