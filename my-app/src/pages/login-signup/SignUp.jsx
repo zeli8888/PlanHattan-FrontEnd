@@ -109,14 +109,8 @@ const SignUp = ({ onSwitchToSignIn }) => {
               Create an account on <span>PlanHattan</span>
             </h2>
 
-            <div className="social-buttons">
-              <button className="google-btn" onClick={() => { window.location.href = 'https://planhattan.ddns.net/api/oauth2/authorization/google' }}>
-                <span className="icon">G</span> Sign up with Google
-              </button>
-            </div>
-
             <hr className="divider" />
-            <p className="or">Or sign up using your email address</p>
+            <p className="or">Sign up using your email address</p>
 
             {error && (
               <div className="error-message" style={{
