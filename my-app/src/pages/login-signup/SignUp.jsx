@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './Auth.css';
-import { authAPI } from '../../api/AuthApi'; 
+import { authAPI } from '../../api/AuthApi';
 import { useNavigate } from 'react-router-dom';
 
 const SignUp = ({ onSwitchToSignIn }) => {
@@ -15,8 +15,8 @@ const SignUp = ({ onSwitchToSignIn }) => {
   const [success, setSuccess] = useState('');
   const navigate = useNavigate();
 
-    const handleHomeNavigate = () => {
-      navigate('/');
+  const handleHomeNavigate = () => {
+    navigate('/');
   };
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -24,7 +24,7 @@ const SignUp = ({ onSwitchToSignIn }) => {
       ...prev,
       [name]: value
     }));
-    
+
     // Clear error when user starts typing
     if (error) setError('');
   };
@@ -34,40 +34,40 @@ const SignUp = ({ onSwitchToSignIn }) => {
       setError('Username is required');
       return false;
     }
-    
+
     if (!formData.password) {
       setError('Password is required');
       return false;
     }
-    
+
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
       return false;
     }
-    
+
     if (formData.password.length < 6) {
       setError('Password must be at least 6 characters long');
       return false;
     }
-    
+
     return true;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
-    
+
     setIsLoading(true);
     setError('');
     setSuccess('');
-    
+
     try {
       const result = await authAPI.register({
         username: formData.username,
         password: formData.password
       });
-      
+
       if (result.success) {
         setSuccess('Registration successful! You can now sign in.');
         // Reset form
@@ -76,7 +76,7 @@ const SignUp = ({ onSwitchToSignIn }) => {
           password: '',
           confirmPassword: ''
         });
-        
+
         // Optional: Auto-switch to sign in after successful registration
         setTimeout(() => {
           onSwitchToSignIn();
@@ -99,7 +99,7 @@ const SignUp = ({ onSwitchToSignIn }) => {
           PLAN<span>HATTAN</span>
         </div>
       </div>
-      
+
       <div className="planner-layout">
         <div className="planner-left"></div>
 
@@ -113,11 +113,11 @@ const SignUp = ({ onSwitchToSignIn }) => {
             <p className="or">Sign up using your email address</p>
 
             {error && (
-              <div className="error-message" style={{ 
-                color: '#ff4444', 
-                backgroundColor: '#ffebee', 
-                padding: '10px', 
-                borderRadius: '4px', 
+              <div className="error-message" style={{
+                color: '#ff4444',
+                backgroundColor: '#ffebee',
+                padding: '10px',
+                borderRadius: '4px',
                 marginBottom: '15px',
                 fontSize: '14px'
               }}>
@@ -126,11 +126,11 @@ const SignUp = ({ onSwitchToSignIn }) => {
             )}
 
             {success && (
-              <div className="success-message" style={{ 
-                color: '#4caf50', 
-                backgroundColor: '#e8f5e8', 
-                padding: '10px', 
-                borderRadius: '4px', 
+              <div className="success-message" style={{
+                color: '#4caf50',
+                backgroundColor: '#e8f5e8',
+                padding: '10px',
+                borderRadius: '4px',
                 marginBottom: '15px',
                 fontSize: '14px'
               }}>
@@ -141,10 +141,10 @@ const SignUp = ({ onSwitchToSignIn }) => {
             <form onSubmit={handleSubmit}>
               <div className="input-group email-field">
                 <label>Username</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   name="username"
-                  placeholder="heisenberg" 
+                  placeholder="heisenberg"
                   value={formData.username}
                   onChange={handleChange}
                   required
@@ -155,10 +155,10 @@ const SignUp = ({ onSwitchToSignIn }) => {
               <div className="password-container signup">
                 <div className="input-group password-field">
                   <label>Password</label>
-                  <input 
-                    type="password" 
+                  <input
+                    type="password"
                     name="password"
-                    placeholder="********" 
+                    placeholder="********"
                     value={formData.password}
                     onChange={handleChange}
                     required
@@ -168,10 +168,10 @@ const SignUp = ({ onSwitchToSignIn }) => {
 
                 <div className="input-group confirm-field visible">
                   <label>Confirm Password</label>
-                  <input 
-                    type="password" 
+                  <input
+                    type="password"
                     name="confirmPassword"
-                    placeholder="********" 
+                    placeholder="********"
                     value={formData.confirmPassword}
                     onChange={handleChange}
                     required
@@ -180,8 +180,8 @@ const SignUp = ({ onSwitchToSignIn }) => {
                 </div>
               </div>
 
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 className="signin-btn"
                 disabled={isLoading}
                 style={{
