@@ -7,7 +7,7 @@ pipeline{
     HOST_TARGET_DIR = "/var/www/zeli8888/planhattan"
     VITE_PLANHATTAN_API_BASE_URL = "https://zeli8888.ddns.net/planhattan/api"
     // APP CONTEXT MUST MATCH THE CONTEXT YOU SET IN VITE.CONFIG.JS
-    VITE_REACT_APP_CONTEXT = "/planhattan/"
+    VITE_REACT_APP_CONTEXT = "/planhattan"
     VITE_GOOGLE_PLACES_API_KEY = credentials('VITE_GOOGLE_PLACES_API_KEY')
     VITE_MAPBOX_TOKEN = credentials('VITE_MAPBOX_TOKEN')
   }
