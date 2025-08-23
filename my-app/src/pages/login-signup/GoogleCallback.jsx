@@ -2,11 +2,11 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../../contexts/AuthContext';
-
+import { useUserProfile } from '../../contexts/UserProfileContext';
 export default function GoogleCallback() {
     const navigate = useNavigate();
     const { login } = useAuth();
-
+    const { loginUser } = useUserProfile();
     useEffect(() => {
         const fetchUserData = async () => {
             try {
@@ -41,6 +41,7 @@ export default function GoogleCallback() {
                     ...user
                 };
 
+                loginUser(userData);
                 login(userData, csrfResult.token);
                 console.log('Google Login successfully verified with CSRF token');
                 navigate("/my-plans");

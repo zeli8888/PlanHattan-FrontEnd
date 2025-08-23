@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const postMultipleUserPlans = async (planDataArray) => {
   try {
-    // Get CSRF token from localStorage
+    // Get CSRF token from sessionStorage
     const csrfToken = sessionStorage.getItem('csrfToken');
 
     if (!csrfToken) {

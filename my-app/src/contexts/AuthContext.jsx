@@ -23,14 +23,14 @@ export const AuthProvider = ({ children }) => {
   const checkAuthStatus = () => {
     const storedUser = userStorage.getUser();
     const csrfToken = userStorage.getCsrfToken();
-    
+
     // User is authenticated if they have user data and a CSRF token
     const authenticated = !!(storedUser && csrfToken);
-    
+
     setIsAuthenticated(authenticated);
     setUser(storedUser);
     setIsLoading(false);
-    
+
     return authenticated;
   };
 
@@ -61,21 +61,21 @@ export const AuthProvider = ({ children }) => {
     checkAuthStatus();
   };
 
-  // Function to refresh auth status (useful when localStorage changes)
+  // Function to refresh auth status (useful when sessionStorage changes)
   const refreshAuth = () => {
     return checkAuthStatus();
   };
 
   // Listen for sessionStorage changes (for same-tab updates)
-  // Note: sessionStorage events don't work across tabs like localStorage does
+  // Note: sessionStorage events don't work across tabs like sessionStorage does
   useEffect(() => {
     // Since sessionStorage doesn't trigger storage events across tabs,
     // we only need to handle programmatic changes within the same tab
     // The storage event listener is removed since we're using sessionStorage
-    
+
     // Optional: You could add a custom event listener for manual storage updates
     // or use other state management solutions for complex scenarios
-    
+
     // For now, we rely on the context methods (login, logout, etc.) to update state
   }, []);
 

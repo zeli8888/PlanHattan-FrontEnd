@@ -1,16 +1,16 @@
 import React, { useState, useRef } from 'react';
 import { updateUserProfile, deleteUserProfile, uploadUserPicture } from '../../api/UserProfileApi';
 import './UserProfile.css';
-import { userStorage } from '../../api/AuthApi'; 
+import { userStorage } from '../../api/AuthApi';
 import { useUserProfile } from '../../contexts/UserProfileContext';
-import Notification from '../../components/features/Notification'; 
-function UserProfile({isOpen, onClose }) {
-    const { 
-        user, 
-        username, 
-        updateUsername, 
-        updateUserPicture, 
-        logoutUser 
+import Notification from '../../components/features/Notification';
+function UserProfile({ isOpen, onClose }) {
+    const {
+        user,
+        username,
+        updateUsername,
+        updateUserPicture,
+        logoutUser
     } = useUserProfile();
 
     const [showUsernameInput, setShowUsernameInput] = useState(false);
@@ -22,7 +22,7 @@ function UserProfile({isOpen, onClose }) {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [profileImage, setProfileImage] = useState(user?.profileImage || null);
     const [isLoading, setIsLoading] = useState(false);
-    const [notification, setNotification] = useState(null); 
+    const [notification, setNotification] = useState(null);
     const fileInputRef = useRef(null);
 
     if (!isOpen) return null;
@@ -45,7 +45,7 @@ function UserProfile({isOpen, onClose }) {
                 showNotification('error', 'Invalid File Type', 'Please select an image file');
                 return;
             }
-            
+
             // Validate file size (5MB limit)
             if (file.size > 5 * 1024 * 1024) {
                 showNotification('error', 'File Too Large', 'Image size should be less than 5MB');
@@ -81,7 +81,7 @@ function UserProfile({isOpen, onClose }) {
         try {
             const result = await uploadUserPicture(selectedFile, '123');
             console.log('Picture upload response:', result);
-            
+
             // Update context with new picture
             updateUserPicture(profileImage);
             showNotification('success', 'Success!', 'Picture uploaded successfully!');
@@ -140,7 +140,7 @@ function UserProfile({isOpen, onClose }) {
                     userName: newUsername.trim(),
                     password: null
                 };
-                
+
                 await updateUserProfile(userData);
                 updateUsername(newUsername.trim()); // Update context
                 showNotification('success', 'Success!', 'Username updated successfully!');
@@ -169,7 +169,7 @@ function UserProfile({isOpen, onClose }) {
                     userName: null,
                     password: newPassword
                 };
-                
+
                 await updateUserProfile(userData);
                 showNotification('success', 'Success!', 'Password updated successfully!');
                 setShowPasswordInput(false);
@@ -200,13 +200,13 @@ function UserProfile({isOpen, onClose }) {
                 showNotification('success', 'Account Deleted', 'Account deleted successfully!');
                 logoutUser();
                 // Clear user storage and update parent component
-                userStorage.clearUser(); // This should clear localStorage/sessionStorage user data
+                userStorage.clearUser(); // This should clear sessionStorage/sessionStorage user data
 
                 onClose(); // Close the modal
-                
+
                 // Force page refresh to update navbar state
                 window.location.reload();
-                
+
             } catch (error) {
                 if (error.response?.status === 403) {
                     showNotification('error', 'Authentication Error', 'Authentication required. Please log in again.');
@@ -225,25 +225,25 @@ function UserProfile({isOpen, onClose }) {
     return (
         <>
             {/* Notification Component */}
-            <Notification 
-                notification={notification} 
-                onClose={closeNotification} 
+            <Notification
+                notification={notification}
+                onClose={closeNotification}
             />
-            
+
             <div className="profile-overlay" onClick={onClose}>
                 <div className={`profile-modal ${showUsernameInput || showPasswordInput || showPictureUpload ? 'expanded' : ''}`} onClick={(e) => e.stopPropagation()}>
                     <button className="profile-close-btn" onClick={onClose}>
                         ×
                     </button>
-                    
+
                     <div className={`profile-content ${showUsernameInput || showPasswordInput || showPictureUpload ? 'expanded' : ''}`}>
                         <div className="profile-left">
                             <div className={`profile-avatar ${showUsernameInput || showPasswordInput || showPictureUpload ? 'expanded' : ''}`}>
                                 {profileImage || user.userPicture ? (
-                                    <img 
-                                        src={profileImage || user.userPicture} 
-                                        alt="Profile" 
-                                        style={{width: '100%', height: '100%', objectFit: 'cover'}}
+                                    <img
+                                        src={profileImage || user.userPicture}
+                                        alt="Profile"
+                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                     />
                                 ) : (
                                     <span className={`profile-user-icon ${showUsernameInput || showPasswordInput || showPictureUpload ? 'expanded' : ''}`}>👤</span>
@@ -260,24 +260,24 @@ function UserProfile({isOpen, onClose }) {
                                     </div>
                                 )}
                             </div>
-                            
+
                             {/* Change Picture Button */}
-                            <button 
-                                className="change-picture-btn" 
+                            <button
+                                className="change-picture-btn"
                                 onClick={handleChangePicture}
                                 disabled={isLoading}
                             >
                                 Change Picture
                             </button>
-                            
+
                             <input
                                 ref={fileInputRef}
                                 type="file"
                                 accept="image/*"
                                 onChange={handleImageUpload}
-                                style={{display: 'none'}}
+                                style={{ display: 'none' }}
                             />
-                            
+
                             {showPictureUpload && (
                                 <div className="picture-upload-section">
                                     {selectedFile && (
@@ -286,15 +286,15 @@ function UserProfile({isOpen, onClose }) {
                                         </div>
                                     )}
                                     <div className="input-buttons">
-                                        <button 
-                                            className="save-btn" 
+                                        <button
+                                            className="save-btn"
                                             onClick={handleSavePicture}
                                             disabled={isLoading || !selectedFile}
                                         >
                                             {isLoading ? 'Saving...' : 'Save'}
                                         </button>
-                                        <button 
-                                            className="cancel-btn" 
+                                        <button
+                                            className="cancel-btn"
                                             onClick={() => {
                                                 setShowPictureUpload(false);
                                                 setSelectedFile(null);
@@ -310,21 +310,21 @@ function UserProfile({isOpen, onClose }) {
                                     </div>
                                 </div>
                             )}
-                            
+
                             <div className={`profile-greeting ${showUsernameInput || showPasswordInput || showPictureUpload ? 'expanded' : ''}`}>
                                 Hi {username}
                             </div>
                         </div>
-                        
+
                         <div className={`profile-right ${showUsernameInput || showPasswordInput || showPictureUpload ? 'expanded' : ''}`}>
-                            <button 
-                                className={`profile-btn ${showUsernameInput || showPasswordInput || showPictureUpload ? 'expanded' : ''}`} 
+                            <button
+                                className={`profile-btn ${showUsernameInput || showPasswordInput || showPictureUpload ? 'expanded' : ''}`}
                                 onClick={handleChangeUsername}
                                 disabled={isLoading}
                             >
                                 Change Username
                             </button>
-                            
+
                             {showUsernameInput && (
                                 <div className="input-section">
                                     <input
@@ -336,15 +336,15 @@ function UserProfile({isOpen, onClose }) {
                                         disabled={isLoading}
                                     />
                                     <div className="input-buttons">
-                                        <button 
-                                            className="save-btn" 
+                                        <button
+                                            className="save-btn"
                                             onClick={handleSaveUsername}
                                             disabled={isLoading || !newUsername.trim()}
                                         >
                                             {isLoading ? 'Saving...' : 'Save'}
                                         </button>
-                                        <button 
-                                            className="cancel-btn" 
+                                        <button
+                                            className="cancel-btn"
                                             onClick={() => setShowUsernameInput(false)}
                                             disabled={isLoading}
                                         >
@@ -354,14 +354,14 @@ function UserProfile({isOpen, onClose }) {
                                 </div>
                             )}
 
-                            <button 
-                                className={`profile-btn ${showUsernameInput || showPasswordInput || showPictureUpload ? 'expanded' : ''}`} 
+                            <button
+                                className={`profile-btn ${showUsernameInput || showPasswordInput || showPictureUpload ? 'expanded' : ''}`}
                                 onClick={handleChangePassword}
                                 disabled={isLoading}
                             >
                                 Change Password
                             </button>
-                            
+
                             {showPasswordInput && (
                                 <div className="input-section">
                                     <input
@@ -381,15 +381,15 @@ function UserProfile({isOpen, onClose }) {
                                         disabled={isLoading}
                                     />
                                     <div className="input-buttons">
-                                        <button 
-                                            className="save-btn" 
+                                        <button
+                                            className="save-btn"
                                             onClick={handleSavePassword}
                                             disabled={isLoading || !newPassword || newPassword !== confirmPassword}
                                         >
                                             {isLoading ? 'Saving...' : 'Save'}
                                         </button>
-                                        <button 
-                                            className="cancel-btn" 
+                                        <button
+                                            className="cancel-btn"
                                             onClick={() => setShowPasswordInput(false)}
                                             disabled={isLoading}
                                         >
@@ -399,8 +399,8 @@ function UserProfile({isOpen, onClose }) {
                                 </div>
                             )}
 
-                            <button 
-                                className={`profile-btn delete ${showUsernameInput || showPasswordInput || showPictureUpload ? 'expanded' : ''}`} 
+                            <button
+                                className={`profile-btn delete ${showUsernameInput || showPasswordInput || showPictureUpload ? 'expanded' : ''}`}
                                 onClick={handleDeleteAccount}
                                 disabled={isLoading}
                             >

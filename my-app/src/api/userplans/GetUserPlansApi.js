@@ -2,11 +2,11 @@ import axios from 'axios';
 
 const getUserPlans = async () => {
   try {
-    // Get CSRF token from localStorage
-    const csrfToken = localStorage.getItem('csrfToken');
+    // Get CSRF token from sessionStorage
+    const csrfToken = sessionStorage.getItem('csrfToken');
 
     if (!csrfToken) {
-      throw new Error('CSRF token not found in localStorage');
+      throw new Error('CSRF token not found in sessionStorage');
     }
 
     const requestConfig = {

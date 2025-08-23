@@ -35,7 +35,7 @@ export const updateUserProfile = async (userData) => {
         const csrfToken = sessionStorage.getItem('csrfToken');
 
         if (!csrfToken) {
-            throw new Error('CSRF token not found in localStorage');
+            throw new Error('CSRF token not found in sessionStorage');
         }
 
         const rawBody = JSON.stringify(userData);
