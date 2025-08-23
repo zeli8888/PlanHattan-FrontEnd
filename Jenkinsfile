@@ -23,6 +23,10 @@ pipeline{
                   --name planhattan-frontend \
                   -v ${WORKSPACE}/my-app:/app \
                   -w /app \
+                  -e VITE_PLANHATTAN_API_BASE_URL="$VITE_PLANHATTAN_API_BASE_URL" \
+                  -e VITE_REACT_APP_CONTEXT="$VITE_REACT_APP_CONTEXT" \
+                  -e VITE_GOOGLE_PLACES_API_KEY="$VITE_GOOGLE_PLACES_API_KEY" \
+                  -e VITE_MAPBOX_TOKEN="$VITE_MAPBOX_TOKEN" \
                   ${DOCKER_IMAGE} \
                   sh -c 'npm install && npm run build'
               """
