@@ -4,7 +4,7 @@ const getUserPlans = async () => {
   try {
     // Get CSRF token from localStorage
     const csrfToken = localStorage.getItem('csrfToken');
-    
+
     if (!csrfToken) {
       throw new Error('CSRF token not found in localStorage');
     }
@@ -20,7 +20,7 @@ const getUserPlans = async () => {
 
     // Make the GET request
     const response = await axios.get(
-      'https://planhattan.ddns.net/api/userplans',
+      import.meta.env.VITE_PLANHATTAN_API_BASE_URL + '/userplans',
       requestConfig
     );
 
@@ -29,7 +29,7 @@ const getUserPlans = async () => {
     return response.data;
   } catch (error) {
     console.error('Error getting user plans:', error);
-    
+
     // Detailed error logging
     if (error.response) {
       throw new Error(`Server error: ${error.response.status} - ${JSON.stringify(error.response.data)}`);

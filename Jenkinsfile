@@ -3,26 +3,41 @@ pipeline{
   agent any
   environment {
     version = '1.0'
-  }
-
-  tools {
-    nodejs "NodeJS24" // Reference the NodeJS installation
+    DOCKER_IMAGE = "node:20.17.0"
+    HOST_TARGET_DIR = "/var/www/zeli8888/planhattan"
+    VITE_PLANHATTAN_API_BASE_URL = "https://zeli8888.ddns.net/planhattan/api"
+    // APP CONTEXT MUST MATCH THE CONTEXT YOU SET IN VITE.CONFIG.JS
+    VITE_REACT_APP_CONTEXT = "/planhattan/"
+    VITE_GOOGLE_PLACES_API_KEY = credentials('VITE_GOOGLE_PLACES_API_KEY')
+    VITE_MAPBOX_TOKEN = credentials('VITE_MAPBOX_TOKEN')
   }
 
   stages{
 
-    stage('Build'){
-      steps{
+    stage('Test and Build') {
+      steps {
           dir('my-app') { 
-              sh 'npm install'
-              sh 'npm run build'
+            script {
+              sh """
+                docker run --rm \
+                  --name planhattan-frontend \
+                  -v ${WORKSPACE}/my-app:/app \
+                  -w /app \
+                  ${DOCKER_IMAGE} \
+                  sh -c 'npm install && npm run build'
+              """
+            }
           }
       }
     }
 
-    stage('Deploy'){
-      steps{
-        sh "cp -rf my-app/dist/* /home/student/zeli/frontend/"
+    stage('Deploy') {
+      steps {
+        script {
+          sh "mkdir -p ${HOST_TARGET_DIR}"
+          
+          sh "cp -rf ${WORKSPACE}/my-app/dist/* ${HOST_TARGET_DIR}/"
+        }
       }
     }
   }

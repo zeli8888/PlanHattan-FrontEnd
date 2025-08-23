@@ -1,11 +1,11 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'https://planhattan.ddns.net/api/user';
+const API_BASE_URL = import.meta.env.VITE_PLANHATTAN_API_BASE_URL + '/user';
 
 export const getUserProfile = async () => {
     try {
         const csrfToken = sessionStorage.getItem('csrfToken');
-    
+
         if (!csrfToken) {
             throw new Error('CSRF token not found in sessionStorage');
         }
@@ -15,14 +15,14 @@ export const getUserProfile = async () => {
             'Content-Type': 'application/json',
             'X-CSRF-TOKEN': csrfToken
         };
-        
+
         const response = await axios({
             method: 'GET',
             url: API_BASE_URL,
             headers: headers,
             withCredentials: true
         });
-        
+
         return response.data;
     } catch (error) {
         console.error('API Error:', error);
@@ -33,13 +33,13 @@ export const updateUserProfile = async (userData) => {
     try {
 
         const csrfToken = sessionStorage.getItem('csrfToken');
-    
+
         if (!csrfToken) {
-        throw new Error('CSRF token not found in localStorage');
+            throw new Error('CSRF token not found in localStorage');
         }
 
         const rawBody = JSON.stringify(userData);
-        
+
         console.log('Request:', {
             method: 'PUT',
             url: API_BASE_URL,
@@ -47,7 +47,7 @@ export const updateUserProfile = async (userData) => {
             data: userData
         });
 
-        
+
         const response = await axios({
             method: 'PUT',
             url: API_BASE_URL,
@@ -59,7 +59,7 @@ export const updateUserProfile = async (userData) => {
             withCredentials: true
 
         });
-        
+
         console.log('Response:', {
             status: response.status,
             statusText: response.statusText,
@@ -81,7 +81,7 @@ export const updateUserProfile = async (userData) => {
 export const uploadUserPicture = async (file, password = '123') => {
     try {
         const csrfToken = sessionStorage.getItem('csrfToken');
-    
+
         if (!csrfToken) {
             throw new Error('CSRF token not found in sessionStorage');
         }
@@ -95,7 +95,7 @@ export const uploadUserPicture = async (file, password = '123') => {
             fileSize: file.size,
             password: password
         });
-        
+
         const response = await axios({
             method: 'POST',
             url: `${API_BASE_URL}/picture`,
@@ -106,7 +106,7 @@ export const uploadUserPicture = async (file, password = '123') => {
             },
             withCredentials: true
         });
-        
+
         console.log('Picture upload response:', {
             status: response.status,
             statusText: response.statusText,
@@ -128,7 +128,7 @@ export const uploadUserPicture = async (file, password = '123') => {
 export const deleteUserProfile = async () => {
     try {
         const csrfToken = sessionStorage.getItem('csrfToken');
-    
+
         if (!csrfToken) {
             throw new Error('CSRF token not found in sessionStorage');
         }
@@ -137,7 +137,7 @@ export const deleteUserProfile = async () => {
             'Content-Type': 'application/json',
             'X-CSRF-TOKEN': csrfToken
         };
-        
+
         const response = await axios({
             method: 'DELETE',
             url: API_BASE_URL,
@@ -150,7 +150,7 @@ export const deleteUserProfile = async () => {
         // OR if you want to clear specific items:
         // sessionStorage.removeItem('csrfToken');
         // sessionStorage.removeItem('user');
-        
+
         return response.data;
     } catch (error) {
         console.error('API Error:', error);

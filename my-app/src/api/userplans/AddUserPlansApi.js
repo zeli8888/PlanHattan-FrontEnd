@@ -4,7 +4,7 @@ const postUserPlans = async (planData) => {
   try {
     // Get CSRF token from localStorage
     const csrfToken = sessionStorage.getItem('csrfToken');
-    
+
     if (!csrfToken) {
       throw new Error('CSRF token not found in localStorage');
     }
@@ -30,7 +30,7 @@ const postUserPlans = async (planData) => {
 
     // Make the POST request with clean payload
     const response = await axios.post(
-      'https://planhattan.ddns.net/api/userplans',
+      import.meta.env.VITE_PLANHATTAN_API_BASE_URL + '/userplans',
       payload,
       requestConfig
     );
@@ -40,7 +40,7 @@ const postUserPlans = async (planData) => {
     return response.data;
   } catch (error) {
     console.error('Error posting user plan:', error);
-    
+
     // Detailed error logging
     if (error.response) {
       throw new Error(`Server error: ${error.response.status} - ${JSON.stringify(error.response.data)}`);

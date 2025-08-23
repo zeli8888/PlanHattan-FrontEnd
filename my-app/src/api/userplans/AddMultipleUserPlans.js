@@ -4,7 +4,7 @@ const postMultipleUserPlans = async (planDataArray) => {
   try {
     // Get CSRF token from localStorage
     const csrfToken = sessionStorage.getItem('csrfToken');
-    
+
     if (!csrfToken) {
       throw new Error('CSRF token not found in session');
     }
@@ -31,7 +31,7 @@ const postMultipleUserPlans = async (planDataArray) => {
 
     // Make the POST request with clean payload
     const response = await axios.post(
-      'https://planhattan.ddns.net/api/userplans/multiple',
+      import.meta.env.VITE_PLANHATTAN_API_BASE_URL + '/userplans/multiple',
       payload,
       requestConfig
     );
@@ -41,7 +41,7 @@ const postMultipleUserPlans = async (planDataArray) => {
     return response.data;
   } catch (error) {
     console.error('Error posting multiple user plans:', error);
-    
+
     // Detailed error logging
     if (error.response) {
       throw new Error(`Server error: ${error.response.status} - ${JSON.stringify(error.response.data)}`);

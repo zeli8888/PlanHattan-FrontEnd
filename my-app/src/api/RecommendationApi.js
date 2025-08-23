@@ -25,7 +25,7 @@ const RequestRecommendations = async (plansArray) => {
 
     // Make the POST request with clean payload
     const response = await axios.post(
-      'https://planhattan.ddns.net/api/pois/recommendation',
+      import.meta.env.VITE_PLANHATTAN_API_BASE_URL + '/pois/recommendation',
       payload, // This is now an array of plan objects
       requestConfig
     );
@@ -33,7 +33,7 @@ const RequestRecommendations = async (plansArray) => {
     return response.data;
   } catch (error) {
     console.error('Error posting user plan:', error);
-    
+
     // Detailed error logging
     if (error.response) {
       console.error('Error response data:', error.response.data);

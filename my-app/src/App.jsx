@@ -4,9 +4,8 @@ import Discover from './pages/planner/discover/Discover.jsx';
 import MyPlans from './pages/planner/myplans/MyPlans.jsx';
 import Recommendation from './pages/planner/recommendation/Recommendation.jsx';
 import Loading from './components/features/LoadingPage.jsx';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import SignIn from './pages/login-signup/SignIn.jsx';
 import NightlifeBars from './pages/planner/Categories/NightlifeBars.jsx';
 import AuthContainer from './pages/login-signup/AuthContainer.jsx';
 import Attractions from './pages/planner/Categories/Attractions.jsx';
@@ -19,7 +18,6 @@ import { AuthProvider } from './contexts/AuthContext.jsx';
 import { ZoneBusynessProvider } from './contexts/ZoneBusynessContext.jsx';
 import GoogleCallback from './pages/login-signup/GoogleCallback.jsx';
 import { UserProfileProvider } from './contexts/UserProfileContext.jsx';
-
 function App() {
   const [isLoading, setIsLoading] = useState(true);
 

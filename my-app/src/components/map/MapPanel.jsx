@@ -11,15 +11,15 @@ const TOKEN = import.meta.env.VITE_MAPBOX_TOKEN;
 
 const DefaultMarker = () => (
   <svg width="28" height="40" viewBox="0 0 28 40" fill="#4a54e1">
-    <path d="M14 0C6.268 0 0 6.268 0 14c0 10 14 26 14 26s14-16 14-26C28 6.268 21.732 0 14 0zm0 20c-3.314 0-6-2.686-6-6s2.686-6 6-6 6 2.686 6 6-2.686 6-6 6z"/>
-    <circle cx="14" cy="14" r="3" fill="white"/>
+    <path d="M14 0C6.268 0 0 6.268 0 14c0 10 14 26 14 26s14-16 14-26C28 6.268 21.732 0 14 0zm0 20c-3.314 0-6-2.686-6-6s2.686-6 6-6 6 2.686 6 6-2.686 6-6 6z" />
+    <circle cx="14" cy="14" r="3" fill="white" />
   </svg>
 );
 
 const SelectedMarker = () => (
   <svg width="32" height="46" viewBox="0 0 32 46" fill="#FF6B6B">
-    <path d="M16 0C7.164 0 0 7.164 0 16c0 12 16 30 16 30s16-18 16-30C32 7.164 24.836 0 16 0zm0 24c-4.418 0-8-3.582-8-8s3.582-8 8-8 8 3.582 8 8-3.582 8-8 8z"/>
-    <circle cx="16" cy="16" r="4" fill="white"/>
+    <path d="M16 0C7.164 0 0 7.164 0 16c0 12 16 30 16 30s16-18 16-30C32 7.164 24.836 0 16 0zm0 24c-4.418 0-8-3.582-8-8s3.582-8 8-8 8 3.582 8 8-3.582 8-8 8z" />
+    <circle cx="16" cy="16" r="4" fill="white" />
     <circle cx="16" cy="16" r="12" fill="none" stroke="#FF6B6B" strokeWidth="2" opacity="0.6">
       <animate attributeName="r" values="12;16;12" dur="2s" repeatCount="indefinite" />
       <animate attributeName="opacity" values="0.6;0.2;0.6" dur="2s" repeatCount="indefinite" />
@@ -41,17 +41,17 @@ const CurrentLocationMarker = () => (
 
 const BusynessHeader = ({ isVisible }) => {
   const today = new Date();
-  const formattedDate = today.toLocaleDateString('en-US', { 
-    weekday: 'long', 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric' 
+  const formattedDate = today.toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
   });
 
   if (!isVisible) return null;
 
   return (
-    <div 
+    <div
       className="busyness-header"
       style={{
         position: 'absolute',
@@ -81,7 +81,7 @@ const BusynessHeader = ({ isVisible }) => {
 };
 
 const GPSButton = ({ onClick, disabled }) => (
-  <div 
+  <div
     className="gps-button"
     onClick={onClick}
     style={{
@@ -98,8 +98,8 @@ const GPSButton = ({ onClick, disabled }) => (
       border: '2px solid #e0e0e0'
     }}
   >
-    <Navigation 
-      size={window.innerWidth <= 768 ? 20 : 24} 
+    <Navigation
+      size={window.innerWidth <= 768 ? 20 : 24}
       color={disabled ? '#999' : '#4a54e1'}
       fill={disabled ? '#999' : '#4a54e1'}
     />
@@ -107,7 +107,7 @@ const GPSButton = ({ onClick, disabled }) => (
 );
 
 const ZoneBusynessToggle = ({ isEnabled, onToggle }) => (
-  <div 
+  <div
     className="zone-busyness-toggle"
     style={{
       position: 'absolute',
@@ -135,7 +135,7 @@ const ZoneBusynessToggle = ({ isEnabled, onToggle }) => (
     }}>
       {window.innerWidth <= 768 ? 'Zone Busyness' : 'Zone Busyness Map'}
     </span>
-    <div 
+    <div
       onClick={onToggle}
       style={{
         width: window.innerWidth <= 768 ? '36px' : '44px',
@@ -148,7 +148,7 @@ const ZoneBusynessToggle = ({ isEnabled, onToggle }) => (
         flexShrink: 0
       }}
     >
-      <div 
+      <div
         style={{
           width: window.innerWidth <= 768 ? '16px' : '20px',
           height: window.innerWidth <= 768 ? '16px' : '20px',
@@ -170,10 +170,10 @@ function calculateCentroid(coordinates) {
   let x = 0;
   let y = 0;
   let count = 0;
-  
+
   if (coordinates && coordinates.length > 0) {
     const coords = Array.isArray(coordinates[0][0]) ? coordinates[0] : coordinates;
-    
+
     coords.forEach(coord => {
       if (coord && coord.length >= 2) {
         x += coord[0];
@@ -181,12 +181,12 @@ function calculateCentroid(coordinates) {
         count++;
       }
     });
-    
+
     if (count > 0) {
       return [x / count, y / count];
     }
   }
-  
+
   return null;
 }
 
@@ -197,7 +197,7 @@ function getBusynessColor(busynessLevel) {
     medium: '#faad14',   // Orange
     high: '#ff4d4f'      // Red
   };
-  
+
   return colors[busynessLevel?.toLowerCase()] || '#088F8F';
 }
 
@@ -208,30 +208,30 @@ function getBusynessOpacity(busynessLevel) {
     medium: 0.5,
     high: 0.7
   };
-  
+
   return opacities[busynessLevel?.toLowerCase()] || 0.3;
 }
 
 // Create a Mapbox GL expression for zone coloring
-function createZoneColorExpression(zoneBusynessMap) {  
+function createZoneColorExpression(zoneBusynessMap) {
   if (!zoneBusynessMap || Object.keys(zoneBusynessMap).length === 0) {
     return 'transparent'; // Changed from '#088F8F' to transparent
   }
 
   const expression = ['case'];
-  
+
   // Add conditions for each zone
   Object.keys(zoneBusynessMap).forEach((zoneId) => {
     const busynessLevel = zoneBusynessMap[zoneId];
     const color = getBusynessColor(busynessLevel);
-    
+
     // Convert locationID to string for comparison
     expression.push(['==', ['to-string', ['get', 'LocationID']], zoneId]);
     expression.push(color);
   });
-  
+
   expression.push('transparent'); // Changed default from '#088F8F' to transparent
-  
+
   return expression;
 }
 
@@ -242,21 +242,21 @@ function createZoneOpacityExpression(zoneBusynessMap) {
   }
 
   const expression = ['case'];
-    
+
   Object.keys(zoneBusynessMap).forEach((zoneId) => {
     const busynessLevel = zoneBusynessMap[zoneId];
     const opacity = getBusynessOpacity(busynessLevel);
-    
+
     expression.push(['==', ['to-string', ['get', 'LocationID']], zoneId]);
     expression.push(opacity);
   });
-  
+
   expression.push(0); // Changed default from 0.3 to 0
   return expression;
 }
 
 
-function MapPanel({ 
+function MapPanel({
   locations = [],
   icon: Icon = DefaultMarker,
   popupContent,
@@ -286,11 +286,11 @@ function MapPanel({
 
 
   // Filter locations with valid coordinates
-  const locationsWithCoordinates = locations.filter(location => 
-    location.coordinates && 
+  const locationsWithCoordinates = locations.filter(location =>
+    location.coordinates &&
     Array.isArray(location.coordinates) &&
     location.coordinates.length === 2 &&
-    !isNaN(location.coordinates[0]) && 
+    !isNaN(location.coordinates[0]) &&
     !isNaN(location.coordinates[1])
   );
 
@@ -303,7 +303,7 @@ function MapPanel({
         `https://api.mapbox.com/directions/v5/mapbox/driving/${start[0]},${start[1]};${end[0]},${end[1]}?geometries=geojson&access_token=${TOKEN}`
       );
       const data = await response.json();
-      
+
       if (data.routes && data.routes.length > 0) {
         const route = data.routes[0];
         setRouteData({
@@ -328,12 +328,12 @@ function MapPanel({
 
     try {
       let geojsonData;
-      
+
       if (geojsonFile) {
         const text = await geojsonFile.text();
         geojsonData = JSON.parse(text);
       } else {
-        const response = await fetch('/zones_with_busyness.geojson');
+        const response = await fetch(import.meta.env.VITE_REACT_APP_CONTEXT + '/zones_with_busyness.geojson');
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -402,7 +402,7 @@ function MapPanel({
       // Add hover effects
       map.on('mouseenter', 'zones-fill', (e) => {
         map.getCanvas().style.cursor = 'pointer';
-        
+
         if (e.features.length > 0) {
           const feature = e.features[0];
           if (feature.id !== undefined) {
@@ -412,7 +412,7 @@ function MapPanel({
                 { hover: false }
               );
             }
-            
+
             hoveredZoneId.current = feature.id;
             map.setFeatureState(
               { source: 'manhattan-zones', id: hoveredZoneId.current },
@@ -424,7 +424,7 @@ function MapPanel({
 
       map.on('mouseleave', 'zones-fill', () => {
         map.getCanvas().style.cursor = '';
-        
+
         if (hoveredZoneId.current !== null) {
           map.setFeatureState(
             { source: 'manhattan-zones', id: hoveredZoneId.current },
@@ -438,11 +438,11 @@ function MapPanel({
       map.on('click', 'zones-fill', (e) => {
         if (e.features.length > 0) {
           const clickedZone = e.features[0];
-          
+
           // Get busyness level for this zone
           const zoneLocationID = clickedZone.properties.locationID;
           const busynessLevel = zoneBusynessMap[zoneLocationID] || 'unknown';
-          
+
           // Calculate centroid for popup positioning
           let centroid = null;
           if (clickedZone.geometry) {
@@ -454,28 +454,28 @@ function MapPanel({
               }
             }
           }
-          
+
           if (!centroid || isNaN(centroid[0]) || isNaN(centroid[1])) {
             centroid = [e.lngLat.lng, e.lngLat.lat];
           }
-          
+
           // Add busyness level to zone properties for popup display
           const zoneWithBusyness = {
             ...clickedZone.properties,
             busynessLevel: busynessLevel,
             busynessColor: getBusynessColor(busynessLevel)
           };
-          
+
           setSelectedZone(zoneWithBusyness);
           setSelectedZoneCoords(centroid);
-          
+
           if (onZoneClick) {
             onZoneClick({ ...clickedZone, busynessLevel });
           }
-          
+
           // Fit map to selected zone
           const coordinates = [];
-          
+
           if (clickedZone.geometry.type === 'Polygon') {
             coordinates.push(...clickedZone.geometry.coordinates[0]);
           } else if (clickedZone.geometry.type === 'MultiPolygon') {
@@ -483,12 +483,12 @@ function MapPanel({
               coordinates.push(...polygon[0]);
             });
           }
-          
+
           if (coordinates.length > 0) {
             const bounds = coordinates.reduce((bounds, coord) => {
               return bounds.extend(coord);
             }, new mapboxgl.LngLatBounds(coordinates[0], coordinates[0]));
-            
+
             map.fitBounds(bounds, { padding: 50 });
           }
         }
@@ -534,7 +534,7 @@ function MapPanel({
   useEffect(() => {
     if (mapRef && !zonesLoaded) {
       const map = mapRef.getMap();
-      
+
       if (map.isStyleLoaded()) {
         loadManhattanZones();
       } else {
@@ -568,10 +568,10 @@ function MapPanel({
     }
   };
 
-  const isCurrentLocationInLocations = currentLocation && locationsWithCoordinates.some(loc => 
-    loc.id === currentLocation.id || 
-    (loc.coordinates[0] === currentLocation.coordinates[0] && 
-     loc.coordinates[1] === currentLocation.coordinates[1])
+  const isCurrentLocationInLocations = currentLocation && locationsWithCoordinates.some(loc =>
+    loc.id === currentLocation.id ||
+    (loc.coordinates[0] === currentLocation.coordinates[0] &&
+      loc.coordinates[1] === currentLocation.coordinates[1])
   );
 
   useEffect(() => {
@@ -638,7 +638,7 @@ function MapPanel({
         {locationsWithCoordinates.map((location) => {
           const isSelected = selectedLocation && selectedLocation.id === location.id;
           const MarkerComponent = isSelected ? SelectedMarker : Icon;
-          
+
           return (
             <Marker
               key={location.id || `${location.coordinates[0]}-${location.coordinates[1]}`}
@@ -678,64 +678,64 @@ function MapPanel({
           </Marker>
         )}
 
-        {selectedLocation && (locationsWithCoordinates.some(loc => 
-          loc.id === selectedLocation.id || 
-          (loc.coordinates[0] === selectedLocation.coordinates[0] && 
-           loc.coordinates[1] === selectedLocation.coordinates[1])
+        {selectedLocation && (locationsWithCoordinates.some(loc =>
+          loc.id === selectedLocation.id ||
+          (loc.coordinates[0] === selectedLocation.coordinates[0] &&
+            loc.coordinates[1] === selectedLocation.coordinates[1])
         ) || (currentLocation && selectedLocation.id === currentLocation.id)) && (
-          <Popup
-            longitude={selectedLocation.coordinates[0]}
-            latitude={selectedLocation.coordinates[1]}
-            anchor="bottom"
-            closeOnClick={false}
-            onClose={onPopupClose}
-          >
-            {popupContent ? (
-              popupContent(selectedLocation) 
-            ) : (
-              <div className="popup-content">
-                <h3>{selectedLocation.name || selectedLocation.place}</h3>
-                <p>{selectedLocation.area || selectedLocation.address}</p>
-                {selectedLocation.rating && (
-                  <p style={{ margin: '5px 0', color: '#666' }}>
-                    Rating: {selectedLocation.rating} ⭐
-                  </p>
-                )}
-                {selectedLocation.busy && (
-                  <div className="busyness-meter">
-                    <div 
-                      className="busyness-level" 
-                      style={{ 
-                        width: `${selectedLocation.busy}%`,
-                        backgroundColor: getBusynessColor(selectedLocation.busy)
-                      }} 
-                    />
-                  </div>
-                )}
-                {routeInfo && (
-                  <div className="route-info">
-                    <p style={{ margin: '5px 0', color: '#FF6B6B', fontWeight: 'bold' }}>
-                      🚗 {routeInfo.distance} km • {routeInfo.duration} min
+            <Popup
+              longitude={selectedLocation.coordinates[0]}
+              latitude={selectedLocation.coordinates[1]}
+              anchor="bottom"
+              closeOnClick={false}
+              onClose={onPopupClose}
+            >
+              {popupContent ? (
+                popupContent(selectedLocation)
+              ) : (
+                <div className="popup-content">
+                  <h3>{selectedLocation.name || selectedLocation.place}</h3>
+                  <p>{selectedLocation.area || selectedLocation.address}</p>
+                  {selectedLocation.rating && (
+                    <p style={{ margin: '5px 0', color: '#666' }}>
+                      Rating: {selectedLocation.rating} ⭐
                     </p>
-                  </div>
-                )}
-                {currentLocation && selectedLocation.id === currentLocation.id && (
-                  <div className="current-location-badge">
-                    📍 Current Location
-                  </div>
-                )}
-              </div>
-            )}
-          </Popup>
-        )}
+                  )}
+                  {selectedLocation.busy && (
+                    <div className="busyness-meter">
+                      <div
+                        className="busyness-level"
+                        style={{
+                          width: `${selectedLocation.busy}%`,
+                          backgroundColor: getBusynessColor(selectedLocation.busy)
+                        }}
+                      />
+                    </div>
+                  )}
+                  {routeInfo && (
+                    <div className="route-info">
+                      <p style={{ margin: '5px 0', color: '#FF6B6B', fontWeight: 'bold' }}>
+                        🚗 {routeInfo.distance} km • {routeInfo.duration} min
+                      </p>
+                    </div>
+                  )}
+                  {currentLocation && selectedLocation.id === currentLocation.id && (
+                    <div className="current-location-badge">
+                      📍 Current Location
+                    </div>
+                  )}
+                </div>
+              )}
+            </Popup>
+          )}
 
       </Map>
 
-      <GPSButton 
+      <GPSButton
         onClick={handleGPSClick}
         disabled={!currentLocation || !currentLocation.coordinates}
       />
-      <ZoneBusynessToggle 
+      <ZoneBusynessToggle
         isEnabled={showZoneBusyness}
         onToggle={() => setShowZoneBusyness(!showZoneBusyness)}
       />

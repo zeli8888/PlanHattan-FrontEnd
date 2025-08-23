@@ -1,10 +1,10 @@
 // Enhanced API function with more configuration options
 export async function makeApiRequest(poiTypeName, options = {}, utcTimestamp, currentLocation = null) {
-    
+
     try {
         let defaultLatitude = '40.6991381066633';
         let defaultLongitude = '-74.0394915248490';
-        
+
         if (currentLocation && currentLocation.coordinates) {
             defaultLongitude = currentLocation.coordinates[0].toString();
             defaultLatitude = currentLocation.coordinates[1].toString();
@@ -12,7 +12,7 @@ export async function makeApiRequest(poiTypeName, options = {}, utcTimestamp, cu
 
         // Default options that can be overridden
         const defaultOptions = {
-            dateTime: utcTimestamp || new Date().toISOString(), 
+            dateTime: utcTimestamp || new Date().toISOString(),
             limit: '100',
             transitType: 'walk',
             latitude: options.latitude || defaultLatitude,
@@ -30,8 +30,8 @@ export async function makeApiRequest(poiTypeName, options = {}, utcTimestamp, cu
             latitude: apiOptions.latitude,
             longitude: apiOptions.longitude
         });
-        
-        const url = `https://planhattan.ddns.net/api/pois?${params.toString()}`;
+
+        const url = import.meta.env.VITE_PLANHATTAN_API_BASE_URL + `/pois?${params.toString()}`;
 
         const response = await fetch(url, {
             method: 'GET',
@@ -40,15 +40,15 @@ export async function makeApiRequest(poiTypeName, options = {}, utcTimestamp, cu
                 // Add any additional headers if needed
             }
         });
-                    
+
         if (!response.ok) {
             const errorText = await response.text();
             throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
         }
-        
+
         const data = await response.json();
-        
-        
+
+
         // Return the data so it can be used
         return data;
     } catch (error) {

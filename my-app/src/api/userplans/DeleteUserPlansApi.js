@@ -2,12 +2,12 @@
 const deleteUserPlans = async (userPlanId) => {
   try {
     const csrfToken = sessionStorage.getItem('csrfToken');
-    
+
     if (!csrfToken) {
       throw new Error('CSRF token not found in localStorage');
     }
 
-    const response = await fetch(`https://planhattan.ddns.net/api/userplans/${userPlanId}`, {
+    const response = await fetch(import.meta.env.VITE_PLANHATTAN_API_BASE_URL + `/userplans/${userPlanId}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',

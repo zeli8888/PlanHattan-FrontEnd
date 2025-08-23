@@ -6,12 +6,16 @@ import App from './App.jsx';
 import './index.css';
 import { MyPlansProvider } from './contexts/MyPlansProvider.jsx';
 
+const routerConfig = {
+  basename: import.meta.env.VITE_REACT_APP_CONTEXT
+};
+
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <BrowserRouter>
+    <BrowserRouter {...routerConfig}>
       <MapProvider>
         <MyPlansProvider>
-        <App />
+          <App />
         </MyPlansProvider>
       </MapProvider>
     </BrowserRouter>

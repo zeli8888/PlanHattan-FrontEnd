@@ -1,7 +1,7 @@
 // api/auth.js
 import axios from 'axios';
 
-const BASE_URL = 'https://planhattan.ddns.net/api';
+const BASE_URL = import.meta.env.VITE_PLANHATTAN_API_BASE_URL;
 
 // Create axios instance with base config
 const apiClient = axios.create({
@@ -16,15 +16,15 @@ const apiClient = axios.create({
 apiClient.interceptors.request.use(config => {
   const user = userStorage.getUser();
   const csrfToken = userStorage.getCsrfToken();
-  
+
   if (user?.token) {
     config.headers['Authorization'] = `Bearer ${user.token}`;
   }
-  
+
   if (csrfToken && ['post', 'put', 'patch', 'delete'].includes(config.method.toLowerCase())) {
     config.headers['X-CSRF-Token'] = csrfToken;
   }
-  
+
   return config;
 }, error => {
   return Promise.reject(error);
@@ -42,28 +42,28 @@ apiClient.interceptors.response.use(response => {
 
 // Get User Profile function
 export const getUserProfile = async () => {
-    try {
-        const csrfToken = sessionStorage.getItem('csrfToken');
-    
-        if (!csrfToken) {
-            throw new Error('CSRF token not found in sessionStorage');
-        }
+  try {
+    const csrfToken = sessionStorage.getItem('csrfToken');
 
-        const headers = {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': csrfToken
-        };
-        
-        const response = await apiClient.get('/user', {
-            headers: headers,
-            withCredentials: true
-        });
-        
-        return response.data;
-    } catch (error) {
-        console.error('API Error:', error);
-        throw error;
+    if (!csrfToken) {
+      throw new Error('CSRF token not found in sessionStorage');
     }
+
+    const headers = {
+      'Content-Type': 'application/json',
+      'X-CSRF-TOKEN': csrfToken
+    };
+
+    const response = await apiClient.get('/user', {
+      headers: headers,
+      withCredentials: true
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error('API Error:', error);
+    throw error;
+  }
 }
 
 export const authAPI = {
@@ -86,93 +86,93 @@ export const authAPI = {
     }
   },
 
-// Login user
-login: async (userData) => {
-  try {
-    const params = new URLSearchParams();
-    params.append('username', userData.username);
-    params.append('password', userData.password);
+  // Login user
+  login: async (userData) => {
+    try {
+      const params = new URLSearchParams();
+      params.append('username', userData.username);
+      params.append('password', userData.password);
 
-    const response = await apiClient.post('/login', params, {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      }
-    });
+      const response = await apiClient.post('/login', params, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        }
+      });
 
-    const userDataToStore = {
-      username: userData.username,
-      ...response.data
-    };
-    userStorage.setUser(userDataToStore);
+      const userDataToStore = {
+        username: userData.username,
+        ...response.data
+      };
+      userStorage.setUser(userDataToStore);
 
-    return {
-      success: true,
-      data: response.data
-    };
-  } catch (error) {
-    console.error('[Auth] Login error:', {
-      message: error.message,
-      response: error.response ? {
-        status: error.response.status,
-        data: error.response.data,
-        headers: error.response.headers
-      } : undefined
-    });
-    return {
-      success: false,
-      error: error.response?.data?.message || error.message
-    };
-  }
-},
-
-// Get CSRF token
-getCsrfToken: async () => {
-  try {
-    const response = await apiClient.get('/csrf-token', {
-      headers: {
-        'Accept': 'application/json',
-        'X-Requested-With': 'XMLHttpRequest' // Explicitly mark as AJAX
-      }
-    });
-
-    let token;
-    if (response.headers['content-type']?.includes('application/json')) {
-      token = response.data?.token || response.data?.csrfToken;
-    } else {
-      const match = response.data.match(/name="_csrf"[^>]*value="([^"]+)"/);
-      token = match?.[1];
+      return {
+        success: true,
+        data: response.data
+      };
+    } catch (error) {
+      console.error('[Auth] Login error:', {
+        message: error.message,
+        response: error.response ? {
+          status: error.response.status,
+          data: error.response.data,
+          headers: error.response.headers
+        } : undefined
+      });
+      return {
+        success: false,
+        error: error.response?.data?.message || error.message
+      };
     }
+  },
 
-    if (!token) {
-      console.error('[Auth] No CSRF token found in response');
-      throw new Error('No CSRF token found');
+  // Get CSRF token
+  getCsrfToken: async () => {
+    try {
+      const response = await apiClient.get('/csrf-token', {
+        headers: {
+          'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest' // Explicitly mark as AJAX
+        }
+      });
+
+      let token;
+      if (response.headers['content-type']?.includes('application/json')) {
+        token = response.data?.token || response.data?.csrfToken;
+      } else {
+        const match = response.data.match(/name="_csrf"[^>]*value="([^"]+)"/);
+        token = match?.[1];
+      }
+
+      if (!token) {
+        console.error('[Auth] No CSRF token found in response');
+        throw new Error('No CSRF token found');
+      }
+
+      userStorage.setCsrfToken(token);
+      return { success: true, token };
+
+    } catch (error) {
+      console.error('[Auth] CSRF token error:', {
+        message: error.message,
+        response: error.response ? {
+          status: error.response.status,
+          data: error.response.data,
+          headers: error.response.headers
+        } : undefined
+      });
+      return {
+        success: false,
+        error: error.response?.data?.message || error.message
+      };
     }
-    
-    userStorage.setCsrfToken(token);
-    return { success: true, token };
-    
-  } catch (error) {
-    console.error('[Auth] CSRF token error:', {
-      message: error.message,
-      response: error.response ? {
-        status: error.response.status,
-        data: error.response.data,
-        headers: error.response.headers
-      } : undefined
-    });
-    return { 
-      success: false, 
-      error: error.response?.data?.message || error.message 
-    };
-  }
-},
+  },
 
   // Logout user
-logout: async () => {
-    try {      
+  logout: async () => {
+    try {
       // Get the existing CSRF token from storage
       const csrfToken = userStorage.getCsrfToken();
-      
+
       if (!csrfToken) {
         userStorage.clearUser();
         return { success: true };
@@ -191,20 +191,20 @@ logout: async () => {
       } catch (error) {
         // Still clear user data even if request fails
         userStorage.clearUser();
-        
+
         // Don't attempt to get new CSRF token - just return the error
-        return { 
+        return {
           success: false,
           error: error.response?.data?.message || error.message,
-          status: error.response?.status 
+          status: error.response?.status
         };
       }
-      
+
     } catch (error) {
       userStorage.clearUser();
-      return { 
-        success: false, 
-        error: error.message 
+      return {
+        success: false,
+        error: error.message
       };
     }
   }
@@ -216,7 +216,7 @@ export const userStorage = {
     try {
       window.currentUser = userData;
       sessionStorage.setItem('currentUser', JSON.stringify(userData)); // Store in sessionStorage
-      
+
       if (userData.token) {
         apiClient.defaults.headers.common['Authorization'] = `Bearer ${userData.token}`;
       }
@@ -224,20 +224,20 @@ export const userStorage = {
       console.error('Error saving user data:', error);
     }
   },
-  
+
   getUser: () => {
     try {
       if (window.currentUser) return window.currentUser;
-      
+
       const storedUser = sessionStorage.getItem('currentUser'); // Get from sessionStorage
       if (storedUser) {
         const user = JSON.parse(storedUser);
         window.currentUser = user;
-        
+
         if (user.token) {
           apiClient.defaults.headers.common['Authorization'] = `Bearer ${user.token}`;
         }
-        
+
         return user;
       }
       return null;
@@ -246,7 +246,7 @@ export const userStorage = {
       return null;
     }
   },
-  
+
   clearUser: () => {
     try {
       window.currentUser = null;
@@ -258,7 +258,7 @@ export const userStorage = {
       console.error('Error clearing user data:', error);
     }
   },
-  
+
   isAuthenticated: () => {
     return !!userStorage.getUser();
   },

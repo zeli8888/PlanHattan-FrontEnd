@@ -138,7 +138,7 @@ const SignIn = ({ onSwitchToSignUp }) => {
             </h2>
 
             <div className="social-buttons">
-              <button className="google-btn" onClick={() => { window.location.href = 'https://planhattan.ddns.net/api/oauth2/authorization/google' }}>
+              <button className="google-btn" onClick={() => { window.location.href = import.meta.env.VITE_PLANHATTAN_API_BASE_URL + '/oauth2/authorization/google' }}>
                 <span className="icon" style={{ background: 'white', color: 'black' }}>G</span> Sign in with Google
               </button>
             </div>

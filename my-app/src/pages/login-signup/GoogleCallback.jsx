@@ -10,7 +10,7 @@ export default function GoogleCallback() {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const { data: csrfResult } = await axios.get('https://planhattan.ddns.net/api/csrf-token', {
+                const { data: csrfResult } = await axios.get(import.meta.env.VITE_PLANHATTAN_API_BASE_URL + '/csrf-token', {
                     headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json',
@@ -23,7 +23,7 @@ export default function GoogleCallback() {
                     return navigate('/signin');
                 }
 
-                const { data: user } = await axios.get('https://planhattan.ddns.net/api/user', {
+                const { data: user } = await axios.get(import.meta.env.VITE_PLANHATTAN_API_BASE_URL + '/user', {
                     headers: {
                         'X-CSRF-TOKEN': csrfResult.token,
                         'Content-Type': 'application/json'
