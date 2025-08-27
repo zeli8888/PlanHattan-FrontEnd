@@ -1,5 +1,5 @@
 # PlanHattan-FrontEnd
-Build a web application that helps users plan their day in New York City by recommending attractions and restaurants based on Predicted busyness levels 
+[Planhattan](https://zeli8888.ddns.net/planhattan/) is a responsive web application that helps users plan their day in New York City by recommending attractions and restaurants based on Predicted busyness levels 
 
 **Machine Learning Model Repository:** https://github.com/zeli8888/COMP47360_Team8_Data.git
 
