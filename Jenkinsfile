@@ -28,7 +28,7 @@ pipeline{
                   -e VITE_GOOGLE_PLACES_API_KEY="$VITE_GOOGLE_PLACES_API_KEY" \
                   -e VITE_MAPBOX_TOKEN="$VITE_MAPBOX_TOKEN" \
                   ${DOCKER_IMAGE} \
-                  sh -c 'npm install && npm run build'
+                  sh -c 'npm ci && npm run build'
               """
             }
           }
