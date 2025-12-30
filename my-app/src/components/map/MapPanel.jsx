@@ -624,7 +624,7 @@ function MapPanel({
         mapboxAccessToken={TOKEN}
         initialViewState={viewport}
         onMove={evt => setViewport(evt.viewState)}
-        mapStyle="mapbox://styles/rahulrodi/cmbtlz1q9014o01sc7rjd6axj/draft"
+        mapStyle="mapbox://styles/zeli8888/cmjstam3v00k701qvcn916rhw"
         style={{ width: '100%', height: '100%' }}
         projection="globe"
         {...viewport}

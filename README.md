@@ -62,7 +62,12 @@ yarn dev
 You need:
 - MapBox API key
 - Google Places API key
+- Create a Mapbox Style and replace style url in [MapPanel.jsx](my-app/src/components/map/MapPanel.jsx#L627)
 
 Store them in a `.env` file or as environment variables.
+- VITE_PLANHATTAN_API_BASE_URL=https://zeli8888.ddns.net/planhattan/api
+- VITE_REACT_APP_CONTEXT=/planhattan
+- VITE_MAPBOX_TOKEN=YOUR_MAPBOX_TOKEN
+- VITE_GOOGLE_PLACES_API_KEY=YOUR_GOOGLE_MAP_KEY
 
 ---

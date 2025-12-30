@@ -4,10 +4,12 @@ import PropTypes from 'prop-types';
 const CardTilt = ({ children, className = '' }) => {
   const x = useMotionValue(0);
   const y = useMotionValue(0);
-  
-  const rotateX = useTransform(y, [-0.5, 0.5], ["7deg", "-7deg"]);
-  const rotateY = useTransform(x, [-0.5, 0.5], ["-7deg", "7deg"]);
-  
+
+  // const rotateX = useTransform(y, [-0.5, 0.5], ["7deg", "-7deg"]);
+  // const rotateY = useTransform(x, [-0.5, 0.5], ["-7deg", "7deg"]);
+  const rotateX = useTransform(y, [-0.5, 0.5], ["0deg", "0deg"]);
+  const rotateY = useTransform(x, [-0.5, 0.5], ["0deg", "0deg"]);
+
   const handleMouseMove = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const xVal = (e.clientX - rect.left) / rect.width - 0.5;
@@ -15,7 +17,7 @@ const CardTilt = ({ children, className = '' }) => {
     x.set(xVal);
     y.set(yVal);
   };
-  
+
   const handleMouseLeave = () => {
     x.set(0);
     y.set(0);
