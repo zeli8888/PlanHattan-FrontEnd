@@ -21,6 +21,8 @@ pipeline{
               sh """
                 docker run --rm \
                   --name planhattan-frontend \
+                  -u "\$(id -u):\$(id -g)" \
+                  -e HOME=/tmp \
                   -v ${WORKSPACE}/my-app:/app \
                   -w /app \
                   -e VITE_PLANHATTAN_API_BASE_URL="$VITE_PLANHATTAN_API_BASE_URL" \
